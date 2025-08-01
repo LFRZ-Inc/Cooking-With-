@@ -68,12 +68,15 @@ export default function Navbar() {
             <div className="flex items-center space-x-4">
               {isAuthenticated ? (
                 <>
-                  <div className="flex items-center space-x-2">
-                    <UserIcon className="h-5 w-5 text-gray-600" />
-                    <span className="text-gray-700">
+                  <Link 
+                    href="/account"
+                    className="flex items-center space-x-2 text-gray-700 hover:text-primary-500 transition-colors"
+                  >
+                    <UserIcon className="h-5 w-5" />
+                    <span>
                       {user?.user_metadata?.name || user?.email || 'User'}
                     </span>
-                  </div>
+                  </Link>
                   <button
                     onClick={() => signOut()}
                     disabled={loading}
@@ -150,12 +153,15 @@ export default function Navbar() {
               </div>
               {isAuthenticated ? (
                 <>
-                  <div className="flex items-center space-x-2 px-3 py-2">
-                    <UserIcon className="h-5 w-5 text-gray-600" />
-                    <span className="text-gray-700">
+                  <Link 
+                    href="/account"
+                    className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-md transition-colors"
+                  >
+                    <UserIcon className="h-5 w-5" />
+                    <span>
                       {user?.user_metadata?.name || user?.email || 'User'}
                     </span>
-                  </div>
+                  </Link>
                   <button
                     onClick={() => signOut()}
                     disabled={loading}
