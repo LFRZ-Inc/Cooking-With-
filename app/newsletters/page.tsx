@@ -12,6 +12,64 @@ import {
 import AuthGuard from '@/components/AuthGuard'
 import { supabase } from '@/lib/supabase'
 
+// Mock demo newsletters - these will be mixed with real user submissions
+const demoNewsletters = [
+  {
+    id: 9001, // High ID to avoid conflicts
+    title: "Fall Comfort Foods: 10 Recipes to Warm Your Soul",
+    excerpt: "As the leaves change color and temperatures drop, there's nothing quite like the comfort of hearty, warming dishes. From creamy soups to rich stews, these fall recipes will embrace you with their comforting flavors and fill your home with delicious aromas.",
+    content: "Fall is a magical time for cooking. The crisp air calls for meals that warm from the inside out...",
+    author_id: "demo_user_555", // Demo user
+    category: "Seasonal",
+    tags: ["Fall", "Comfort Food", "Soups", "Stews"],
+    featured: true,
+    publish_date: "2024-01-15",
+    read_time_minutes: 5,
+    created_at: "2024-01-15T10:00:00Z",
+    author: "Emily Chen",
+    authorImage: "https://images.unsplash.com/photo-1494790108755-2616b612b5e5?w=100",
+    readTime: "5 min read",
+    publishDate: "2024-01-15",
+    image: "https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=600"
+  },
+  {
+    id: 9002,
+    title: "The Art of French Pastry: A Beginner's Guide",
+    excerpt: "Master the fundamentals of French pastry with these essential techniques and recipes. From croissants to éclairs, we'll walk you through the delicate art of creating beautiful, buttery pastries that will impress everyone.",
+    content: "French pastry is both an art and a science. It requires precision, patience, and practice...",
+    author_id: undefined, // Anonymous demo submission
+    category: "Techniques",
+    tags: ["French", "Pastry", "Baking", "Techniques"],
+    featured: true,
+    publish_date: "2024-01-12",
+    read_time_minutes: 8,
+    created_at: "2024-01-12T14:30:00Z",
+    author: "Anonymous Writer",
+    authorImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
+    readTime: "8 min read",
+    publishDate: "2024-01-12",
+    image: "https://images.unsplash.com/photo-1555507036-ab794f0aadb2?w=600"
+  },
+  {
+    id: 9003,
+    title: "Plant-Based Protein: Beyond Tofu",
+    excerpt: "Discover exciting and delicious plant-based protein sources that will revolutionize your vegetarian cooking. From tempeh to lentils, learn how to create satisfying meals without meat.",
+    content: "The world of plant-based proteins extends far beyond tofu and beans...",
+    author_id: "demo_user_666", // Demo user
+    category: "Health",
+    tags: ["Vegan", "Protein", "Health", "Plant-Based"],
+    featured: false,
+    publish_date: "2024-01-08",
+    read_time_minutes: 6,
+    created_at: "2024-01-08T16:20:00Z",
+    author: "Sarah Green",
+    authorImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100",
+    readTime: "6 min read",
+    publishDate: "2024-01-08",
+    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600"
+  }
+]
+
 interface Newsletter {
   id: number
   title: string
@@ -39,7 +97,7 @@ function NewslettersPageContent() {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false)
 
-  // Fetch newsletters from Supabase
+  // Fetch newsletters from Supabase and mix with demo newsletters
   const fetchNewsletters = async () => {
     try {
       const { data, error } = await supabase
@@ -49,11 +107,13 @@ function NewslettersPageContent() {
 
       if (error) {
         console.error('Error fetching newsletters:', error)
+        // If there's an error, just show demo newsletters
+        setNewsletters(demoNewsletters)
         return
       }
 
-      // Transform data and add mock fields for demo purposes
-      const transformedNewsletters = data?.map((newsletter) => ({
+      // Transform real data and add mock fields for demo purposes
+      const transformedRealNewsletters = data?.map((newsletter) => ({
         ...newsletter,
         author: newsletter.author_id ? 'Registered Author' : 'Anonymous Writer',
         authorImage: "https://images.unsplash.com/photo-1494790108755-2616b612b5e5?w=100",
@@ -62,9 +122,15 @@ function NewslettersPageContent() {
         image: "https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=600"
       })) || []
 
-      setNewsletters(transformedNewsletters)
+      // Mix demo newsletters with real newsletters, sorting by creation date
+      const allNewsletters = [...demoNewsletters, ...transformedRealNewsletters]
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+      setNewsletters(allNewsletters)
     } catch (error) {
       console.error('Error fetching newsletters:', error)
+      // If there's an error, just show demo newsletters
+      setNewsletters(demoNewsletters)
     } finally {
       setLoading(false)
     }
