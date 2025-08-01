@@ -53,6 +53,12 @@ export default function Navbar() {
             >
               <span>Create</span>
             </Link>
+            <Link 
+              href="/admin" 
+              className="flex items-center space-x-1 text-gray-700 hover:text-primary-500 transition-colors"
+            >
+              <span>Admin</span>
+            </Link>
             
             {/* Search Bar */}
             <div className="relative">

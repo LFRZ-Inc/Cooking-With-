@@ -108,7 +108,7 @@ function CreateRecipePageContent() {
         prep_time_minutes: parseInt(formData.prepTime) || 0,
         cook_time_minutes: parseInt(formData.cookTime) || 0,
         servings: parseInt(formData.servings) || 1,
-        instructions: formData.instructions.filter(inst => inst.trim() !== ''),
+        instructions: JSON.stringify(formData.instructions.filter(inst => inst.trim() !== '')),
         tips: formData.tips || null,
         status: 'published' as const,
         rating: 0,

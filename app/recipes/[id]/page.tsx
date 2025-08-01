@@ -214,6 +214,33 @@ interface RecipePageProps {
   params: { id: string }
 }
 
+// Helper function to safely parse instructions
+function parseInstructions(instructions: any): string[] {
+  // If it's already an array, return it
+  if (Array.isArray(instructions)) {
+    return instructions.filter(inst => typeof inst === 'string' && inst.trim() !== '')
+  }
+  
+  // If it's a string, try to parse as JSON
+  if (typeof instructions === 'string') {
+    try {
+      const parsed = JSON.parse(instructions)
+      if (Array.isArray(parsed)) {
+        return parsed.filter(inst => typeof inst === 'string' && inst.trim() !== '')
+      }
+      // If it's a single string that failed JSON parsing, treat it as a single instruction
+      return [instructions]
+    } catch (error) {
+      console.warn('Failed to parse instructions as JSON:', error)
+      // If JSON parsing fails, treat the string as a single instruction
+      return [instructions]
+    }
+  }
+  
+  // Fallback
+  return []
+}
+
 // Helper function to parse and scale ingredients
 function parseIngredient(ingredient: string, scale: number) {
   // Pattern 1: "Item name (quantity unit)" - most common format
@@ -349,31 +376,61 @@ function RecipePageContent({ params }: RecipePageProps) {
 
       // Fetch real recipe from Supabase (ID is a UUID string)
       try {
+        console.log('Fetching recipe with ID:', id)
         const { data: recipeData, error: recipeError } = await supabase
           .from('recipes')
           .select('*')
           .eq('id', id)
           .single()
 
-        if (recipeError || !recipeData) {
+        console.log('Recipe fetch result:', { recipeData, recipeError })
+
+        if (recipeError) {
+          console.error('Recipe fetch error:', recipeError)
+          if (recipeError.code === 'PGRST116') {
+            // No rows returned
+            notFound()
+            return
+          }
+          // Other database errors - show error instead of 404
+          throw new Error(`Database error: ${recipeError.message}`)
+        }
+
+        if (!recipeData) {
+          console.log('No recipe data returned')
           notFound()
           return
         }
 
         // Fetch recipe ingredients
+        console.log('Fetching ingredients for recipe ID:', id)
         const { data: ingredientsData, error: ingredientsError } = await supabase
           .from('recipe_ingredients')
           .select('*')
           .eq('recipe_id', id)
           .order('order_index')
 
+        console.log('Ingredients fetch result:', { ingredientsData, ingredientsError })
+
+        if (ingredientsError) {
+          console.error('Ingredients fetch error:', ingredientsError)
+          // Don't fail the whole recipe for ingredients error, just log it
+        }
+
         // Transform the data for display
         const transformedRecipe: Recipe = {
           ...recipeData,
-          ingredients: ingredientsData?.map(ing => 
-            `${ing.name} (${ing.amount} ${ing.unit || ''})`
-          ) || [],
-          instructions: recipeData.instructions ? JSON.parse(recipeData.instructions) : [],
+          ingredients: ingredientsData?.map(ing => {
+            // Handle different ingredient formatting
+            if (ing.amount && ing.unit) {
+              return `${ing.name} (${ing.amount} ${ing.unit})`
+            } else if (ing.amount) {
+              return `${ing.name} (${ing.amount})`
+            } else {
+              return ing.name
+            }
+          }) || [],
+          instructions: parseInstructions(recipeData.instructions),
           author: recipeData.author_id ? 'Registered Chef' : 'Anonymous Chef',
           inventor: 'User Creation',
           history: 'This recipe was shared by our community members.',

@@ -49,7 +49,7 @@ export type Database = {
           id: string
           title: string
           description: string
-          author_id: string
+          author_id: string | null
           category_id: string | null
           difficulty: 'easy' | 'medium' | 'hard'
           prep_time_minutes: number
@@ -69,7 +69,7 @@ export type Database = {
           id?: string
           title: string
           description: string
-          author_id: string
+          author_id?: string | null
           category_id?: string | null
           difficulty: 'easy' | 'medium' | 'hard'
           prep_time_minutes: number
@@ -89,7 +89,7 @@ export type Database = {
           id?: string
           title?: string
           description?: string
-          author_id?: string
+          author_id?: string | null
           category_id?: string | null
           difficulty?: 'easy' | 'medium' | 'hard'
           prep_time_minutes?: number
