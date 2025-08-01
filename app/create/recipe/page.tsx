@@ -22,7 +22,7 @@ export default function CreateRecipePage() {
     ingredients: [{ item: '', amount: '', unit: '' }],
     instructions: [''],
     tips: '',
-    tags: []
+    tags: [] as string[]
   })
 
   const [newTag, setNewTag] = useState('')
