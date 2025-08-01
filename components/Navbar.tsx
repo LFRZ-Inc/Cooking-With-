@@ -1,0 +1,145 @@
+'use client'
+import React, { useState } from 'react'
+import Link from 'next/link'
+import { 
+  ChefHatIcon, 
+  BookOpenIcon, 
+  NewspaperIcon, 
+  UserIcon,
+  MenuIcon,
+  XIcon,
+  SearchIcon
+} from 'lucide-react'
+
+export default function Navbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  return (
+    <nav className="bg-white shadow-lg sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          {/* Logo */}
+          <div className="flex items-center">
+            <Link href="/" className="flex items-center space-x-2">
+              <ChefHatIcon className="h-8 w-8 text-primary-500" />
+              <span className="font-serif text-2xl font-bold text-gray-900">
+                Cooking With!
+              </span>
+            </Link>
+          </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link 
+              href="/recipes" 
+              className="flex items-center space-x-1 text-gray-700 hover:text-primary-500 transition-colors"
+            >
+              <BookOpenIcon className="h-5 w-5" />
+              <span>Recipes</span>
+            </Link>
+            <Link 
+              href="/newsletters" 
+              className="flex items-center space-x-1 text-gray-700 hover:text-primary-500 transition-colors"
+            >
+              <NewspaperIcon className="h-5 w-5" />
+              <span>Newsletters</span>
+            </Link>
+            <Link 
+              href="/create" 
+              className="flex items-center space-x-1 text-gray-700 hover:text-primary-500 transition-colors"
+            >
+              <span>Create</span>
+            </Link>
+            
+            {/* Search Bar */}
+            <div className="relative">
+              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search recipes..."
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* User Menu */}
+            <div className="flex items-center space-x-4">
+              <Link 
+                href="/login" 
+                className="text-gray-700 hover:text-primary-500 transition-colors"
+              >
+                Login
+              </Link>
+              <Link 
+                href="/signup" 
+                className="btn-primary"
+              >
+                Sign Up
+              </Link>
+            </div>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden flex items-center">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-gray-700 hover:text-primary-500 transition-colors"
+            >
+              {isMenuOpen ? (
+                <XIcon className="h-6 w-6" />
+              ) : (
+                <MenuIcon className="h-6 w-6" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+              <Link 
+                href="/recipes" 
+                className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-md transition-colors"
+              >
+                <BookOpenIcon className="h-5 w-5" />
+                <span>Recipes</span>
+              </Link>
+              <Link 
+                href="/newsletters" 
+                className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-md transition-colors"
+              >
+                <NewspaperIcon className="h-5 w-5" />
+                <span>Newsletters</span>
+              </Link>
+              <Link 
+                href="/create" 
+                className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-md transition-colors"
+              >
+                <span>Create</span>
+              </Link>
+              <div className="px-3 py-2">
+                <input
+                  type="text"
+                  placeholder="Search recipes..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+              <Link 
+                href="/login" 
+                className="block px-3 py-2 text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-md transition-colors"
+              >
+                Login
+              </Link>
+              <Link 
+                href="/signup" 
+                className="block mx-3 my-2 text-center btn-primary"
+              >
+                Sign Up
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
+    </nav>
+  )
+} 
