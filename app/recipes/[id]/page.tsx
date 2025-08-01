@@ -271,36 +271,47 @@ interface RecipePageProps {
 
 // Helper function to parse and scale ingredients
 function parseIngredient(ingredient: string, scale: number) {
-  // Regular expressions to match different quantity patterns
-  const patterns = [
-    /^(.+?)\s*\((\d+(?:\.\d+)?(?:\/\d+)?)\s*([^)]+)\)(.*)$/,  // "Item (2 cups) extra"
-    /^(\d+(?:\.\d+)?(?:\/\d+)?)\s*([a-zA-Z]+)\s+(.+)$/,      // "2 cups item"
-    /^(\d+(?:\.\d+)?(?:\/\d+)?)\s*(.+)$/                      // "2 item"
-  ]
-
-  for (const pattern of patterns) {
-    const match = ingredient.match(pattern)
-    if (match) {
-      if (pattern === patterns[0]) {
-        // Format: "Item (quantity unit) extra"
-        const [, itemName, quantity, unit, extra] = match
-        const scaledQuantity = scaleQuantity(quantity, scale)
-        return `${itemName.trim()} (${scaledQuantity} ${unit})${extra}`
-      } else if (pattern === patterns[1]) {
-        // Format: "quantity unit item"
-        const [, quantity, unit, itemName] = match
-        const scaledQuantity = scaleQuantity(quantity, scale)
-        return `${scaledQuantity} ${unit} ${itemName}`
-      } else {
-        // Format: "quantity item"
-        const [, quantity, itemName] = match
-        const scaledQuantity = scaleQuantity(quantity, scale)
-        return `${scaledQuantity} ${itemName}`
-      }
+  // Pattern 1: "Item name (quantity unit)" - most common format
+  const pattern1 = /^(.+?)\s*\(([^)]+)\)(.*)$/
+  const match1 = ingredient.match(pattern1)
+  
+  if (match1) {
+    const [, itemName, quantityPart, extra] = match1
+    
+    // Extract number and unit from the quantity part
+    const quantityMatch = quantityPart.match(/^(\d+(?:\.\d+)?(?:\/\d+)?)\s*(.*)$/)
+    
+    if (quantityMatch) {
+      const [, quantity, unit] = quantityMatch
+      const scaledQuantity = scaleQuantity(quantity, scale)
+      return `${itemName.trim()} (${scaledQuantity} ${unit.trim()})${extra}`
+    } else {
+      // If we can't parse the quantity, return original
+      return ingredient
     }
   }
   
-  // If no quantity found, return original ingredient
+  // Pattern 2: "quantity unit item name" 
+  const pattern2 = /^(\d+(?:\.\d+)?(?:\/\d+)?)\s*([a-zA-Z]+)\s+(.+)$/
+  const match2 = ingredient.match(pattern2)
+  
+  if (match2) {
+    const [, quantity, unit, itemName] = match2
+    const scaledQuantity = scaleQuantity(quantity, scale)
+    return `${scaledQuantity} ${unit} ${itemName}`
+  }
+  
+  // Pattern 3: "quantity item name" (no unit)
+  const pattern3 = /^(\d+(?:\.\d+)?(?:\/\d+)?)\s+(.+)$/
+  const match3 = ingredient.match(pattern3)
+  
+  if (match3) {
+    const [, quantity, itemName] = match3
+    const scaledQuantity = scaleQuantity(quantity, scale)
+    return `${scaledQuantity} ${itemName}`
+  }
+  
+  // If no quantity found, return original ingredient (for items like "Salt to taste")
   return ingredient
 }
 
@@ -308,6 +319,9 @@ function scaleQuantity(quantity: string, scale: number): string {
   // Handle fractions
   if (quantity.includes('/')) {
     const [numerator, denominator] = quantity.split('/').map(Number)
+    if (isNaN(numerator) || isNaN(denominator) || denominator === 0) {
+      return quantity // Return original if parsing fails
+    }
     const decimal = numerator / denominator
     const scaled = decimal * scale
     return formatQuantity(scaled)
@@ -315,16 +329,53 @@ function scaleQuantity(quantity: string, scale: number): string {
   
   // Handle regular numbers
   const num = parseFloat(quantity)
+  if (isNaN(num)) {
+    return quantity // Return original if not a number
+  }
   const scaled = num * scale
   return formatQuantity(scaled)
 }
 
 function formatQuantity(num: number): string {
-  // Round to reasonable precision
-  if (num < 0.125) return (Math.round(num * 16) / 16).toString()
-  if (num < 1) return (Math.round(num * 8) / 8).toString()
+  if (num === 0) return "0"
+  
+  // Convert common decimals to fractions for readability
+  const fractionMap: { [key: string]: string } = {
+    "0.125": "1/8",
+    "0.25": "1/4", 
+    "0.33": "1/3",
+    "0.5": "1/2",
+    "0.66": "2/3",
+    "0.75": "3/4"
+  }
+  
+  // Check for exact fraction matches
+  const rounded = Math.round(num * 1000) / 1000
+  const fractionKey = rounded.toString()
+  if (fractionMap[fractionKey]) {
+    return fractionMap[fractionKey]
+  }
+  
+  // For numbers with fractional parts, try to represent as mixed numbers
+  if (num > 1) {
+    const whole = Math.floor(num)
+    const fraction = num - whole
+    
+    // Check if the fractional part matches a common fraction
+    const fractionRounded = Math.round(fraction * 1000) / 1000
+    const fracKey = fractionRounded.toString()
+    if (fractionMap[fracKey]) {
+      return `${whole} ${fractionMap[fracKey]}`
+    }
+  }
+  
+  // Round to reasonable precision for display
+  if (num < 0.1) return (Math.round(num * 100) / 100).toString()
+  if (num < 1) return (Math.round(num * 10) / 10).toString()
   if (num < 10) return (Math.round(num * 4) / 4).toString()
-  return Math.round(num * 2) / 2 === Math.round(num) ? Math.round(num).toString() : (Math.round(num * 2) / 2).toString()
+  
+  // For larger numbers, round to 1 decimal place if needed
+  return num % 1 === 0 ? Math.round(num).toString() : (Math.round(num * 10) / 10).toString()
 }
 
 export default function RecipePage({ params }: RecipePageProps) {
