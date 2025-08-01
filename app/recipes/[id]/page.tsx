@@ -110,7 +110,11 @@ const demoRecipes = [
     history: "Created in 1889 by pizzaiolo Raffaele Esposito at Pizzeria Brandi in Naples for Queen Margherita of Savoy. The pizza featured the colors of the Italian flag: red tomatoes, white mozzarella, and green basil. This was the birth of the modern pizza as we know it, transforming from a simple flatbread into an artistic culinary expression.",
     rating: 4.9,
     prepTime: "30 min",
-    cookTime: "15 min"
+    cookTime: "15 min",
+    version_number: 1,
+    parent_recipe_id: null,
+    is_original: true,
+    branch_name: null
   },
   {
     id: 9003,
@@ -151,7 +155,11 @@ const demoRecipes = [
     history: "Invented by accident in 1987 by chef Jean-Georges Vongerichten at Lafayette Restaurant in New York. He was baking chocolate sponge cakes when he pulled one out too early and discovered the molten center. This happy accident became one of the most iconic desserts of the late 20th century, popularizing the concept of 'controlled undercooking' in fine dining.",
     rating: 4.7,
     prepTime: "15 min",
-    cookTime: "12 min"
+    cookTime: "12 min",
+    version_number: 1,
+    parent_recipe_id: null,
+    is_original: true,
+    branch_name: null
   },
   {
     id: 9004,
@@ -192,7 +200,11 @@ const demoRecipes = [
     history: "Grilling fish over open flames dates back to ancient Mediterranean civilizations, particularly the Greeks and Romans around 800 BCE. The combination of herbs like oregano and dill with fish was documented in ancient Greek cooking texts. This preparation method preserved the fish's natural flavors while the herbs provided antimicrobial properties, crucial before refrigeration.",
     rating: 4.6,
     prepTime: "10 min",
-    cookTime: "15 min"
+    cookTime: "15 min",
+    version_number: 1,
+    parent_recipe_id: null,
+    is_original: true,
+    branch_name: null
   }
 ]
 
@@ -630,7 +642,7 @@ function RecipePageContent({ params }: RecipePageProps) {
     return (
     <div className="min-h-screen bg-gray-50">
       {/* Version Navigator */}
-      {recipe.version_number && recipe.version_number > 1 && (
+      {recipe && recipe.version_number && recipe.version_number > 1 && (
         <div className="max-w-4xl mx-auto px-6 pt-8">
           <VersionNavigator
             recipe={recipe}
@@ -913,7 +925,7 @@ function RecipePageContent({ params }: RecipePageProps) {
             )}
 
             {/* Recipe Family Tree (if this is a branch) */}
-            {recipe.parent_recipe_id && (
+            {recipe && recipe.parent_recipe_id && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 shadow-sm">
                 <h3 className="text-lg font-semibold text-blue-900 mb-3">Recipe Family Tree</h3>
                 <p className="text-blue-700 mb-3">

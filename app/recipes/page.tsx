@@ -30,6 +30,10 @@ const demoRecipes = [
     rating: 4.8,
     author: "Chef Maria",
     dietType: "Vegetarian",
+    version_number: 1,
+    parent_recipe_id: null,
+    is_original: true,
+    branch_name: null,
     ingredients: ["Arborio rice (1 cup)", "Porcini mushrooms (200g)", "Parmigiano-Reggiano (100g)", "Dry white wine (1/2 cup)", "Warm vegetable broth (1 liter)", "Onion (1 medium)", "Butter (4 tbsp)", "Extra virgin olive oil (2 tbsp)", "Fresh parsley", "Salt and white pepper"],
     inventor: "Traditional Northern Italian dish",
     history: "Risotto originated in Northern Italy during the 14th century when rice cultivation began in the Po Valley. The technique of slowly adding warm broth to rice was perfected by Milanese cooks, creating the signature creamy texture without cream. This mushroom variation became popular in the 19th century when dried porcini mushrooms became widely available."
@@ -50,6 +54,10 @@ const demoRecipes = [
     rating: 4.9,
     author: "Pizzaiolo Antonio",
     dietType: "Vegetarian",
+    version_number: 1,
+    parent_recipe_id: null,
+    is_original: true,
+    branch_name: null,
     ingredients: ["Neapolitan pizza dough (300g)", "San Marzano tomatoes (200g)", "Mozzarella di bufala (150g)", "Fresh basil leaves", "Extra virgin olive oil", "Sea salt", "Tipo 00 flour for dusting"],
     inventor: "Raffaele Esposito (1889)",
     history: "Created in 1889 by pizzaiolo Raffaele Esposito at Pizzeria Brandi in Naples for Queen Margherita of Savoy. The pizza featured the colors of the Italian flag: red tomatoes, white mozzarella, and green basil. This was the birth of the modern pizza as we know it, transforming from a simple flatbread into an artistic culinary expression."
@@ -70,6 +78,10 @@ const demoRecipes = [
     rating: 4.7,
     author: "Anonymous Chef",
     dietType: "Vegetarian",
+    version_number: 1,
+    parent_recipe_id: null,
+    is_original: true,
+    branch_name: null,
     ingredients: ["Dark chocolate 70% (100g)", "Unsalted butter (100g)", "Large eggs (2 whole + 2 yolks)", "Caster sugar (60g)", "Plain flour (30g)", "Butter for ramekins", "Cocoa powder for dusting", "Vanilla ice cream (to serve)"],
     inventor: "Jean-Georges Vongerichten (1987)",
     history: "Invented by accident in 1987 by chef Jean-Georges Vongerichten at Lafayette Restaurant in New York. He was baking chocolate sponge cakes when he pulled one out too early and discovered the molten center. This happy accident became one of the most iconic desserts of the late 20th century, popularizing the concept of 'controlled undercooking' in fine dining."
@@ -90,6 +102,10 @@ const demoRecipes = [
     rating: 4.6,
     author: "Chef Dimitris",
     dietType: "Keto",
+    version_number: 1,
+    parent_recipe_id: null,
+    is_original: true,
+    branch_name: null,
     ingredients: ["Wild salmon fillets (4 x 150g)", "Fresh dill (2 tbsp)", "Fresh oregano (1 tbsp)", "Lemon zest and juice", "Extra virgin olive oil (3 tbsp)", "Garlic (2 cloves)", "Sea salt", "Freshly ground black pepper", "Capers (optional)"],
     inventor: "Ancient Mediterranean tradition",
     history: "Grilling fish over open flames dates back to ancient Mediterranean civilizations, particularly the Greeks and Romans around 800 BCE. The combination of herbs like oregano and dill with fish was documented in ancient Greek cooking texts. This preparation method preserved the fish's natural flavors while the herbs provided antimicrobial properties, crucial before refrigeration."
@@ -109,6 +125,11 @@ interface Recipe {
   category?: string
   tags: string[]
   created_at: string
+  // Version control fields
+  version_number?: number
+  parent_recipe_id?: string | null
+  is_original?: boolean
+  branch_name?: string | null
   // Mock fields for display (we'll enhance these later)
   rating?: number
   author?: string
