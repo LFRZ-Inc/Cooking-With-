@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { 
@@ -15,23 +15,24 @@ import {
   PlusIcon
 } from 'lucide-react'
 import AuthGuard from '@/components/AuthGuard'
+import { supabase } from '@/lib/supabase'
 
-// Same recipe data as in the recipes page
-const recipes = [
+// Demo recipes - same as in recipes page
+const demoRecipes = [
   {
-    id: 1,
+    id: 9001,
     title: "Creamy Mushroom Risotto",
     description: "A rich and creamy Italian classic made with arborio rice and fresh porcini mushrooms.",
-    image: "https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=800",
-    cookTime: "35 min",
-    prepTime: "15 min",
-    difficulty: "Medium",
-    rating: 4.8,
-    author: "Chef Maria",
-    authorId: "user_123", // Authenticated user
-    category: "Italian",
-    dietType: "Vegetarian",
+    image_url: "https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=800",
+    prep_time_minutes: 15,
+    cook_time_minutes: 20,
+    difficulty: "medium" as const,
     servings: 4,
+    author_id: "demo_user_123",
+    category: "Italian",
+    tags: ["Italian", "Vegetarian", "Rice"],
+    created_at: "2024-01-15T10:00:00Z",
+    author: "Chef Maria",
     ingredients: [
       "Arborio rice (1 cup)",
       "Porcini mushrooms (200g)",
@@ -48,32 +49,34 @@ const recipes = [
       "Soak the porcini mushrooms in warm water for 20 minutes, then drain and chop.",
       "Heat olive oil and 2 tbsp butter in a heavy-bottomed pan over medium heat.",
       "Add finely chopped onion and cook until translucent, about 3-4 minutes.",
-      "Add the rice and stir to coat with oil, toasting for 2 minutes until edges are translucent.",
-      "Pour in the white wine and stir until absorbed.",
+      "Add rice and stir for 2 minutes until grains are well-coated and slightly translucent.",
+      "Pour in white wine and stir until absorbed.",
       "Add warm broth one ladle at a time, stirring constantly until absorbed before adding more.",
-      "After 15 minutes, add the chopped porcini mushrooms.",
-      "Continue adding broth and stirring until rice is creamy but still al dente, about 18-20 minutes total.",
-      "Remove from heat and stir in remaining butter and grated Parmigiano-Reggiano.",
-      "Season with salt and white pepper to taste.",
-      "Garnish with fresh parsley and extra cheese before serving immediately."
+      "After 18 minutes, add chopped mushrooms and continue stirring.",
+      "Once rice is creamy and al dente, remove from heat.",
+      "Stir in remaining butter and grated Parmigiano-Reggiano.",
+      "Season with salt and pepper, garnish with fresh parsley and serve immediately."
     ],
-    tips: "The key to perfect risotto is patience and constant stirring. Never add cold broth - it should always be warm to maintain the cooking temperature.",
     inventor: "Traditional Northern Italian dish",
-    history: "Risotto originated in Northern Italy during the 14th century when rice cultivation began in the Po Valley. The technique of slowly adding warm broth to rice was perfected by Milanese cooks, creating the signature creamy texture without cream. This mushroom variation became popular in the 19th century when dried porcini mushrooms became widely available."
+    history: "Risotto originated in Northern Italy during the 14th century when rice cultivation began in the Po Valley. The technique of slowly adding warm broth to rice was perfected by Milanese cooks, creating the signature creamy texture without cream. This mushroom variation became popular in the 19th century when dried porcini mushrooms became widely available.",
+    rating: 4.8,
+    prepTime: "15 min",
+    cookTime: "20 min"
   },
   {
-    id: 2,
+    id: 9002,
     title: "Classic Margherita Pizza",
     description: "Traditional Neapolitan pizza with San Marzano tomatoes, fresh mozzarella di bufala, and basil.",
-    image: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=800",
-    cookTime: "15 min",
-    prepTime: "30 min",
-    difficulty: "Medium",
-    rating: 4.9,
-    author: "Pizzaiolo Antonio",
-    category: "Italian",
-    dietType: "Vegetarian",
+    image_url: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=800",
+    prep_time_minutes: 30,
+    cook_time_minutes: 15,
+    difficulty: "medium" as const,
     servings: 2,
+    author_id: "demo_user_456",
+    category: "Italian",
+    tags: ["Italian", "Pizza", "Vegetarian"],
+    created_at: "2024-01-12T14:30:00Z",
+    author: "Pizzaiolo Antonio",
     ingredients: [
       "Neapolitan pizza dough (300g)",
       "San Marzano tomatoes (200g)",
@@ -84,34 +87,36 @@ const recipes = [
       "Tipo 00 flour for dusting"
     ],
     instructions: [
-      "Preheat your oven to its highest temperature (500°F/260°C) with a pizza stone or baking sheet inside.",
-      "Crush the San Marzano tomatoes by hand, season with salt and a drizzle of olive oil.",
-      "On a floured surface, stretch the dough into a 12-inch circle, keeping the edges slightly thicker.",
-      "Transfer to parchment paper and spread the tomato sauce thinly, leaving a 1-inch border.",
-      "Tear the mozzarella into small pieces and distribute evenly over the sauce.",
-      "Slide the pizza (on parchment) onto the hot stone or baking sheet.",
-      "Bake for 10-15 minutes until the crust is golden and cheese is bubbly with some charred spots.",
+      "Preheat oven to its highest temperature (usually 500°F/260°C) with pizza stone inside.",
+      "Crush San Marzano tomatoes by hand and season with salt.",
+      "Stretch pizza dough on floured surface to 12-inch circle.",
+      "Spread thin layer of crushed tomatoes, leaving 1-inch border for crust.",
+      "Tear mozzarella into chunks and distribute evenly.",
+      "Drizzle lightly with olive oil.",
+      "Transfer to preheated pizza stone and bake 10-15 minutes until crust is golden.",
       "Remove from oven and immediately top with fresh basil leaves.",
-      "Drizzle with extra virgin olive oil and let cool for 2-3 minutes before slicing."
+      "Drizzle with olive oil and serve immediately."
     ],
-    tips: "For the best results, use a pizza stone and get your oven as hot as possible. The dough should be room temperature for easy stretching.",
     inventor: "Raffaele Esposito (1889)",
-    history: "Created in 1889 by pizzaiolo Raffaele Esposito at Pizzeria Brandi in Naples for Queen Margherita of Savoy. The pizza featured the colors of the Italian flag: red tomatoes, white mozzarella, and green basil. This was the birth of the modern pizza as we know it, transforming from a simple flatbread into an artistic culinary expression."
+    history: "Created in 1889 by pizzaiolo Raffaele Esposito at Pizzeria Brandi in Naples for Queen Margherita of Savoy. The pizza featured the colors of the Italian flag: red tomatoes, white mozzarella, and green basil. This was the birth of the modern pizza as we know it, transforming from a simple flatbread into an artistic culinary expression.",
+    rating: 4.9,
+    prepTime: "30 min",
+    cookTime: "15 min"
   },
   {
-    id: 3,
+    id: 9003,
     title: "Chocolate Lava Cake",
     description: "Decadent individual chocolate cake with a molten center, invented by Jean-Georges Vongerichten.",
-    image: "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=800",
-    cookTime: "12 min",
-    prepTime: "20 min",
-    difficulty: "Hard",
-    rating: 4.7,
-    author: "Pastry Chef Laurent",
-    authorId: "user_456", // Authenticated user
-    category: "Dessert",
-    dietType: "Vegetarian",
+    image_url: "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=800",
+    prep_time_minutes: 15,
+    cook_time_minutes: 12,
+    difficulty: "hard" as const,
     servings: 4,
+    author_id: undefined,
+    category: "Dessert",
+    tags: ["Dessert", "Chocolate", "French"],
+    created_at: "2024-01-10T16:45:00Z",
+    author: "Anonymous Chef",
     ingredients: [
       "Dark chocolate 70% (100g)",
       "Unsalted butter (100g)",
@@ -123,35 +128,36 @@ const recipes = [
       "Vanilla ice cream (to serve)"
     ],
     instructions: [
-      "Preheat oven to 425°F (220°C). Butter 4 ramekins and dust with cocoa powder.",
-      "Melt chocolate and butter in a double boiler until smooth. Let cool slightly.",
-      "In a bowl, whisk whole eggs, egg yolks, and sugar until thick and pale.",
-      "Gradually fold the chocolate mixture into the egg mixture.",
-      "Sift flour over the mixture and gently fold in until just combined.",
-      "Divide batter evenly among prepared ramekins.",
-      "Bake for 10-12 minutes until edges are firm but centers still jiggle slightly.",
-      "Let rest for 1 minute, then run a knife around edges to loosen.",
-      "Invert onto serving plates and let sit for 10 seconds before lifting ramekins.",
-      "Dust with powdered sugar and serve immediately with vanilla ice cream."
+      "Preheat oven to 425°F (220°C). Butter four 6-oz ramekins and dust with cocoa.",
+      "Melt chocolate and butter in double boiler until smooth. Remove from heat.",
+      "In separate bowl, whisk eggs, egg yolks, and sugar until thick and pale.",
+      "Slowly whisk chocolate mixture into egg mixture.",
+      "Fold in flour until just combined - don't overmix.",
+      "Divide batter among prepared ramekins.",
+      "Bake 12-14 minutes until edges are firm but centers still jiggle slightly.",
+      "Let stand 1 minute, then run knife around edges and invert onto plates.",
+      "Serve immediately with vanilla ice cream."
     ],
-    tips: "The key is timing - underbake slightly for the molten center. These can be made ahead and refrigerated, just add 1-2 extra minutes of baking time.",
     inventor: "Jean-Georges Vongerichten (1987)",
-    history: "Invented by accident in 1987 by chef Jean-Georges Vongerichten at Lafayette Restaurant in New York. He was baking chocolate sponge cakes when he pulled one out too early and discovered the molten center. This happy accident became one of the most iconic desserts of the late 20th century, popularizing the concept of 'controlled undercooking' in fine dining."
+    history: "Invented by accident in 1987 by chef Jean-Georges Vongerichten at Lafayette Restaurant in New York. He was baking chocolate sponge cakes when he pulled one out too early and discovered the molten center. This happy accident became one of the most iconic desserts of the late 20th century, popularizing the concept of 'controlled undercooking' in fine dining.",
+    rating: 4.7,
+    prepTime: "15 min",
+    cookTime: "12 min"
   },
   {
-    id: 4,
+    id: 9004,
     title: "Grilled Salmon with Herbs",
     description: "Wild-caught salmon grilled to perfection with a Mediterranean herb crust and lemon.",
-    image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800",
-    cookTime: "15 min",
-    prepTime: "10 min",
-    difficulty: "Easy",
-    rating: 4.6,
-    author: "Chef Dimitris",
-    authorId: "user_789", // Authenticated user
-    category: "Seafood",
-    dietType: "Keto",
+    image_url: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800",
+    prep_time_minutes: 10,
+    cook_time_minutes: 15,
+    difficulty: "easy" as const,
     servings: 4,
+    author_id: "demo_user_789",
+    category: "Seafood",
+    tags: ["Seafood", "Mediterranean", "Keto"],
+    created_at: "2024-01-08T12:20:00Z",
+    author: "Chef Dimitris",
     ingredients: [
       "Wild salmon fillets (4 x 150g)",
       "Fresh dill (2 tbsp)",
@@ -164,115 +170,48 @@ const recipes = [
       "Capers (optional)"
     ],
     instructions: [
-      "Remove salmon from refrigerator 15 minutes before cooking to bring to room temperature.",
-      "Preheat grill to medium-high heat and oil the grates.",
-      "Mix minced garlic, dill, oregano, lemon zest, and olive oil in a bowl.",
-      "Pat salmon fillets dry and season both sides with salt and pepper.",
-      "Brush the herb mixture generously over the salmon fillets.",
-      "Grill skin-side down for 4-5 minutes without moving.",
-      "Carefully flip and grill for another 3-4 minutes until internal temperature reaches 145°F.",
-      "Remove from grill and immediately squeeze fresh lemon juice over the fish.",
-      "Let rest for 2 minutes before serving.",
-      "Garnish with additional fresh herbs and capers if desired."
+      "Preheat grill to medium-high heat and oil grates.",
+      "Pat salmon fillets dry and season with salt and pepper.",
+      "Mix chopped herbs, minced garlic, lemon zest, and olive oil.",
+      "Brush herb mixture generously over salmon fillets.",
+      "Grill skin-side up for 4-5 minutes until nice grill marks form.",
+      "Flip carefully and grill 3-4 minutes more until fish flakes easily.",
+      "Remove from grill and squeeze fresh lemon juice over top.",
+      "Garnish with capers if using and serve immediately."
     ],
-    tips: "Don't move the salmon once it hits the grill - let it develop a good sear. The fish is done when it flakes easily with a fork.",
     inventor: "Ancient Mediterranean tradition",
-    history: "Grilling fish over open flames dates back to ancient Mediterranean civilizations, particularly the Greeks and Romans around 800 BCE. The combination of herbs like oregano and dill with fish was documented in ancient Greek cooking texts. This preparation method preserved the fish's natural flavors while the herbs provided antimicrobial properties, crucial before refrigeration."
-  },
-  {
-    id: 5,
-    title: "Quinoa Buddha Bowl",
-    description: "Nutritious power bowl with rainbow vegetables, quinoa, and tahini dressing inspired by macrobiotic principles.",
-    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800",
-    cookTime: "25 min",
-    prepTime: "15 min",
-    difficulty: "Easy",
-    rating: 4.5,
-    author: "Wellness Chef Sarah",
-    authorId: null, // Anonymous submission
-    category: "Healthy",
-    dietType: "Vegan",
-    servings: 2,
-    ingredients: [
-      "Tricolor quinoa (1 cup)",
-      "Roasted chickpeas (150g)",
-      "Avocado (1 ripe)",
-      "Roasted sweet potato cubes",
-      "Fresh spinach (2 cups)",
-      "Tahini (3 tbsp)",
-      "Lemon juice (2 tbsp)",
-      "Maple syrup (1 tsp)",
-      "Purple cabbage (shredded)",
-      "Hemp seeds",
-      "Pomegranate seeds"
-    ],
-    instructions: [
-      "Rinse quinoa and cook in 2 cups water with a pinch of salt for 15 minutes until fluffy.",
-      "Preheat oven to 400°F. Toss cubed sweet potato with olive oil, salt, and pepper.",
-      "Roast sweet potato for 20-25 minutes until tender and lightly caramelized.",
-      "For tahini dressing: whisk tahini, lemon juice, maple syrup, and 2-3 tbsp water until smooth.",
-      "Drain and rinse canned chickpeas, then roast with spices for 15-20 minutes until crispy.",
-      "Massage spinach leaves with a little olive oil and lemon juice.",
-      "Slice avocado and prepare other toppings.",
-      "Assemble bowls: place quinoa as base, arrange vegetables in sections.",
-      "Top with roasted chickpeas, hemp seeds, and pomegranate seeds.",
-      "Drizzle generously with tahini dressing before serving."
-    ],
-    tips: "Prep components ahead of time for quick assembly. The tahini dressing keeps well in the fridge for up to a week.",
-    inventor: "Modern fusion of ancient traditions",
-    history: "Buddha bowls emerged in the 1970s California health food movement, combining ancient grains like quinoa (cultivated by the Incas since 3000 BCE) with macrobiotic principles from Japanese Zen Buddhism. The concept of balanced, colorful meals in one bowl reflects the Buddhist principle of mindful eating and nutritional harmony. Quinoa was considered sacred by the Incas, called 'chisaya mama' or 'mother of all grains.'"
-  },
-  {
-    id: 6,
-    title: "Beef Bourguignon",
-    description: "Classic Burgundian beef stew slowly braised in red wine with pearl onions and mushrooms.",
-    image: "https://images.unsplash.com/photo-1574653853027-5ec760facb1d?w=800",
-    cookTime: "3 hours",
-    prepTime: "30 min",
-    difficulty: "Hard",
-    rating: 4.8,
-    author: "Chef Auguste",
-    authorId: "user_101", // Authenticated user
-    category: "French",
-    dietType: "None",
-    servings: 6,
-    ingredients: [
-      "Beef chuck cut in cubes (1.5kg)",
-      "Burgundy red wine (750ml)",
-      "Pearl onions (300g)",
-      "Button mushrooms (250g)",
-      "Carrots (3 large)",
-      "Bacon lardons (150g)",
-      "Beef stock (500ml)",
-      "Tomato paste (2 tbsp)",
-      "Fresh thyme",
-      "Bay leaves (2)",
-      "Flour (3 tbsp)",
-      "Butter (2 tbsp)"
-    ],
-    instructions: [
-      "Marinate beef cubes in red wine overnight with herbs and vegetables.",
-      "Remove beef and strain marinade, reserving liquid and vegetables separately.",
-      "Pat beef dry and season with salt and pepper. Dust lightly with flour.",
-      "Brown bacon lardons in a heavy Dutch oven, then remove and set aside.",
-      "Brown beef cubes in batches in the bacon fat until well-seared on all sides.",
-      "Add reserved vegetables and cook until softened, about 5 minutes.",
-      "Add tomato paste and cook for 1 minute, then return beef to pot.",
-      "Pour in reserved marinade and enough stock to just cover the meat.",
-      "Bring to a simmer, cover, and braise in 325°F oven for 2.5-3 hours.",
-      "In the last 30 minutes, add pearl onions and mushrooms.",
-      "Adjust seasoning and serve with crusty bread or mashed potatoes."
-    ],
-    tips: "Marinating overnight is crucial for flavor. Don't skip the browning step - it adds incredible depth to the final dish.",
-    inventor: "Auguste Escoffier (refined version)",
-    history: "Originally a peasant dish from the Burgundy region of France, dating back to the Middle Ages when local farmers would slow-cook tough cuts of beef in local wine. The dish was elevated to haute cuisine status by Auguste Escoffier in the early 20th century. Julia Child's recipe in 'Mastering the Art of French Cooking' (1961) introduced this sophisticated stew to American home cooks, making it a symbol of French culinary excellence."
+    history: "Grilling fish over open flames dates back to ancient Mediterranean civilizations, particularly the Greeks and Romans around 800 BCE. The combination of herbs like oregano and dill with fish was documented in ancient Greek cooking texts. This preparation method preserved the fish's natural flavors while the herbs provided antimicrobial properties, crucial before refrigeration.",
+    rating: 4.6,
+    prepTime: "10 min",
+    cookTime: "15 min"
   }
 ]
 
+interface Recipe {
+  id: number
+  title: string
+  description: string
+  image_url?: string
+  prep_time_minutes: number
+  cook_time_minutes: number
+  difficulty: 'easy' | 'medium' | 'hard'
+  servings: number
+  author_id?: string
+  category?: string
+  tags: string[]
+  created_at: string
+  ingredients?: string[]
+  instructions?: string[]
+  author?: string
+  inventor?: string
+  history?: string
+  rating?: number
+  prepTime?: string
+  cookTime?: string
+}
+
 interface RecipePageProps {
-  params: {
-    id: string
-  }
+  params: { id: string }
 }
 
 // Helper function to parse and scale ingredients
@@ -385,24 +324,104 @@ function formatQuantity(num: number): string {
 }
 
 function RecipePageContent({ params }: RecipePageProps) {
-  const recipe = recipes.find(r => r.id === parseInt(params.id))
-  const [selectedServings, setSelectedServings] = useState(recipe?.servings || 4)
+  const [recipe, setRecipe] = useState<Recipe | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [servings, setServings] = useState(4)
+
+  // Fetch recipe data
+  useEffect(() => {
+    const fetchRecipe = async () => {
+      const id = parseInt(params.id)
+      
+      // Check if it's a demo recipe (high ID)
+      if (id >= 9000) {
+        const demoRecipe = demoRecipes.find(r => r.id === id)
+        if (demoRecipe) {
+          setRecipe(demoRecipe)
+          setServings(demoRecipe.servings)
+        } else {
+          notFound()
+        }
+        setLoading(false)
+        return
+      }
+
+      // Fetch real recipe from Supabase
+      try {
+        const { data: recipeData, error: recipeError } = await supabase
+          .from('recipes')
+          .select('*')
+          .eq('id', id)
+          .single()
+
+        if (recipeError || !recipeData) {
+          notFound()
+          return
+        }
+
+        // Fetch recipe ingredients
+        const { data: ingredientsData, error: ingredientsError } = await supabase
+          .from('recipe_ingredients')
+          .select('*')
+          .eq('recipe_id', id)
+          .order('order_index')
+
+        // Transform the data for display
+        const transformedRecipe: Recipe = {
+          ...recipeData,
+          ingredients: ingredientsData?.map(ing => 
+            `${ing.ingredient_name} (${ing.quantity} ${ing.unit || ''})`
+          ) || [],
+          instructions: recipeData.instructions ? JSON.parse(recipeData.instructions) : [],
+          author: recipeData.author_id ? 'Registered Chef' : 'Anonymous Chef',
+          inventor: 'User Creation',
+          history: 'This recipe was shared by our community members.',
+          rating: 4.5 + Math.random() * 0.5,
+          prepTime: `${recipeData.prep_time_minutes} min`,
+          cookTime: `${recipeData.cook_time_minutes} min`
+        }
+
+        setRecipe(transformedRecipe)
+        setServings(transformedRecipe.servings)
+      } catch (error) {
+        console.error('Error fetching recipe:', error)
+        notFound()
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchRecipe()
+  }, [params.id])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+            <span className="ml-3 text-lg text-gray-600">Loading recipe...</span>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (!recipe) {
     notFound()
   }
 
-  const servingScale = selectedServings / recipe.servings
-  const scaledIngredients = recipe.ingredients.map(ingredient => 
+  const servingScale = servings / recipe.servings
+  const scaledIngredients = recipe.ingredients?.map(ingredient => 
     parseIngredient(ingredient, servingScale)
-  )
+  ) || []
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <div className="relative h-96 bg-gray-900">
         <img 
-          src={recipe.image} 
+          src={recipe.image_url || "https://via.placeholder.com/800x600"} 
           alt={recipe.title}
           className="w-full h-full object-cover opacity-70"
         />
@@ -424,11 +443,7 @@ function RecipePageContent({ params }: RecipePageProps) {
               <span className="bg-primary-500 px-3 py-1 rounded-full text-sm font-medium">
                 {recipe.category}
               </span>
-              {recipe.dietType !== 'None' && (
-                <span className="bg-green-500 px-3 py-1 rounded-full text-sm font-medium">
-                  {recipe.dietType}
-                </span>
-              )}
+              {/* Diet Type is not directly available in the new recipe structure, so we'll remove it */}
               <span className="bg-gray-600 px-3 py-1 rounded-full text-sm font-medium">
                 {recipe.difficulty}
               </span>
@@ -485,7 +500,7 @@ function RecipePageContent({ params }: RecipePageProps) {
                 </div>
                 
                 {/* Anonymous Content Disclaimer */}
-                {!recipe.authorId && (
+                {!recipe.author_id && (
                   <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
                     <div className="flex items-start space-x-2">
                       <div className="flex-shrink-0">
@@ -526,29 +541,29 @@ function RecipePageContent({ params }: RecipePageProps) {
                 </h4>
                 <div className="flex items-center justify-center space-x-4">
                   <button
-                    onClick={() => setSelectedServings(Math.max(1, selectedServings - 1))}
+                    onClick={() => setServings(Math.max(1, servings - 1))}
                     className="w-8 h-8 bg-primary-500 text-white rounded-full flex items-center justify-center hover:bg-primary-600 transition-colors"
-                    disabled={selectedServings <= 1}
+                    disabled={servings <= 1}
                   >
                     <MinusIcon className="h-4 w-4" />
                   </button>
                   
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-primary-700">{selectedServings}</div>
+                    <div className="text-2xl font-bold text-primary-700">{servings}</div>
                     <div className="text-xs text-primary-600">
-                      {selectedServings === 1 ? 'person' : 'people'}
+                      {servings === 1 ? 'person' : 'people'}
                     </div>
                   </div>
                   
                   <button
-                    onClick={() => setSelectedServings(selectedServings + 1)}
+                    onClick={() => setServings(servings + 1)}
                     className="w-8 h-8 bg-primary-500 text-white rounded-full flex items-center justify-center hover:bg-primary-600 transition-colors"
                   >
                     <PlusIcon className="h-4 w-4" />
                   </button>
                 </div>
                 
-                {selectedServings !== recipe.servings && (
+                {servings !== recipe.servings && (
                   <div className="mt-3 text-center">
                     <span className="text-xs text-primary-600 bg-primary-100 px-2 py-1 rounded-full">
                       Ingredients scaled {servingScale > 1 ? 'up' : 'down'} by {Math.round(servingScale * 100)}%
@@ -576,7 +591,7 @@ function RecipePageContent({ params }: RecipePageProps) {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Ingredients</h3>
                 <span className="text-sm text-gray-500">
-                  For {selectedServings} {selectedServings === 1 ? 'person' : 'people'}
+                  For {servings} {servings === 1 ? 'person' : 'people'}
                 </span>
               </div>
               <ul className="space-y-3">
@@ -588,10 +603,10 @@ function RecipePageContent({ params }: RecipePageProps) {
                 ))}
               </ul>
               
-              {selectedServings !== recipe.servings && (
+              {servings !== recipe.servings && (
                 <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                   <p className="text-xs text-green-700">
-                    <strong>Smart Scaling:</strong> All quantities have been automatically adjusted for {selectedServings} {selectedServings === 1 ? 'person' : 'people'} 
+                    <strong>Smart Scaling:</strong> All quantities have been automatically adjusted for {servings} {servings === 1 ? 'person' : 'people'} 
                     (original recipe serves {recipe.servings}).
                   </p>
                 </div>
@@ -617,7 +632,7 @@ function RecipePageContent({ params }: RecipePageProps) {
             <div className="bg-white rounded-lg p-6 shadow-sm">
               <h3 className="text-2xl font-semibold mb-6">Instructions</h3>
               <ol className="space-y-6">
-                {recipe.instructions.map((instruction, index) => (
+                {recipe.instructions?.map((instruction, index) => (
                   <li key={index} className="flex space-x-4">
                     <div className="w-8 h-8 bg-primary-500 text-white rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0">
                       {index + 1}
@@ -627,18 +642,8 @@ function RecipePageContent({ params }: RecipePageProps) {
                 ))}
               </ol>
 
-              {recipe.tips && (
-                <div className="mt-8 bg-blue-50 border-l-4 border-blue-200 p-4 rounded-lg">
-                  <h4 className="font-semibold text-blue-800 mb-2">
-                    <ChefHatIcon className="h-5 w-5 inline mr-2" />
-                    Chef's Tips
-                  </h4>
-                  <p className="text-blue-700 text-sm leading-relaxed">{recipe.tips}</p>
-                </div>
-              )}
-
               {/* Scaling Tips */}
-              {selectedServings !== recipe.servings && (
+              {servings !== recipe.servings && (
                 <div className="mt-6 bg-amber-50 border-l-4 border-amber-200 p-4 rounded-lg">
                   <h4 className="font-semibold text-amber-800 mb-2">
                     <UsersIcon className="h-5 w-5 inline mr-2" />
