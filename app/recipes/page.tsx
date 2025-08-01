@@ -15,7 +15,7 @@ import { supabase } from '@/lib/supabase'
 // Mock demo recipes - these will be mixed with real user submissions
 const demoRecipes = [
   {
-    id: 9001, // High ID to avoid conflicts
+    id: "9001", // High ID to avoid conflicts - string to match UUID pattern
     title: "Creamy Mushroom Risotto",
     description: "A rich and creamy Italian classic made with arborio rice and fresh porcini mushrooms.",
     image_url: "https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=400",
@@ -39,7 +39,7 @@ const demoRecipes = [
     history: "Risotto originated in Northern Italy during the 14th century when rice cultivation began in the Po Valley. The technique of slowly adding warm broth to rice was perfected by Milanese cooks, creating the signature creamy texture without cream. This mushroom variation became popular in the 19th century when dried porcini mushrooms became widely available."
   },
   {
-    id: 9002,
+    id: "9002",
     title: "Classic Margherita Pizza",
     description: "Traditional Neapolitan pizza with San Marzano tomatoes, fresh mozzarella di bufala, and basil.",
     image_url: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=400",
@@ -63,7 +63,7 @@ const demoRecipes = [
     history: "Created in 1889 by pizzaiolo Raffaele Esposito at Pizzeria Brandi in Naples for Queen Margherita of Savoy. The pizza featured the colors of the Italian flag: red tomatoes, white mozzarella, and green basil. This was the birth of the modern pizza as we know it, transforming from a simple flatbread into an artistic culinary expression."
   },
   {
-    id: 9003,
+    id: "9003",
     title: "Chocolate Lava Cake",
     description: "Decadent individual chocolate cake with a molten center, invented by Jean-Georges Vongerichten.",
     image_url: "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400",
@@ -87,7 +87,7 @@ const demoRecipes = [
     history: "Invented by accident in 1987 by chef Jean-Georges Vongerichten at Lafayette Restaurant in New York. He was baking chocolate sponge cakes when he pulled one out too early and discovered the molten center. This happy accident became one of the most iconic desserts of the late 20th century, popularizing the concept of 'controlled undercooking' in fine dining."
   },
   {
-    id: 9004,
+    id: "9004",
     title: "Grilled Salmon with Herbs",
     description: "Wild-caught salmon grilled to perfection with a Mediterranean herb crust and lemon.",
     image_url: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400",
@@ -113,7 +113,7 @@ const demoRecipes = [
 ]
 
 interface Recipe {
-  id: number | string
+  id: string
   title: string
   description: string
   image_url?: string
@@ -149,8 +149,7 @@ function RecipesPageContent() {
   // Fetch recipes from Supabase and mix with demo recipes
   const fetchRecipes = async () => {
     try {
-      console.log('🔍 Demo recipes before processing:', demoRecipes.map(r => ({ id: r.id, title: r.title })))
-      
+
       const { data, error } = await supabase
         .from('recipes')
         .select('*')
@@ -159,7 +158,6 @@ function RecipesPageContent() {
       if (error) {
         console.error('Error fetching recipes:', error)
         // If there's an error, just show demo recipes
-        console.log('🔍 Setting recipes to demo recipes only:', demoRecipes.map(r => ({ id: r.id, title: r.title })))
         setRecipes(demoRecipes)
         return
       }
@@ -175,18 +173,14 @@ function RecipesPageContent() {
         history: 'This recipe was shared by our community members.'
       })) || []
 
-      console.log('🔍 Real recipes from DB:', transformedRealRecipes.map(r => ({ id: r.id, title: r.title })))
-
       // Mix demo recipes with real recipes, sorting by creation date
       const allRecipes = [...demoRecipes, ...transformedRealRecipes]
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
-      console.log('🔍 All recipes after mixing and sorting:', allRecipes.map(r => ({ id: r.id, title: r.title })))
       setRecipes(allRecipes)
     } catch (error) {
       console.error('Error fetching recipes:', error)
       // If there's an error, just show demo recipes
-      console.log('🔍 Catch block - Setting recipes to demo recipes:', demoRecipes.map(r => ({ id: r.id, title: r.title })))
       setRecipes(demoRecipes)
     } finally {
       setLoading(false)
@@ -213,9 +207,6 @@ function RecipesPageContent() {
     
     return matchesSearch && matchesCategory && matchesDifficulty
   })
-
-  // Debug filtered recipes
-  console.log('🔍 Filtered recipes for rendering:', filteredRecipes.map(r => ({ id: r.id, title: r.title })))
 
   const categories = ['All', ...Array.from(new Set(recipes.map(r => r.category).filter(Boolean)))]
   const difficulties = ['All', 'Easy', 'Medium', 'Hard']
@@ -383,7 +374,6 @@ function RecipesPageContent() {
                   <Link 
                     href={`/recipes/${recipe.id}`}
                     className="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors duration-200 text-center block"
-                    onClick={() => console.log('Navigating to recipe:', recipe.id, 'for title:', recipe.title)}
                   >
                     View Recipe
                   </Link>

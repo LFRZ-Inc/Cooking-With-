@@ -25,7 +25,7 @@ import toast from 'react-hot-toast'
 // Demo recipes - same as in recipes page
 const demoRecipes = [
   {
-    id: 9001,
+    id: "9001",
     title: "Creamy Mushroom Risotto",
     description: "A rich and creamy Italian classic made with arborio rice and fresh porcini mushrooms.",
     image_url: "https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=800",
@@ -73,7 +73,7 @@ const demoRecipes = [
     branch_name: null
   },
   {
-    id: 9002,
+    id: "9002",
     title: "Classic Margherita Pizza",
     description: "Traditional Neapolitan pizza with San Marzano tomatoes, fresh mozzarella di bufala, and basil.",
     image_url: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=800",
@@ -117,7 +117,7 @@ const demoRecipes = [
     branch_name: null
   },
   {
-    id: 9003,
+    id: "9003",
     title: "Chocolate Lava Cake",
     description: "Decadent individual chocolate cake with a molten center, invented by Jean-Georges Vongerichten.",
     image_url: "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=800",
@@ -162,7 +162,7 @@ const demoRecipes = [
     branch_name: null
   },
   {
-    id: 9004,
+    id: "9004",
     title: "Grilled Salmon with Herbs",
     description: "Wild-caught salmon grilled to perfection with a Mediterranean herb crust and lemon.",
     image_url: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800",
@@ -209,7 +209,7 @@ const demoRecipes = [
 ]
 
 interface Recipe {
-  id: number | string
+  id: string
   title: string
   description: string
   image_url?: string
@@ -393,10 +393,9 @@ function RecipePageContent({ params }: RecipePageProps) {
     const fetchRecipe = async () => {
       const id = params.id
       
-      // Check if it's a demo recipe (numeric ID >= 9000)
-      const numericId = parseInt(id)
-      if (!isNaN(numericId) && numericId >= 9000) {
-        const demoRecipe = demoRecipes.find(r => r.id === numericId)
+      // Check if it's a demo recipe (string ID starting with "900")
+      if (id.startsWith("900")) {
+        const demoRecipe = demoRecipes.find(r => r.id === id)
         if (demoRecipe) {
           setRecipe(demoRecipe)
           setServings(demoRecipe.servings)
