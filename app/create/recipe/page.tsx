@@ -24,6 +24,7 @@ function CreateRecipePageContent() {
     prepTime: '',
     cookTime: '',
     servings: '',
+    imageUrl: '',
     ingredients: [{ item: '', amount: '', unit: '' }],
     instructions: [''],
     tips: '',
@@ -110,6 +111,7 @@ function CreateRecipePageContent() {
         servings: parseInt(formData.servings) || 1,
         instructions: JSON.stringify(formData.instructions.filter(inst => inst.trim() !== '')),
         tips: formData.tips || null,
+        image_url: formData.imageUrl || null,
         status: 'published' as const,
         rating: 0,
         rating_count: 0,
@@ -159,6 +161,7 @@ function CreateRecipePageContent() {
         prepTime: '',
         cookTime: '',
         servings: '',
+        imageUrl: '',
         ingredients: [{ item: '', amount: '', unit: '' }],
         instructions: [''],
         tips: '',
@@ -339,16 +342,56 @@ function CreateRecipePageContent() {
           {/* Recipe Images */}
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Recipe Images
+              Recipe Image
             </h2>
             
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-              <ImageIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-2">Upload photos of your finished dish and ingredients</p>
-              <p className="text-sm text-gray-500 mb-4">PNG, JPG up to 10MB each</p>
-              <button type="button" className="btn-primary">
-                Choose Images
-              </button>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Image URL (Optional)
+                </label>
+                <input
+                  type="url"
+                  value={formData.imageUrl}
+                  onChange={(e) => setFormData(prev => ({...prev, imageUrl: e.target.value}))}
+                  className="input-field"
+                  placeholder="https://example.com/your-recipe-image.jpg"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Paste a link to your recipe image. Try free hosting: 
+                  <a href="https://imgur.com" target="_blank" rel="noopener" className="text-primary-600 hover:text-primary-700 ml-1">Imgur</a>,
+                  <a href="https://postimg.cc" target="_blank" rel="noopener" className="text-primary-600 hover:text-primary-700 ml-1">PostImage</a>, or
+                  <a href="https://drive.google.com" target="_blank" rel="noopener" className="text-primary-600 hover:text-primary-700 ml-1">Google Drive</a>
+                </p>
+              </div>
+              
+              {/* Image Preview */}
+              {formData.imageUrl && (
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <p className="text-sm font-medium text-gray-700 mb-2">Preview:</p>
+                  <div className="relative">
+                    <img
+                      src={formData.imageUrl}
+                      alt="Recipe preview"
+                      className="w-full max-w-md h-48 object-cover rounded-lg"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none'
+                        e.currentTarget.nextElementSibling?.classList.remove('hidden')
+                      }}
+                      onLoad={(e) => {
+                        e.currentTarget.style.display = 'block'
+                        e.currentTarget.nextElementSibling?.classList.add('hidden')
+                      }}
+                    />
+                    <div className="hidden w-full max-w-md h-48 bg-red-50 border border-red-200 rounded-lg flex items-center justify-center">
+                      <div className="text-center text-red-600">
+                        <ImageIcon className="h-8 w-8 mx-auto mb-2" />
+                        <p className="text-sm">Invalid image URL</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
