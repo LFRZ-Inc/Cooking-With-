@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
+import StarRating from '@/components/StarRating'
 import toast from 'react-hot-toast'
 
 interface RecipeFormData {
@@ -26,6 +27,7 @@ interface RecipeFormData {
   instructions: string[]
   tips: string
   changeSummary: string
+  selfRating: number
 }
 
 interface Recipe {
@@ -67,7 +69,8 @@ export default function EditRecipePage({ params }: EditRecipePageProps) {
     ingredients: [{ item: '', amount: '', unit: '' }],
     instructions: [''],
     tips: '',
-    changeSummary: ''
+    changeSummary: '',
+    selfRating: 0
   })
 
   // Fetch recipe and check authorization
@@ -109,6 +112,15 @@ export default function EditRecipePage({ params }: EditRecipePageProps) {
           .eq('recipe_id', params.id)
           .order('order_index')
 
+        // Fetch current self-rating
+        const { data: selfRatingData } = await supabase
+          .from('user_ratings')
+          .select('rating')
+          .eq('user_id', user.id)
+          .eq('recipe_id', params.id)
+          .eq('is_self_rating', true)
+          .single()
+
         // Populate form with existing data
         const instructions = Array.isArray(recipeData.instructions) 
           ? recipeData.instructions 
@@ -131,7 +143,8 @@ export default function EditRecipePage({ params }: EditRecipePageProps) {
           ingredients,
           instructions,
           tips: recipeData.tips || '',
-          changeSummary: ''
+          changeSummary: '',
+          selfRating: selfRatingData?.rating || 0
         })
 
       } catch (error) {
@@ -336,6 +349,38 @@ export default function EditRecipePage({ params }: EditRecipePageProps) {
         }
       }
 
+      // Save self-rating
+      if (formData.selfRating > 0) {
+        const ratingData = {
+          user_id: user.id,
+          recipe_id: recipe.id,
+          rating: formData.selfRating,
+          is_self_rating: true
+        }
+
+        // Check if self-rating already exists
+        const { data: existingSelfRating } = await supabase
+          .from('user_ratings')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('recipe_id', recipe.id)
+          .eq('is_self_rating', true)
+          .single()
+
+        if (existingSelfRating) {
+          // Update existing self-rating
+          await supabase
+            .from('user_ratings')
+            .update({ rating: formData.selfRating, updated_at: new Date().toISOString() })
+            .eq('id', existingSelfRating.id)
+        } else {
+          // Create new self-rating
+          await supabase
+            .from('user_ratings')
+            .insert([ratingData])
+        }
+      }
+
       toast.success(significantChanges ? 'Recipe updated with new version!' : 'Recipe saved!')
       router.push(`/recipes/${recipe.id}`)
       
@@ -451,6 +496,31 @@ export default function EditRecipePage({ params }: EditRecipePageProps) {
                   className="input-field"
                   required
                 />
+              </div>
+            </div>
+
+            {/* Self-Rating */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Recipe Self-Rating</h2>
+              <div className="space-y-4">
+                <p className="text-gray-600 text-sm">
+                  Rate your own recipe to help others understand your confidence in it. This appears as "Your Rating" separately from community ratings.
+                </p>
+                <div className="flex items-center space-x-4">
+                  <StarRating
+                    rating={formData.selfRating}
+                    interactive={true}
+                    onRatingChange={(rating) => setFormData(prev => ({...prev, selfRating: rating}))}
+                    showValue={true}
+                    size="lg"
+                    label="Self-Rating"
+                  />
+                </div>
+                {formData.selfRating > 0 && (
+                  <p className="text-sm text-blue-600">
+                    Your {formData.selfRating}-star rating will be displayed as the author's confidence level.
+                  </p>
+                )}
               </div>
             </div>
           </div>

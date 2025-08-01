@@ -16,8 +16,10 @@ import {
   EditIcon
 } from 'lucide-react'
 import AuthGuard from '@/components/AuthGuard'
+import StarRating, { DualRatingDisplay } from '@/components/StarRating'
 import { useAuth } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
+import toast from 'react-hot-toast'
 
 // Demo recipes - same as in recipes page
 const demoRecipes = [
@@ -365,6 +367,11 @@ function RecipePageContent({ params }: RecipePageProps) {
   const [recipe, setRecipe] = useState<Recipe | null>(null)
   const [loading, setLoading] = useState(true)
   const [servings, setServings] = useState(4)
+  const [userRating, setUserRating] = useState(0)
+  const [selfRating, setSelfRating] = useState(0)
+  const [communityRating, setCommunityRating] = useState(0)
+  const [communityCount, setCommunityCount] = useState(0)
+  const [ratingsLoading, setRatingsLoading] = useState(true)
 
   // Fetch recipe data
   useEffect(() => {
@@ -463,6 +470,115 @@ function RecipePageContent({ params }: RecipePageProps) {
     fetchRecipe()
   }, [params.id])
 
+  // Fetch ratings for this recipe
+  const fetchRatings = async () => {
+    if (!recipe) return
+
+    try {
+      // Fetch all ratings for this recipe
+      const { data: ratings, error } = await supabase
+        .from('user_ratings')
+        .select('*')
+        .eq('recipe_id', recipe.id)
+
+      if (error) {
+        console.error('Error fetching ratings:', error)
+        return
+      }
+
+      const allRatings = ratings || []
+      
+      // Find user's rating (if logged in)
+      const userRatingData = user ? allRatings.find(r => r.user_id === user.id) : null
+      setUserRating(userRatingData?.rating || 0)
+
+      // Find self-rating (recipe author's rating)
+      const selfRatingData = recipe.author_id ? allRatings.find(r => r.user_id === recipe.author_id && r.is_self_rating) : null
+      setSelfRating(selfRatingData?.rating || 0)
+
+      // Calculate community rating (exclude self-ratings)
+      const communityRatings = allRatings.filter(r => !r.is_self_rating)
+      setCommunityCount(communityRatings.length)
+      
+      if (communityRatings.length > 0) {
+        const avgRating = communityRatings.reduce((sum, r) => sum + r.rating, 0) / communityRatings.length
+        setCommunityRating(avgRating)
+      } else {
+        setCommunityRating(0)
+      }
+
+    } catch (error) {
+      console.error('Error fetching ratings:', error)
+    } finally {
+      setRatingsLoading(false)
+    }
+  }
+
+  // Submit or update user rating
+  const handleRatingChange = async (newRating: number) => {
+    if (!user || !recipe) {
+      toast.error('Please log in to rate recipes')
+      return
+    }
+
+    try {
+      const isAuthor = recipe.author_id === user.id
+      const ratingData = {
+        user_id: user.id,
+        recipe_id: recipe.id.toString(),
+        rating: newRating,
+        is_self_rating: isAuthor
+      }
+
+      // Check if user already has a rating
+      const { data: existingRating } = await supabase
+        .from('user_ratings')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('recipe_id', recipe.id)
+        .single()
+
+      if (existingRating) {
+        // Update existing rating
+        const { error } = await supabase
+          .from('user_ratings')
+          .update({ rating: newRating, updated_at: new Date().toISOString() })
+          .eq('id', existingRating.id)
+
+        if (error) throw error
+        toast.success(isAuthor ? 'Self-rating updated!' : 'Rating updated!')
+      } else {
+        // Create new rating
+        const { error } = await supabase
+          .from('user_ratings')
+          .insert([ratingData])
+
+        if (error) throw error
+        toast.success(isAuthor ? 'Self-rating added!' : 'Rating added!')
+      }
+
+      // Update local state
+      setUserRating(newRating)
+      if (isAuthor) {
+        setSelfRating(newRating)
+      }
+
+      // Refresh ratings to update community average
+      fetchRatings()
+
+    } catch (error: any) {
+      console.error('Error saving rating:', error)
+      toast.error('Failed to save rating')
+    }
+  }
+
+  // Fetch ratings when recipe loads
+  useEffect(() => {
+    if (recipe) {
+      fetchRatings()
+    }
+  }, [recipe, user])
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -524,7 +640,12 @@ function RecipePageContent({ params }: RecipePageProps) {
             <div className="flex items-center space-x-6 text-gray-200">
               <div className="flex items-center space-x-1">
                 <StarIcon className="h-5 w-5 text-yellow-400 fill-current" />
-                <span className="font-medium">{recipe.rating}</span>
+                <span className="font-medium">
+                  {communityRating > 0 ? communityRating.toFixed(1) : 'Unrated'}
+                </span>
+                {communityCount > 0 && (
+                  <span className="text-sm opacity-75">({communityCount})</span>
+                )}
               </div>
               <div className="flex items-center space-x-1">
                 <ClockIcon className="h-5 w-5" />
@@ -663,6 +784,67 @@ function RecipePageContent({ params }: RecipePageProps) {
                   <EditIcon className="h-4 w-4" />
                   <span>Edit Recipe</span>
                 </Link>
+              )}
+            </div>
+
+            {/* Ratings */}
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <h3 className="text-lg font-semibold mb-4">Ratings</h3>
+              
+              {!ratingsLoading ? (
+                <div className="space-y-4">
+                  {/* Display Ratings */}
+                  <DualRatingDisplay
+                    selfRating={selfRating}
+                    communityRating={communityRating}
+                    communityCount={communityCount}
+                    size="md"
+                    showLabels={true}
+                  />
+
+                  {/* Interactive Rating for Users */}
+                  {user && (
+                    <div className="pt-4 border-t border-gray-200">
+                      <div className="space-y-3">
+                        <h4 className="font-medium text-gray-700">
+                          {recipe.author_id === user.id ? 'Rate Your Recipe:' : 'Rate This Recipe:'}
+                        </h4>
+                        <StarRating
+                          rating={userRating}
+                          interactive={true}
+                          onRatingChange={handleRatingChange}
+                          showValue={true}
+                          size="md"
+                        />
+                        {userRating > 0 && (
+                          <p className="text-sm text-gray-600">
+                            {recipe.author_id === user.id 
+                              ? 'Your self-rating helps others understand your confidence in this recipe.'
+                              : 'Thank you for rating this recipe!'
+                            }
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Login Prompt for Non-Users */}
+                  {!user && (
+                    <div className="pt-4 border-t border-gray-200">
+                      <p className="text-sm text-gray-600 text-center">
+                        <Link href="/login" className="text-primary-600 hover:text-primary-700 font-medium">
+                          Log in
+                        </Link>
+                        {' '}to rate this recipe
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-500"></div>
+                  <span className="ml-2 text-gray-600">Loading ratings...</span>
+                </div>
               )}
             </div>
 

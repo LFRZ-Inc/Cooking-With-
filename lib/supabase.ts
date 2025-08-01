@@ -240,6 +240,35 @@ export type Database = {
           created_at?: string
         }
       }
+      user_ratings: {
+        Row: {
+          id: string
+          user_id: string
+          recipe_id: string
+          rating: number
+          is_self_rating: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          recipe_id: string
+          rating: number
+          is_self_rating?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          recipe_id?: string
+          rating?: number
+          is_self_rating?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
       recipe_versions: {
         Row: {
           id: string
