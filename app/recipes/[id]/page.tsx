@@ -407,6 +407,14 @@ function RecipePageContent({ params }: RecipePageProps) {
         return
       }
 
+      // Check if the ID is a valid UUID format for database recipes
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+      if (!uuidRegex.test(id)) {
+        console.log('Invalid recipe ID format. Expected UUID or demo recipe ID (>=9000):', id)
+        notFound()
+        return
+      }
+
       // Fetch real recipe from Supabase (ID is a UUID string)
       try {
         console.log('Fetching recipe with ID:', id)
