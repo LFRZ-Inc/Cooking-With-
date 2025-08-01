@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import AuthGuard from '@/components/AuthGuard'
 import StarRating, { DualRatingDisplay } from '@/components/StarRating'
+import VersionNavigator from '@/components/VersionNavigator'
 import { useAuth } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import toast from 'react-hot-toast'
@@ -372,6 +373,8 @@ function RecipePageContent({ params }: RecipePageProps) {
   const [communityRating, setCommunityRating] = useState(0)
   const [communityCount, setCommunityCount] = useState(0)
   const [ratingsLoading, setRatingsLoading] = useState(true)
+  const [displayedRecipe, setDisplayedRecipe] = useState<Recipe | null>(null)
+  const [selectedVersion, setSelectedVersion] = useState<any>(null)
 
   // Fetch recipe data
   useEffect(() => {
@@ -458,6 +461,7 @@ function RecipePageContent({ params }: RecipePageProps) {
         }
 
         setRecipe(transformedRecipe)
+        setDisplayedRecipe(transformedRecipe)
         setServings(transformedRecipe.servings)
       } catch (error) {
         console.error('Error fetching recipe:', error)
@@ -572,6 +576,28 @@ function RecipePageContent({ params }: RecipePageProps) {
     }
   }
 
+  // Handle version navigation
+  const handleVersionChange = (versionData: any) => {
+    if (!versionData) {
+      // Show current version
+      setDisplayedRecipe(recipe)
+      setSelectedVersion(null)
+    } else {
+      // Show historical version
+      const versionRecipe = {
+        ...recipe,
+        ...versionData,
+        ingredients: versionData.ingredients?.map((ing: any) => 
+          typeof ing === 'string' ? ing : `${ing.amount || ''} ${ing.unit || ''} ${ing.item || ing.name || ''}`.trim()
+        ) || [],
+        instructions: versionData.instructions || [],
+        version_number: versionData.version_number
+      }
+      setDisplayedRecipe(versionRecipe)
+      setSelectedVersion(versionData)
+    }
+  }
+
   // Fetch ratings when recipe loads
   useEffect(() => {
     if (recipe) {
@@ -592,22 +618,33 @@ function RecipePageContent({ params }: RecipePageProps) {
     )
   }
 
-  if (!recipe) {
+  if (!recipe || !displayedRecipe) {
     notFound()
   }
 
-  const servingScale = servings / recipe.servings
-  const scaledIngredients = recipe.ingredients?.map(ingredient => 
+  const servingScale = servings / displayedRecipe.servings
+  const scaledIngredients = displayedRecipe.ingredients?.map(ingredient => 
     parseIngredient(ingredient, servingScale)
   ) || []
 
-  return (
+    return (
     <div className="min-h-screen bg-gray-50">
-              {/* Hero Section */}
+      {/* Version Navigator */}
+      {recipe.version_number && recipe.version_number > 1 && (
+        <div className="max-w-4xl mx-auto px-6 pt-8">
+          <VersionNavigator
+            recipe={recipe}
+            currentVersion={recipe.version_number}
+            onVersionChange={handleVersionChange}
+          />
+        </div>
+      )}
+
+      {/* Hero Section */}
         <div className="relative h-96 bg-gray-900">
           <img 
-            src={recipe.image_url || "https://via.placeholder.com/800x600"} 
-            alt={recipe.title}
+            src={displayedRecipe.image_url || "https://via.placeholder.com/800x600"} 
+            alt={displayedRecipe.title}
             className="w-full h-full object-cover opacity-70"
           />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -626,16 +663,21 @@ function RecipePageContent({ params }: RecipePageProps) {
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center space-x-4 mb-4">
               <span className="bg-primary-500 px-3 py-1 rounded-full text-sm font-medium">
-                {recipe.category}
+                {displayedRecipe.category}
               </span>
-              {/* Diet Type is not directly available in the new recipe structure, so we'll remove it */}
+              {/* Version indicator */}
+              {selectedVersion && (
+                <span className="bg-blue-500 px-3 py-1 rounded-full text-sm font-medium">
+                  Version {selectedVersion.version_number}
+                </span>
+              )}
               <span className="bg-gray-600 px-3 py-1 rounded-full text-sm font-medium">
-                {recipe.difficulty}
+                {displayedRecipe.difficulty}
               </span>
             </div>
             
-            <h1 className="text-4xl font-bold mb-4">{recipe.title}</h1>
-            <p className="text-xl text-gray-200 mb-4">{recipe.description}</p>
+            <h1 className="text-4xl font-bold mb-4">{displayedRecipe.title}</h1>
+            <p className="text-xl text-gray-200 mb-4">{displayedRecipe.description}</p>
             
             <div className="flex items-center space-x-6 text-gray-200">
               <div className="flex items-center space-x-1">
@@ -649,11 +691,11 @@ function RecipePageContent({ params }: RecipePageProps) {
               </div>
               <div className="flex items-center space-x-1">
                 <ClockIcon className="h-5 w-5" />
-                <span>Prep: {recipe.prepTime} | Cook: {recipe.cookTime}</span>
+                <span>Prep: {displayedRecipe.prepTime} | Cook: {displayedRecipe.cookTime}</span>
               </div>
               <div className="flex items-center space-x-1">
                 <UsersIcon className="h-5 w-5" />
-                <span>Serves {recipe.servings}</span>
+                <span>Serves {displayedRecipe.servings}</span>
               </div>
             </div>
           </div>
@@ -847,6 +889,48 @@ function RecipePageContent({ params }: RecipePageProps) {
                 </div>
               )}
             </div>
+
+            {/* Recipe Branching */}
+            {user && recipe.author_id !== user.id && (
+              <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Create Your Take</h3>
+                <p className="text-gray-600 mb-4">
+                  Want to modify this recipe with your own twist? Create your own version while giving credit to the original creator.
+                </p>
+                <div className="flex items-center space-x-3">
+                  <Link
+                    href={`/recipes/${recipe.id}/branch`}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+                  >
+                    <span>🍴</span>
+                    <span>Fork This Recipe</span>
+                  </Link>
+                  <div className="text-sm text-gray-500">
+                    Your version will credit "{displayedRecipe.author}" as the original creator
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Recipe Family Tree (if this is a branch) */}
+            {recipe.parent_recipe_id && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-blue-900 mb-3">Recipe Family Tree</h3>
+                <p className="text-blue-700 mb-3">
+                  This recipe is a variation of another recipe. 
+                  {recipe.branch_name && (
+                    <span className="font-medium"> Branch: "{recipe.branch_name}"</span>
+                  )}
+                </p>
+                <Link
+                  href={`/recipes/${recipe.parent_recipe_id}`}
+                  className="text-blue-600 hover:text-blue-800 hover:underline flex items-center space-x-1"
+                >
+                  <span>👨‍🍳</span>
+                  <span>View Original Recipe</span>
+                </Link>
+              </div>
+            )}
 
             {/* Ingredients */}
             <div className="bg-white rounded-lg p-6 shadow-sm">

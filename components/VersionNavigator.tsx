@@ -22,10 +22,10 @@ interface RecipeVersion {
 }
 
 interface Recipe {
-  id: string
+  id: string | number
   title: string
-  version_number: number
-  author_id: string | null
+  version_number?: number
+  author_id?: string | null
   created_at: string
 }
 
