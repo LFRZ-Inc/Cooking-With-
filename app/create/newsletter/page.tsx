@@ -8,9 +8,13 @@ import {
   TagIcon,
   EyeIcon
 } from 'lucide-react'
+import { useAuth } from '@/lib/auth'
+import { supabase } from '@/lib/supabase'
+import toast from 'react-hot-toast'
 
 
 function CreateNewsletterPage() {
+  const { user } = useAuth() // Optional user for attribution
   const [formData, setFormData] = useState({
     title: '',
     excerpt: '',
@@ -55,11 +59,52 @@ function CreateNewsletterPage() {
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission
-    console.log('Newsletter data:', formData)
-    alert('Newsletter submitted! (This will be connected to database)')
+
+    try {
+      // Prepare newsletter data for Supabase (anonymous or authenticated)
+      const newsletterData = {
+        title: formData.title,
+        excerpt: formData.excerpt,
+        content: formData.content,
+        author_id: user?.id || null, // Allow anonymous submissions
+        category: formData.category || null,
+        featured: formData.featured,
+        status: 'published' as const,
+        read_time_minutes: formData.readTime ? parseInt(formData.readTime.replace(/\D/g, '')) : null,
+        view_count: 0,
+        published_at: new Date().toISOString()
+      }
+
+      const { data: newsletter, error: newsletterError } = await supabase
+        .from('newsletters')
+        .insert([newsletterData])
+        .select()
+        .single()
+
+      if (newsletterError) {
+        throw newsletterError
+      }
+
+      toast.success('Newsletter published successfully!')
+      
+      // Reset form
+      setFormData({
+        title: '',
+        excerpt: '',
+        content: '',
+        category: '',
+        tags: [] as string[],
+        featured: false,
+        publishDate: '',
+        readTime: ''
+      })
+
+    } catch (error: any) {
+      console.error('Error creating newsletter:', error)
+      toast.error(error.message || 'Failed to publish newsletter')
+    }
   }
 
   const renderPreview = () => {
