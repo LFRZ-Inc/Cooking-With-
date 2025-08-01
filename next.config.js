@@ -1,10 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
   images: {
     domains: ['images.unsplash.com', 'res.cloudinary.com'],
+  },
+  // Remove webpack warnings about the exclamation mark in folder path
+  webpack: (config, { isServer }) => {
+    return config;
   },
 }
 
