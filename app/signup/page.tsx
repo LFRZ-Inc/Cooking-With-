@@ -205,7 +205,8 @@ export default function SignupPage() {
               </button>
             </div>
 
-            <div className="mt-6">
+            {/* Social Login Buttons - Temporarily Hidden */}
+            <div className="mt-6 hidden">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300" />
