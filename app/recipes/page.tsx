@@ -15,80 +15,92 @@ const recipes = [
   {
     id: 1,
     title: "Creamy Mushroom Risotto",
-    description: "A rich and creamy Italian classic made with arborio rice and fresh mushrooms.",
+    description: "A rich and creamy Italian classic made with arborio rice and fresh porcini mushrooms.",
     image: "https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=400",
-    cookTime: "30 min",
+    cookTime: "35 min",
     difficulty: "Medium",
     rating: 4.8,
     author: "Chef Maria",
     category: "Italian",
     dietType: "Vegetarian",
-    ingredients: ["Arborio rice", "Mushrooms", "Parmesan", "White wine", "Vegetable broth", "Onion"]
+    ingredients: ["Arborio rice (1 cup)", "Porcini mushrooms (200g)", "Parmigiano-Reggiano (100g)", "Dry white wine (1/2 cup)", "Warm vegetable broth (1 liter)", "Onion (1 medium)", "Butter (4 tbsp)", "Extra virgin olive oil (2 tbsp)", "Fresh parsley", "Salt and white pepper"],
+    inventor: "Traditional Northern Italian dish",
+    history: "Risotto originated in Northern Italy during the 14th century when rice cultivation began in the Po Valley. The technique of slowly adding warm broth to rice was perfected by Milanese cooks, creating the signature creamy texture without cream. This mushroom variation became popular in the 19th century when dried porcini mushrooms became widely available."
   },
   {
     id: 2,
     title: "Classic Margherita Pizza",
-    description: "Traditional Italian pizza with fresh mozzarella, tomatoes, and basil.",
+    description: "Traditional Neapolitan pizza with San Marzano tomatoes, fresh mozzarella di bufala, and basil.",
     image: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=400",
-    cookTime: "45 min",
-    difficulty: "Easy",
+    cookTime: "15 min",
+    difficulty: "Medium",
     rating: 4.9,
-    author: "Tony's Kitchen",
+    author: "Pizzaiolo Antonio",
     category: "Italian",
     dietType: "Vegetarian",
-    ingredients: ["Pizza dough", "Mozzarella", "Tomatoes", "Basil", "Olive oil"]
+    ingredients: ["Neapolitan pizza dough (300g)", "San Marzano tomatoes (200g)", "Mozzarella di bufala (150g)", "Fresh basil leaves", "Extra virgin olive oil", "Sea salt", "Tipo 00 flour for dusting"],
+    inventor: "Raffaele Esposito (1889)",
+    history: "Created in 1889 by pizzaiolo Raffaele Esposito at Pizzeria Brandi in Naples for Queen Margherita of Savoy. The pizza featured the colors of the Italian flag: red tomatoes, white mozzarella, and green basil. This was the birth of the modern pizza as we know it, transforming from a simple flatbread into an artistic culinary expression."
   },
   {
     id: 3,
     title: "Chocolate Lava Cake",
-    description: "Decadent chocolate cake with a molten center, perfect for dessert lovers.",
+    description: "Decadent individual chocolate cake with a molten center, invented by Jean-Georges Vongerichten.",
     image: "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400",
-    cookTime: "25 min",
+    cookTime: "12 min",
     difficulty: "Hard",
     rating: 4.7,
-    author: "Sweet Dreams Bakery",
+    author: "Pastry Chef Laurent",
     category: "Dessert",
     dietType: "Vegetarian",
-    ingredients: ["Dark chocolate", "Butter", "Eggs", "Sugar", "Flour", "Vanilla"]
+    ingredients: ["Dark chocolate 70% (100g)", "Unsalted butter (100g)", "Large eggs (2 whole + 2 yolks)", "Caster sugar (60g)", "Plain flour (30g)", "Butter for ramekins", "Cocoa powder for dusting", "Vanilla ice cream (to serve)"],
+    inventor: "Jean-Georges Vongerichten (1987)",
+    history: "Invented by accident in 1987 by chef Jean-Georges Vongerichten at Lafayette Restaurant in New York. He was baking chocolate sponge cakes when he pulled one out too early and discovered the molten center. This happy accident became one of the most iconic desserts of the late 20th century, popularizing the concept of 'controlled undercooking' in fine dining."
   },
   {
     id: 4,
     title: "Grilled Salmon with Herbs",
-    description: "Fresh Atlantic salmon grilled to perfection with aromatic herbs.",
+    description: "Wild-caught salmon grilled to perfection with a Mediterranean herb crust and lemon.",
     image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400",
-    cookTime: "20 min",
+    cookTime: "15 min",
     difficulty: "Easy",
     rating: 4.6,
-    author: "Ocean Breeze",
+    author: "Chef Dimitris",
     category: "Seafood",
     dietType: "Keto",
-    ingredients: ["Salmon fillet", "Dill", "Lemon", "Olive oil", "Garlic", "Black pepper"]
+    ingredients: ["Wild salmon fillets (4 x 150g)", "Fresh dill (2 tbsp)", "Fresh oregano (1 tbsp)", "Lemon zest and juice", "Extra virgin olive oil (3 tbsp)", "Garlic (2 cloves)", "Sea salt", "Freshly ground black pepper", "Capers (optional)"],
+    inventor: "Ancient Mediterranean tradition",
+    history: "Grilling fish over open flames dates back to ancient Mediterranean civilizations, particularly the Greeks and Romans around 800 BCE. The combination of herbs like oregano and dill with fish was documented in ancient Greek cooking texts. This preparation method preserved the fish's natural flavors while the herbs provided antimicrobial properties, crucial before refrigeration."
   },
   {
     id: 5,
     title: "Quinoa Buddha Bowl",
-    description: "Nutritious and colorful bowl packed with quinoa, vegetables, and tahini dressing.",
+    description: "Nutritious power bowl with rainbow vegetables, quinoa, and tahini dressing inspired by macrobiotic principles.",
     image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400",
-    cookTime: "35 min",
+    cookTime: "25 min",
     difficulty: "Easy",
     rating: 4.5,
-    author: "Healthy Bites",
+    author: "Wellness Chef Sarah",
     category: "Healthy",
     dietType: "Vegan",
-    ingredients: ["Quinoa", "Chickpeas", "Avocado", "Sweet potato", "Tahini", "Spinach"]
+    ingredients: ["Tricolor quinoa (1 cup)", "Roasted chickpeas (150g)", "Avocado (1 ripe)", "Roasted sweet potato cubes", "Fresh spinach (2 cups)", "Tahini (3 tbsp)", "Lemon juice (2 tbsp)", "Maple syrup (1 tsp)", "Purple cabbage (shredded)", "Hemp seeds", "Pomegranate seeds"],
+    inventor: "Modern fusion of ancient traditions",
+    history: "Buddha bowls emerged in the 1970s California health food movement, combining ancient grains like quinoa (cultivated by the Incas since 3000 BCE) with macrobiotic principles from Japanese Zen Buddhism. The concept of balanced, colorful meals in one bowl reflects the Buddhist principle of mindful eating and nutritional harmony. Quinoa was considered sacred by the Incas, called 'chisaya mama' or 'mother of all grains.'"
   },
   {
     id: 6,
     title: "Beef Bourguignon",
-    description: "Classic French beef stew braised in red wine with vegetables.",
+    description: "Classic Burgundian beef stew slowly braised in red wine with pearl onions and mushrooms.",
     image: "https://images.unsplash.com/photo-1574653853027-5ec760facb1d?w=400",
-    cookTime: "2.5 hours",
+    cookTime: "3 hours",
     difficulty: "Hard",
     rating: 4.8,
-    author: "French Bistro",
+    author: "Chef Auguste",
     category: "French",
     dietType: "None",
-    ingredients: ["Beef chuck", "Red wine", "Carrots", "Onions", "Mushrooms", "Thyme"]
+    ingredients: ["Beef chuck cut in cubes (1.5kg)", "Burgundy red wine (750ml)", "Pearl onions (300g)", "Button mushrooms (250g)", "Carrots (3 large)", "Bacon lardons (150g)", "Beef stock (500ml)", "Tomato paste (2 tbsp)", "Fresh thyme", "Bay leaves (2)", "Flour (3 tbsp)", "Butter (2 tbsp)"],
+    inventor: "Auguste Escoffier (refined version)",
+    history: "Originally a peasant dish from the Burgundy region of France, dating back to the Middle Ages when local farmers would slow-cook tough cuts of beef in local wine. The dish was elevated to haute cuisine status by Auguste Escoffier in the early 20th century. Julia Child's recipe in 'Mastering the Art of French Cooking' (1961) introduced this sophisticated stew to American home cooks, making it a symbol of French culinary excellence."
   }
 ]
 
@@ -235,7 +247,7 @@ export default function RecipesPage() {
                 
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-500">by {recipe.author}</span>
+                    <span className="text-sm text-gray-500">Cooked With! {recipe.author}</span>
                     <div className="flex items-center space-x-1">
                       <StarIcon className="h-4 w-4 text-yellow-400 fill-current" />
                       <span className="text-sm text-gray-600">{recipe.rating}</span>
@@ -269,7 +281,7 @@ export default function RecipesPage() {
                   
                   <div className="border-t pt-4">
                     <p className="text-sm text-gray-600 mb-2">Key ingredients:</p>
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-1 mb-4">
                       {recipe.ingredients.slice(0, 3).map((ingredient, index) => (
                         <span key={index} className="bg-primary-50 text-primary-700 px-2 py-1 rounded-full text-xs">
                           {ingredient}
@@ -281,6 +293,18 @@ export default function RecipesPage() {
                         </span>
                       )}
                     </div>
+                    
+                    {recipe.inventor && (
+                      <div className="bg-amber-50 border-l-4 border-amber-200 p-3 mb-4">
+                        <p className="text-xs font-semibold text-amber-800 mb-1">Historical Origins</p>
+                        <p className="text-xs text-amber-700 mb-1">
+                          <strong>Inventor:</strong> {recipe.inventor}
+                        </p>
+                        <p className="text-xs text-amber-600 leading-relaxed">
+                          {recipe.history}
+                        </p>
+                      </div>
+                    )}
                   </div>
                   
                   <Link 

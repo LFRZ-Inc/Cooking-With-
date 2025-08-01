@@ -16,35 +16,41 @@ const featuredRecipes = [
   {
     id: 1,
     title: "Creamy Mushroom Risotto",
-    description: "A rich and creamy Italian classic made with arborio rice and fresh mushrooms.",
+    description: "A rich and creamy Italian classic made with arborio rice and fresh porcini mushrooms.",
     image: "https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=400",
-    cookTime: "30 min",
+    cookTime: "35 min",
     difficulty: "Medium",
     rating: 4.8,
     author: "Chef Maria",
-    ingredients: ["Arborio rice", "Mushrooms", "Parmesan", "White wine"]
+    ingredients: ["Arborio rice (1 cup)", "Porcini mushrooms (200g)", "Parmigiano-Reggiano (100g)", "Dry white wine (1/2 cup)"],
+    inventor: "Traditional Northern Italian dish",
+    history: "Risotto originated in Northern Italy during the 14th century when rice cultivation began in the Po Valley."
   },
   {
     id: 2,
     title: "Classic Margherita Pizza",
-    description: "Traditional Italian pizza with fresh mozzarella, tomatoes, and basil.",
+    description: "Traditional Neapolitan pizza with San Marzano tomatoes, fresh mozzarella di bufala, and basil.",
     image: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=400",
-    cookTime: "45 min",
-    difficulty: "Easy",
+    cookTime: "15 min",
+    difficulty: "Medium",
     rating: 4.9,
-    author: "Tony's Kitchen",
-    ingredients: ["Pizza dough", "Mozzarella", "Tomatoes", "Basil"]
+    author: "Pizzaiolo Antonio",
+    ingredients: ["Neapolitan pizza dough (300g)", "San Marzano tomatoes (200g)", "Mozzarella di bufala (150g)", "Fresh basil leaves"],
+    inventor: "Raffaele Esposito (1889)",
+    history: "Created in 1889 by pizzaiolo Raffaele Esposito at Pizzeria Brandi in Naples for Queen Margherita of Savoy."
   },
   {
     id: 3,
     title: "Chocolate Lava Cake",
-    description: "Decadent chocolate cake with a molten center, perfect for dessert lovers.",
+    description: "Decadent individual chocolate cake with a molten center, invented by Jean-Georges Vongerichten.",
     image: "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400",
-    cookTime: "25 min",
+    cookTime: "12 min",
     difficulty: "Hard",
     rating: 4.7,
-    author: "Sweet Dreams Bakery",
-    ingredients: ["Dark chocolate", "Butter", "Eggs", "Sugar"]
+    author: "Pastry Chef Laurent",
+    ingredients: ["Dark chocolate 70% (100g)", "Unsalted butter (100g)", "Large eggs (2 whole + 2 yolks)", "Caster sugar (60g)"],
+    inventor: "Jean-Georges Vongerichten (1987)",
+    history: "Invented by accident in 1987 by chef Jean-Georges Vongerichten at Lafayette Restaurant in New York."
   }
 ]
 
@@ -172,7 +178,7 @@ export default function Home() {
                 
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-500">by {recipe.author}</span>
+                    <span className="text-sm text-gray-500">Cooked With! {recipe.author}</span>
                     <div className="flex items-center space-x-1">
                       <StarIcon className="h-4 w-4 text-yellow-400 fill-current" />
                       <span className="text-sm text-gray-600">{recipe.rating}</span>
@@ -199,7 +205,7 @@ export default function Home() {
                   
                   <div className="border-t pt-4">
                     <p className="text-sm text-gray-600 mb-2">Key ingredients:</p>
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-1 mb-4">
                       {recipe.ingredients.slice(0, 3).map((ingredient, index) => (
                         <span key={index} className="bg-primary-50 text-primary-700 px-2 py-1 rounded-full text-xs">
                           {ingredient}
@@ -211,6 +217,18 @@ export default function Home() {
                         </span>
                       )}
                     </div>
+                    
+                    {recipe.inventor && (
+                      <div className="bg-amber-50 border-l-4 border-amber-200 p-3">
+                        <p className="text-xs font-semibold text-amber-800 mb-1">Historical Origins</p>
+                        <p className="text-xs text-amber-700 mb-1">
+                          <strong>Inventor:</strong> {recipe.inventor}
+                        </p>
+                        <p className="text-xs text-amber-600 leading-relaxed">
+                          {recipe.history}
+                        </p>
+                      </div>
+                    )}
                   </div>
                   
                   <Link 
