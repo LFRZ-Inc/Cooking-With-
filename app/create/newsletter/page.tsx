@@ -68,7 +68,7 @@ function CreateNewsletterPage() {
         title: formData.title,
         excerpt: formData.excerpt,
         content: formData.content,
-        author_id: user?.id || null, // Allow anonymous submissions
+        author_id: user?.id || null, // Use Supabase auth user ID or null for anonymous
         category: formData.category || null,
         featured: formData.featured,
         status: 'published' as const,

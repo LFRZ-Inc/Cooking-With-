@@ -103,7 +103,7 @@ function CreateRecipePageContent() {
       const recipeData = {
         title: formData.title,
         description: formData.description,
-        author_id: user?.id || null, // Allow anonymous submissions
+        author_id: user?.id || null, // Use Supabase auth user ID or null for anonymous
         difficulty: formData.difficulty.toLowerCase() as 'easy' | 'medium' | 'hard',
         prep_time_minutes: parseInt(formData.prepTime) || 0,
         cook_time_minutes: parseInt(formData.cookTime) || 0,
