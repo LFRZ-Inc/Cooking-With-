@@ -113,7 +113,7 @@ const demoRecipes = [
 ]
 
 interface Recipe {
-  id: number
+  id: number | string
   title: string
   description: string
   image_url?: string
@@ -373,6 +373,7 @@ function RecipesPageContent() {
                   <Link 
                     href={`/recipes/${recipe.id}`}
                     className="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors duration-200 text-center block"
+                    onClick={() => console.log('Navigating to recipe:', recipe.id, 'for title:', recipe.title)}
                   >
                     View Recipe
                   </Link>
