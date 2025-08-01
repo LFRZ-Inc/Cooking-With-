@@ -298,7 +298,9 @@ function RecipesPageContent() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredRecipes.map((recipe) => (
+            {filteredRecipes.map((recipe) => {
+              console.log('🔍 Rendering recipe:', recipe.id, recipe.title)
+              return (
               <div key={recipe.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
                 {/* Recipe Image */}
                 <div className="relative h-48 bg-gray-200">
@@ -379,7 +381,8 @@ function RecipesPageContent() {
                   </Link>
                 </div>
               </div>
-            ))}
+            )
+          })}
           </div>
         )}
       </div>

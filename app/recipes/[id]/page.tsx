@@ -394,12 +394,18 @@ function RecipePageContent({ params }: RecipePageProps) {
       const id = params.id
       
       // Check if it's a demo recipe (string ID starting with "900")
+      console.log('🔍 Checking recipe ID:', id, 'Type:', typeof id, 'StartsWith900:', id.startsWith("900"))
+      console.log('🔍 Available demo recipe IDs:', demoRecipes.map(r => r.id))
+      
       if (id.startsWith("900")) {
+        console.log('🔍 Found demo recipe ID, searching...')
         const demoRecipe = demoRecipes.find(r => r.id === id)
         if (demoRecipe) {
+          console.log('🔍 Demo recipe found:', demoRecipe.title)
           setRecipe(demoRecipe)
           setServings(demoRecipe.servings)
         } else {
+          console.log('🔍 Demo recipe not found with ID:', id)
           notFound()
         }
         setLoading(false)
@@ -409,7 +415,7 @@ function RecipePageContent({ params }: RecipePageProps) {
       // Check if the ID is a valid UUID format for database recipes
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
       if (!uuidRegex.test(id)) {
-        console.log('Invalid recipe ID format. Expected UUID or demo recipe ID (>=9000):', id)
+        console.log('Invalid recipe ID format. Expected UUID or demo recipe ID (900X):', id)
         notFound()
         return
       }
