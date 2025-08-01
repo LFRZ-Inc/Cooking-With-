@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { 
@@ -10,7 +10,9 @@ import {
   ChefHatIcon,
   HeartIcon,
   PrinterIcon,
-  ShareIcon
+  ShareIcon,
+  MinusIcon,
+  PlusIcon
 } from 'lucide-react'
 
 // Same recipe data as in the recipes page
@@ -267,12 +269,76 @@ interface RecipePageProps {
   }
 }
 
+// Helper function to parse and scale ingredients
+function parseIngredient(ingredient: string, scale: number) {
+  // Regular expressions to match different quantity patterns
+  const patterns = [
+    /^(.+?)\s*\((\d+(?:\.\d+)?(?:\/\d+)?)\s*([^)]+)\)(.*)$/,  // "Item (2 cups) extra"
+    /^(\d+(?:\.\d+)?(?:\/\d+)?)\s*([a-zA-Z]+)\s+(.+)$/,      // "2 cups item"
+    /^(\d+(?:\.\d+)?(?:\/\d+)?)\s*(.+)$/                      // "2 item"
+  ]
+
+  for (const pattern of patterns) {
+    const match = ingredient.match(pattern)
+    if (match) {
+      if (pattern === patterns[0]) {
+        // Format: "Item (quantity unit) extra"
+        const [, itemName, quantity, unit, extra] = match
+        const scaledQuantity = scaleQuantity(quantity, scale)
+        return `${itemName.trim()} (${scaledQuantity} ${unit})${extra}`
+      } else if (pattern === patterns[1]) {
+        // Format: "quantity unit item"
+        const [, quantity, unit, itemName] = match
+        const scaledQuantity = scaleQuantity(quantity, scale)
+        return `${scaledQuantity} ${unit} ${itemName}`
+      } else {
+        // Format: "quantity item"
+        const [, quantity, itemName] = match
+        const scaledQuantity = scaleQuantity(quantity, scale)
+        return `${scaledQuantity} ${itemName}`
+      }
+    }
+  }
+  
+  // If no quantity found, return original ingredient
+  return ingredient
+}
+
+function scaleQuantity(quantity: string, scale: number): string {
+  // Handle fractions
+  if (quantity.includes('/')) {
+    const [numerator, denominator] = quantity.split('/').map(Number)
+    const decimal = numerator / denominator
+    const scaled = decimal * scale
+    return formatQuantity(scaled)
+  }
+  
+  // Handle regular numbers
+  const num = parseFloat(quantity)
+  const scaled = num * scale
+  return formatQuantity(scaled)
+}
+
+function formatQuantity(num: number): string {
+  // Round to reasonable precision
+  if (num < 0.125) return (Math.round(num * 16) / 16).toString()
+  if (num < 1) return (Math.round(num * 8) / 8).toString()
+  if (num < 10) return (Math.round(num * 4) / 4).toString()
+  return Math.round(num * 2) / 2 === Math.round(num) ? Math.round(num).toString() : (Math.round(num * 2) / 2).toString()
+}
+
 export default function RecipePage({ params }: RecipePageProps) {
   const recipe = recipes.find(r => r.id === parseInt(params.id))
+  const [selectedServings, setSelectedServings] = useState(recipe?.servings || 4)
 
   if (!recipe) {
     notFound()
   }
+
+  const servingScale = selectedServings / recipe.servings
+  const scaledIngredients = recipe.ingredients.map(ingredient => 
+    parseIngredient(ingredient, servingScale)
+  )
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -354,13 +420,52 @@ export default function RecipePage({ params }: RecipePageProps) {
                   <span className="font-medium">{recipe.cookTime}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Servings:</span>
+                  <span className="text-gray-600">Original Servings:</span>
                   <span className="font-medium">{recipe.servings}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Difficulty:</span>
                   <span className="font-medium">{recipe.difficulty}</span>
                 </div>
+              </div>
+
+              {/* Serving Size Selector */}
+              <div className="mt-6 p-4 bg-primary-50 rounded-lg border">
+                <h4 className="font-semibold text-primary-800 mb-3 flex items-center">
+                  <UsersIcon className="h-4 w-4 mr-2" />
+                  Cooking for how many people?
+                </h4>
+                <div className="flex items-center justify-center space-x-4">
+                  <button
+                    onClick={() => setSelectedServings(Math.max(1, selectedServings - 1))}
+                    className="w-8 h-8 bg-primary-500 text-white rounded-full flex items-center justify-center hover:bg-primary-600 transition-colors"
+                    disabled={selectedServings <= 1}
+                  >
+                    <MinusIcon className="h-4 w-4" />
+                  </button>
+                  
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-primary-700">{selectedServings}</div>
+                    <div className="text-xs text-primary-600">
+                      {selectedServings === 1 ? 'person' : 'people'}
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={() => setSelectedServings(selectedServings + 1)}
+                    className="w-8 h-8 bg-primary-500 text-white rounded-full flex items-center justify-center hover:bg-primary-600 transition-colors"
+                  >
+                    <PlusIcon className="h-4 w-4" />
+                  </button>
+                </div>
+                
+                {selectedServings !== recipe.servings && (
+                  <div className="mt-3 text-center">
+                    <span className="text-xs text-primary-600 bg-primary-100 px-2 py-1 rounded-full">
+                      Ingredients scaled {servingScale > 1 ? 'up' : 'down'} by {Math.round(servingScale * 100)}%
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="flex space-x-2 mt-6">
@@ -379,15 +484,29 @@ export default function RecipePage({ params }: RecipePageProps) {
 
             {/* Ingredients */}
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="text-lg font-semibold mb-4">Ingredients</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Ingredients</h3>
+                <span className="text-sm text-gray-500">
+                  For {selectedServings} {selectedServings === 1 ? 'person' : 'people'}
+                </span>
+              </div>
               <ul className="space-y-3">
-                {recipe.ingredients.map((ingredient, index) => (
+                {scaledIngredients.map((ingredient, index) => (
                   <li key={index} className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-primary-500 rounded-full mt-2 flex-shrink-0" />
                     <span className="text-gray-700">{ingredient}</span>
                   </li>
                 ))}
               </ul>
+              
+              {selectedServings !== recipe.servings && (
+                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-xs text-green-700">
+                    <strong>Smart Scaling:</strong> All quantities have been automatically adjusted for {selectedServings} {selectedServings === 1 ? 'person' : 'people'} 
+                    (original recipe serves {recipe.servings}).
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Historical Information */}
@@ -426,6 +545,28 @@ export default function RecipePage({ params }: RecipePageProps) {
                     Chef's Tips
                   </h4>
                   <p className="text-blue-700 text-sm leading-relaxed">{recipe.tips}</p>
+                </div>
+              )}
+
+              {/* Scaling Tips */}
+              {selectedServings !== recipe.servings && (
+                <div className="mt-6 bg-amber-50 border-l-4 border-amber-200 p-4 rounded-lg">
+                  <h4 className="font-semibold text-amber-800 mb-2">
+                    <UsersIcon className="h-5 w-5 inline mr-2" />
+                    Scaling Tips
+                  </h4>
+                  <div className="text-amber-700 text-sm space-y-2">
+                    {servingScale > 2 && (
+                      <p>• <strong>Large batches:</strong> You may need a bigger pot/pan and slightly longer cooking times for even heating.</p>
+                    )}
+                    {servingScale < 0.75 && (
+                      <p>• <strong>Small portions:</strong> Watch cooking times closely - smaller quantities may cook faster.</p>
+                    )}
+                    <p>• <strong>Seasonings:</strong> Taste as you go - salt and spices may need fine-tuning when scaled.</p>
+                    {(recipe.category === "Dessert" || recipe.title.includes("Cake")) && servingScale !== 1 && (
+                      <p>• <strong>Baking note:</strong> For best results with scaled baking recipes, consider making multiple smaller batches.</p>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
