@@ -14,6 +14,7 @@ import {
   MinusIcon,
   PlusIcon
 } from 'lucide-react'
+import AuthGuard from '@/components/AuthGuard'
 
 // Same recipe data as in the recipes page
 const recipes = [
@@ -378,7 +379,7 @@ function formatQuantity(num: number): string {
   return num % 1 === 0 ? Math.round(num).toString() : (Math.round(num * 10) / 10).toString()
 }
 
-export default function RecipePage({ params }: RecipePageProps) {
+function RecipePageContent({ params }: RecipePageProps) {
   const recipe = recipes.find(r => r.id === parseInt(params.id))
   const [selectedServings, setSelectedServings] = useState(recipe?.servings || 4)
 
@@ -625,5 +626,13 @@ export default function RecipePage({ params }: RecipePageProps) {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function RecipePage({ params }: RecipePageProps) {
+  return (
+    <AuthGuard>
+      <RecipePageContent params={params} />
+    </AuthGuard>
   )
 } 

@@ -12,6 +12,7 @@ import {
   BookmarkIcon,
   PrinterIcon
 } from 'lucide-react'
+import AuthGuard from '@/components/AuthGuard'
 
 // Same newsletter data as in the newsletters page
 const newsletters = [
@@ -745,7 +746,7 @@ interface NewsletterPageProps {
   }
 }
 
-export default function NewsletterPage({ params }: NewsletterPageProps) {
+function NewsletterPageContent({ params }: NewsletterPageProps) {
   const newsletter = newsletters.find(n => n.id === parseInt(params.id))
 
   if (!newsletter) {
@@ -970,5 +971,13 @@ export default function NewsletterPage({ params }: NewsletterPageProps) {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function NewsletterPage({ params }: NewsletterPageProps) {
+  return (
+    <AuthGuard>
+      <NewsletterPageContent params={params} />
+    </AuthGuard>
   )
 } 

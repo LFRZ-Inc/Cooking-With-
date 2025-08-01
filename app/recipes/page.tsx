@@ -9,6 +9,7 @@ import {
   HeartIcon,
   ChefHatIcon
 } from 'lucide-react'
+import AuthGuard from '@/components/AuthGuard'
 
 // Mock recipe data
 const recipes = [
@@ -108,7 +109,7 @@ const categories = ["All", "Italian", "French", "Seafood", "Dessert", "Healthy"]
 const dietTypes = ["All", "Vegetarian", "Vegan", "Keto", "Gluten-Free"]
 const difficulties = ["All", "Easy", "Medium", "Hard"]
 
-export default function RecipesPage() {
+function RecipesPageContent() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [selectedDietType, setSelectedDietType] = useState('All')
@@ -339,5 +340,13 @@ export default function RecipesPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function RecipesPage() {
+  return (
+    <AuthGuard>
+      <RecipesPageContent />
+    </AuthGuard>
   )
 } 

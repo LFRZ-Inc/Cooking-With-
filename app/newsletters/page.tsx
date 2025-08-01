@@ -9,6 +9,7 @@ import {
   NewspaperIcon,
   TagIcon
 } from 'lucide-react'
+import AuthGuard from '@/components/AuthGuard'
 
 // Mock newsletter data
 const newsletters = [
@@ -100,7 +101,7 @@ const newsletters = [
 
 const categories = ["All", "Seasonal", "Techniques", "Health", "Fermentation", "Baking", "Wine"]
 
-export default function NewslettersPage() {
+function NewslettersPageContent() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
 
@@ -332,5 +333,13 @@ export default function NewslettersPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function NewslettersPage() {
+  return (
+    <AuthGuard>
+      <NewslettersPageContent />
+    </AuthGuard>
   )
 } 

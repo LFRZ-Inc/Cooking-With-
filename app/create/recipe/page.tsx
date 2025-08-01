@@ -8,13 +8,13 @@ import {
   UsersIcon,
   ChefHatIcon
 } from 'lucide-react'
-import AuthGuard from '@/components/AuthGuard'
+
 import { useAuth } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import toast from 'react-hot-toast'
 
 function CreateRecipePageContent() {
-  const { user } = useAuth()
+  const { user } = useAuth() // Optional user for attribution
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -97,18 +97,13 @@ function CreateRecipePageContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    if (!user) {
-      toast.error('You must be logged in to create a recipe')
-      return
-    }
 
     try {
-      // Prepare recipe data for Supabase
+      // Prepare recipe data for Supabase (anonymous or authenticated)
       const recipeData = {
         title: formData.title,
         description: formData.description,
-        author_id: user.id,
+        author_id: user?.id || null, // Allow anonymous submissions
         difficulty: formData.difficulty.toLowerCase() as 'easy' | 'medium' | 'hard',
         prep_time_minutes: parseInt(formData.prepTime) || 0,
         cook_time_minutes: parseInt(formData.cookTime) || 0,
@@ -552,9 +547,5 @@ function CreateRecipePageContent() {
 }
 
 export default function CreateRecipePage() {
-  return (
-    <AuthGuard>
-      <CreateRecipePageContent />
-    </AuthGuard>
-  )
+  return <CreateRecipePageContent />
 } 

@@ -8,7 +8,7 @@ import {
   TagIcon,
   EyeIcon
 } from 'lucide-react'
-import AuthGuard from '@/components/AuthGuard'
+
 
 function CreateNewsletterPage() {
   const [formData, setFormData] = useState({
@@ -353,9 +353,5 @@ function CreateNewsletterPage() {
 }
 
 export default function CreateNewsletterPageWithAuth() {
-  return (
-    <AuthGuard>
-      <CreateNewsletterPage />
-    </AuthGuard>
-  )
+  return <CreateNewsletterPage />
 } 
