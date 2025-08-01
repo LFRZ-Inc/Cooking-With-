@@ -62,6 +62,10 @@ export type Database = {
           rating: number
           rating_count: number
           view_count: number
+          version_number: number
+          parent_recipe_id: string | null
+          is_original: boolean
+          branch_name: string | null
           created_at: string
           updated_at: string
         }
@@ -82,6 +86,10 @@ export type Database = {
           rating?: number
           rating_count?: number
           view_count?: number
+          version_number?: number
+          parent_recipe_id?: string | null
+          is_original?: boolean
+          branch_name?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -102,6 +110,10 @@ export type Database = {
           rating?: number
           rating_count?: number
           view_count?: number
+          version_number?: number
+          parent_recipe_id?: string | null
+          is_original?: boolean
+          branch_name?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -225,6 +237,59 @@ export type Database = {
           unit?: string | null
           notes?: string | null
           order_index?: number
+          created_at?: string
+        }
+      }
+      recipe_versions: {
+        Row: {
+          id: string
+          recipe_id: string
+          version_number: number
+          title: string
+          description: string
+          difficulty: 'easy' | 'medium' | 'hard'
+          prep_time_minutes: number
+          cook_time_minutes: number
+          servings: number
+          instructions: any[] // JSONB
+          tips: string | null
+          image_url: string | null
+          ingredients: any[] // JSONB - snapshot of ingredients at this version
+          change_summary: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          recipe_id: string
+          version_number: number
+          title: string
+          description: string
+          difficulty: 'easy' | 'medium' | 'hard'
+          prep_time_minutes: number
+          cook_time_minutes: number
+          servings: number
+          instructions: any[]
+          tips?: string | null
+          image_url?: string | null
+          ingredients: any[]
+          change_summary?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          recipe_id?: string
+          version_number?: number
+          title?: string
+          description?: string
+          difficulty?: 'easy' | 'medium' | 'hard'
+          prep_time_minutes?: number
+          cook_time_minutes?: number
+          servings?: number
+          instructions?: any[]
+          tips?: string | null
+          image_url?: string | null
+          ingredients?: any[]
+          change_summary?: string | null
           created_at?: string
         }
       }

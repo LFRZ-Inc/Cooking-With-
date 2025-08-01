@@ -12,9 +12,11 @@ import {
   PrinterIcon,
   ShareIcon,
   MinusIcon,
-  PlusIcon
+  PlusIcon,
+  EditIcon
 } from 'lucide-react'
 import AuthGuard from '@/components/AuthGuard'
+import { useAuth } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 
 // Demo recipes - same as in recipes page
@@ -61,7 +63,11 @@ const demoRecipes = [
     history: "Risotto originated in Northern Italy during the 14th century when rice cultivation began in the Po Valley. The technique of slowly adding warm broth to rice was perfected by Milanese cooks, creating the signature creamy texture without cream. This mushroom variation became popular in the 19th century when dried porcini mushrooms became widely available.",
     rating: 4.8,
     prepTime: "15 min",
-    cookTime: "20 min"
+    cookTime: "20 min",
+    version_number: 1,
+    parent_recipe_id: null,
+    is_original: true,
+    branch_name: null
   },
   {
     id: 9002,
@@ -208,6 +214,10 @@ interface Recipe {
   rating?: number
   prepTime?: string
   cookTime?: string
+  version_number?: number
+  parent_recipe_id?: string | null
+  is_original?: boolean
+  branch_name?: string | null
 }
 
 interface RecipePageProps {
@@ -351,6 +361,7 @@ function formatQuantity(num: number): string {
 }
 
 function RecipePageContent({ params }: RecipePageProps) {
+  const { user } = useAuth()
   const [recipe, setRecipe] = useState<Recipe | null>(null)
   const [loading, setLoading] = useState(true)
   const [servings, setServings] = useState(4)
@@ -476,13 +487,13 @@ function RecipePageContent({ params }: RecipePageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="relative h-96 bg-gray-900">
-        <img 
-          src={recipe.image_url || "https://via.placeholder.com/800x600"} 
-          alt={recipe.title}
-          className="w-full h-full object-cover opacity-70"
-        />
+              {/* Hero Section */}
+        <div className="relative h-96 bg-gray-900">
+          <img 
+            src={recipe.image_url || "https://via.placeholder.com/800x600"} 
+            alt={recipe.title}
+            className="w-full h-full object-cover opacity-70"
+          />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         
         {/* Back Button */}
@@ -642,6 +653,17 @@ function RecipePageContent({ params }: RecipePageProps) {
                   <PrinterIcon className="h-4 w-4" />
                 </button>
               </div>
+
+              {/* Edit Button (only for recipe author) */}
+              {recipe.author_id && user?.id === recipe.author_id && (
+                <Link
+                  href={`/recipes/${recipe.id}/edit`}
+                  className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+                >
+                  <EditIcon className="h-4 w-4" />
+                  <span>Edit Recipe</span>
+                </Link>
+              )}
             </div>
 
             {/* Ingredients */}

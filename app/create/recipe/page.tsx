@@ -115,7 +115,11 @@ function CreateRecipePageContent() {
         status: 'published' as const,
         rating: 0,
         rating_count: 0,
-        view_count: 0
+        view_count: 0,
+        version_number: 1,
+        parent_recipe_id: null,
+        is_original: true,
+        branch_name: null
       }
 
       const { data: recipe, error: recipeError } = await supabase
