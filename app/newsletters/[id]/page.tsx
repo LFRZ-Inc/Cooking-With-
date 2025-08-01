@@ -165,7 +165,7 @@ These ingredients open up a world of culinary possibilities while providing comp
 ]
 
 interface Newsletter {
-  id: number
+  id: number | string
   title: string
   excerpt: string
   content: string
@@ -194,11 +194,12 @@ function NewsletterPageContent({ params }: NewsletterPageProps) {
   // Fetch newsletter data
   useEffect(() => {
     const fetchNewsletter = async () => {
-      const id = parseInt(params.id)
+      const id = params.id
       
-      // Check if it's a demo newsletter (high ID)
-      if (id >= 9000) {
-        const demoNewsletter = demoNewsletters.find(n => n.id === id)
+      // Check if it's a demo newsletter (numeric ID >= 9000)
+      const numericId = parseInt(id)
+      if (!isNaN(numericId) && numericId >= 9000) {
+        const demoNewsletter = demoNewsletters.find(n => n.id === numericId)
         if (demoNewsletter) {
           setNewsletter(demoNewsletter)
         } else {
@@ -208,7 +209,7 @@ function NewsletterPageContent({ params }: NewsletterPageProps) {
         return
       }
 
-      // Fetch real newsletter from Supabase
+      // Fetch real newsletter from Supabase (ID is a UUID string)
       try {
         const { data: newsletterData, error: newsletterError } = await supabase
           .from('newsletters')

@@ -188,7 +188,7 @@ const demoRecipes = [
 ]
 
 interface Recipe {
-  id: number
+  id: number | string
   title: string
   description: string
   image_url?: string
@@ -331,11 +331,12 @@ function RecipePageContent({ params }: RecipePageProps) {
   // Fetch recipe data
   useEffect(() => {
     const fetchRecipe = async () => {
-      const id = parseInt(params.id)
+      const id = params.id
       
-      // Check if it's a demo recipe (high ID)
-      if (id >= 9000) {
-        const demoRecipe = demoRecipes.find(r => r.id === id)
+      // Check if it's a demo recipe (numeric ID >= 9000)
+      const numericId = parseInt(id)
+      if (!isNaN(numericId) && numericId >= 9000) {
+        const demoRecipe = demoRecipes.find(r => r.id === numericId)
         if (demoRecipe) {
           setRecipe(demoRecipe)
           setServings(demoRecipe.servings)
@@ -346,7 +347,7 @@ function RecipePageContent({ params }: RecipePageProps) {
         return
       }
 
-      // Fetch real recipe from Supabase
+      // Fetch real recipe from Supabase (ID is a UUID string)
       try {
         const { data: recipeData, error: recipeError } = await supabase
           .from('recipes')
@@ -370,7 +371,7 @@ function RecipePageContent({ params }: RecipePageProps) {
         const transformedRecipe: Recipe = {
           ...recipeData,
           ingredients: ingredientsData?.map(ing => 
-            `${ing.ingredient_name} (${ing.quantity} ${ing.unit || ''})`
+            `${ing.name} (${ing.amount} ${ing.unit || ''})`
           ) || [],
           instructions: recipeData.instructions ? JSON.parse(recipeData.instructions) : [],
           author: recipeData.author_id ? 'Registered Chef' : 'Anonymous Chef',
