@@ -149,6 +149,8 @@ function RecipesPageContent() {
   // Fetch recipes from Supabase and mix with demo recipes
   const fetchRecipes = async () => {
     try {
+      console.log('🔍 Demo recipes before processing:', demoRecipes.map(r => ({ id: r.id, title: r.title })))
+      
       const { data, error } = await supabase
         .from('recipes')
         .select('*')
@@ -157,6 +159,7 @@ function RecipesPageContent() {
       if (error) {
         console.error('Error fetching recipes:', error)
         // If there's an error, just show demo recipes
+        console.log('🔍 Setting recipes to demo recipes only:', demoRecipes.map(r => ({ id: r.id, title: r.title })))
         setRecipes(demoRecipes)
         return
       }
@@ -172,14 +175,18 @@ function RecipesPageContent() {
         history: 'This recipe was shared by our community members.'
       })) || []
 
+      console.log('🔍 Real recipes from DB:', transformedRealRecipes.map(r => ({ id: r.id, title: r.title })))
+
       // Mix demo recipes with real recipes, sorting by creation date
       const allRecipes = [...demoRecipes, ...transformedRealRecipes]
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
+      console.log('🔍 All recipes after mixing and sorting:', allRecipes.map(r => ({ id: r.id, title: r.title })))
       setRecipes(allRecipes)
     } catch (error) {
       console.error('Error fetching recipes:', error)
       // If there's an error, just show demo recipes
+      console.log('🔍 Catch block - Setting recipes to demo recipes:', demoRecipes.map(r => ({ id: r.id, title: r.title })))
       setRecipes(demoRecipes)
     } finally {
       setLoading(false)
@@ -206,6 +213,9 @@ function RecipesPageContent() {
     
     return matchesSearch && matchesCategory && matchesDifficulty
   })
+
+  // Debug filtered recipes
+  console.log('🔍 Filtered recipes for rendering:', filteredRecipes.map(r => ({ id: r.id, title: r.title })))
 
   const categories = ['All', ...Array.from(new Set(recipes.map(r => r.category).filter(Boolean)))]
   const difficulties = ['All', 'Easy', 'Medium', 'Hard']
