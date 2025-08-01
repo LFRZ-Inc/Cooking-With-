@@ -8,8 +8,9 @@ import {
   ChefHatIcon,
   PenToolIcon
 } from 'lucide-react'
+import AuthGuard from '@/components/AuthGuard'
 
-export default function CreatePage() {
+function CreatePageContent() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -186,5 +187,13 @@ export default function CreatePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CreatePage() {
+  return (
+    <AuthGuard>
+      <CreatePageContent />
+    </AuthGuard>
   )
 } 

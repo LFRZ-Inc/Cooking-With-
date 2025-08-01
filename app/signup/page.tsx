@@ -1,7 +1,9 @@
 'use client'
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { ChefHatIcon, EyeIcon, EyeOffIcon, UserIcon, PenToolIcon } from 'lucide-react'
+import { useAuth } from '@/lib/auth'
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -14,15 +16,22 @@ export default function SignupPage() {
     agreeToTerms: false
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { signUp, loading } = useAuth()
+  const router = useRouter()
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (formData.password !== formData.confirmPassword) {
       alert('Passwords do not match!')
       return
     }
-    // Handle signup
-    console.log('Signup data:', { ...formData, userType })
-    alert('Signup functionality coming soon! (This is a demo)')
+    
+    try {
+      await signUp(formData.email, formData.password, formData.name, userType)
+      router.push('/') // Redirect after successful signup
+    } catch (error) {
+      // Error is handled by the auth context with toast
+    }
   }
 
   return (
@@ -187,8 +196,12 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <button type="submit" className="w-full btn-primary">
-                Create Account
+              <button 
+                type="submit" 
+                disabled={loading}
+                className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Creating Account...' : 'Create Account'}
               </button>
             </div>
 

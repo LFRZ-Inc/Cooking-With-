@@ -8,11 +8,14 @@ import {
   UserIcon,
   MenuIcon,
   XIcon,
-  SearchIcon
+  SearchIcon,
+  LogOutIcon
 } from 'lucide-react'
+import { useAuth } from '@/lib/auth'
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { user, signOut, loading, isAuthenticated } = useAuth()
 
   return (
     <nav className="bg-white shadow-lg sticky top-0 z-50">
@@ -63,18 +66,39 @@ export default function Navbar() {
 
             {/* User Menu */}
             <div className="flex items-center space-x-4">
-              <Link 
-                href="/login" 
-                className="text-gray-700 hover:text-primary-500 transition-colors"
-              >
-                Login
-              </Link>
-              <Link 
-                href="/signup" 
-                className="btn-primary"
-              >
-                Sign Up
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <div className="flex items-center space-x-2">
+                    <UserIcon className="h-5 w-5 text-gray-600" />
+                    <span className="text-gray-700">
+                      {user?.user_metadata?.name || user?.email || 'User'}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => signOut()}
+                    disabled={loading}
+                    className="flex items-center space-x-1 text-gray-700 hover:text-primary-500 transition-colors disabled:opacity-50"
+                  >
+                    <LogOutIcon className="h-4 w-4" />
+                    <span>Logout</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    href="/login" 
+                    className="text-gray-700 hover:text-primary-500 transition-colors"
+                  >
+                    Login
+                  </Link>
+                  <Link 
+                    href="/signup" 
+                    className="btn-primary"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 
@@ -124,18 +148,39 @@ export default function Navbar() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
-              <Link 
-                href="/login" 
-                className="block px-3 py-2 text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-md transition-colors"
-              >
-                Login
-              </Link>
-              <Link 
-                href="/signup" 
-                className="block mx-3 my-2 text-center btn-primary"
-              >
-                Sign Up
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <div className="flex items-center space-x-2 px-3 py-2">
+                    <UserIcon className="h-5 w-5 text-gray-600" />
+                    <span className="text-gray-700">
+                      {user?.user_metadata?.name || user?.email || 'User'}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => signOut()}
+                    disabled={loading}
+                    className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-md transition-colors disabled:opacity-50 w-full"
+                  >
+                    <LogOutIcon className="h-4 w-4" />
+                    <span>Logout</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    href="/login" 
+                    className="block px-3 py-2 text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-md transition-colors"
+                  >
+                    Login
+                  </Link>
+                  <Link 
+                    href="/signup" 
+                    className="block mx-3 my-2 text-center btn-primary"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}

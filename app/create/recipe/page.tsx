@@ -8,8 +8,13 @@ import {
   UsersIcon,
   ChefHatIcon
 } from 'lucide-react'
+import AuthGuard from '@/components/AuthGuard'
+import { useAuth } from '@/lib/auth'
+import { supabase } from '@/lib/supabase'
+import toast from 'react-hot-toast'
 
-export default function CreateRecipePage() {
+function CreateRecipePageContent() {
+  const { user } = useAuth()
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -90,11 +95,85 @@ export default function CreateRecipePage() {
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission
-    console.log('Recipe data:', formData)
-    alert('Recipe submitted! (This is a demo)')
+    
+    if (!user) {
+      toast.error('You must be logged in to create a recipe')
+      return
+    }
+
+    try {
+      // Prepare recipe data for Supabase
+      const recipeData = {
+        title: formData.title,
+        description: formData.description,
+        author_id: user.id,
+        difficulty: formData.difficulty.toLowerCase() as 'easy' | 'medium' | 'hard',
+        prep_time_minutes: parseInt(formData.prepTime) || 0,
+        cook_time_minutes: parseInt(formData.cookTime) || 0,
+        servings: parseInt(formData.servings) || 1,
+        instructions: formData.instructions.filter(inst => inst.trim() !== ''),
+        tips: formData.tips || null,
+        status: 'published' as const,
+        rating: 0,
+        rating_count: 0,
+        view_count: 0
+      }
+
+      const { data: recipe, error: recipeError } = await supabase
+        .from('recipes')
+        .insert([recipeData])
+        .select()
+        .single()
+
+      if (recipeError) {
+        throw recipeError
+      }
+
+      // Add ingredients
+      if (recipe && formData.ingredients.length > 0) {
+        const ingredientsData = formData.ingredients
+          .filter(ing => ing.item.trim() !== '')
+          .map((ingredient, index) => ({
+            recipe_id: recipe.id,
+            name: `${ingredient.amount} ${ingredient.unit} ${ingredient.item}`.trim(),
+            amount: parseFloat(ingredient.amount) || null,
+            unit: ingredient.unit || null,
+            order_index: index
+          }))
+
+        const { error: ingredientsError } = await supabase
+          .from('recipe_ingredients')
+          .insert(ingredientsData)
+
+        if (ingredientsError) {
+          console.error('Error adding ingredients:', ingredientsError)
+        }
+      }
+
+      toast.success('Recipe created successfully!')
+      
+      // Reset form
+      setFormData({
+        title: '',
+        description: '',
+        category: '',
+        dietType: '',
+        difficulty: '',
+        prepTime: '',
+        cookTime: '',
+        servings: '',
+        ingredients: [{ item: '', amount: '', unit: '' }],
+        instructions: [''],
+        tips: '',
+        tags: [] as string[]
+      })
+
+    } catch (error: any) {
+      console.error('Error creating recipe:', error)
+      toast.error(error.message || 'Failed to create recipe')
+    }
   }
 
   return (
@@ -469,5 +548,13 @@ export default function CreateRecipePage() {
         </form>
       </div>
     </div>
+  )
+}
+
+export default function CreateRecipePage() {
+  return (
+    <AuthGuard>
+      <CreateRecipePageContent />
+    </AuthGuard>
   )
 } 

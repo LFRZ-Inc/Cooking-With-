@@ -1,7 +1,9 @@
 'use client'
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { ChefHatIcon, EyeIcon, EyeOffIcon } from 'lucide-react'
+import { useAuth } from '@/lib/auth'
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -9,12 +11,17 @@ export default function LoginPage() {
     email: '',
     password: ''
   })
+  const { signIn, loading } = useAuth()
+  const router = useRouter()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle login
-    console.log('Login data:', formData)
-    alert('Login functionality coming soon! (This is a demo)')
+    try {
+      await signIn(formData.email, formData.password)
+      router.push('/') // Redirect to home after successful login
+    } catch (error) {
+      // Error is handled by the auth context with toast
+    }
   }
 
   return (
@@ -104,8 +111,12 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <button type="submit" className="w-full btn-primary">
-                Sign in
+              <button 
+                type="submit" 
+                disabled={loading}
+                className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Signing In...' : 'Sign in'}
               </button>
             </div>
 
