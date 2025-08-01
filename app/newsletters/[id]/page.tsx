@@ -76,6 +76,7 @@ Remember, the best comfort food recipes are those that speak to your personal hi
 
 As autumn settles in around us, let these recipes guide you toward creating meals that warm both body and soul. Happy cooking!`,
     author: "Emily Chen",
+    authorId: "user_555", // Authenticated user
     authorImage: "https://images.unsplash.com/photo-1494790108755-2616b612b5e5?w=100",
     publishDate: "2024-10-15",
     readTime: "5 min read",
@@ -170,6 +171,7 @@ Remember, even the most accomplished pastry chefs started with basic techniques.
 
 *Bon appétit et bonne chance!*`,
     author: "Jean-Pierre Dubois",
+    authorId: null, // Anonymous submission
     authorImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
     publishDate: "2024-10-12",
     readTime: "8 min read",

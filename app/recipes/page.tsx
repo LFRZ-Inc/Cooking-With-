@@ -22,6 +22,7 @@ const recipes = [
     difficulty: "Medium",
     rating: 4.8,
     author: "Chef Maria",
+    authorId: "user_123", // Authenticated user
     category: "Italian",
     dietType: "Vegetarian",
     ingredients: ["Arborio rice (1 cup)", "Porcini mushrooms (200g)", "Parmigiano-Reggiano (100g)", "Dry white wine (1/2 cup)", "Warm vegetable broth (1 liter)", "Onion (1 medium)", "Butter (4 tbsp)", "Extra virgin olive oil (2 tbsp)", "Fresh parsley", "Salt and white pepper"],
@@ -37,6 +38,7 @@ const recipes = [
     difficulty: "Medium",
     rating: 4.9,
     author: "Pizzaiolo Antonio",
+    authorId: "user_456", // Authenticated user
     category: "Italian",
     dietType: "Vegetarian",
     ingredients: ["Neapolitan pizza dough (300g)", "San Marzano tomatoes (200g)", "Mozzarella di bufala (150g)", "Fresh basil leaves", "Extra virgin olive oil", "Sea salt", "Tipo 00 flour for dusting"],
@@ -52,6 +54,7 @@ const recipes = [
     difficulty: "Hard",
     rating: 4.7,
     author: "Pastry Chef Laurent",
+    authorId: null, // Anonymous submission
     category: "Dessert",
     dietType: "Vegetarian",
     ingredients: ["Dark chocolate 70% (100g)", "Unsalted butter (100g)", "Large eggs (2 whole + 2 yolks)", "Caster sugar (60g)", "Plain flour (30g)", "Butter for ramekins", "Cocoa powder for dusting", "Vanilla ice cream (to serve)"],
@@ -67,6 +70,7 @@ const recipes = [
     difficulty: "Easy",
     rating: 4.6,
     author: "Chef Dimitris",
+    authorId: "user_789", // Authenticated user
     category: "Seafood",
     dietType: "Keto",
     ingredients: ["Wild salmon fillets (4 x 150g)", "Fresh dill (2 tbsp)", "Fresh oregano (1 tbsp)", "Lemon zest and juice", "Extra virgin olive oil (3 tbsp)", "Garlic (2 cloves)", "Sea salt", "Freshly ground black pepper", "Capers (optional)"],
@@ -82,6 +86,7 @@ const recipes = [
     difficulty: "Easy",
     rating: 4.5,
     author: "Wellness Chef Sarah",
+    authorId: null, // Anonymous submission
     category: "Healthy",
     dietType: "Vegan",
     ingredients: ["Tricolor quinoa (1 cup)", "Roasted chickpeas (150g)", "Avocado (1 ripe)", "Roasted sweet potato cubes", "Fresh spinach (2 cups)", "Tahini (3 tbsp)", "Lemon juice (2 tbsp)", "Maple syrup (1 tsp)", "Purple cabbage (shredded)", "Hemp seeds", "Pomegranate seeds"],
@@ -97,6 +102,7 @@ const recipes = [
     difficulty: "Hard",
     rating: 4.8,
     author: "Chef Auguste",
+    authorId: "user_101", // Authenticated user
     category: "French",
     dietType: "None",
     ingredients: ["Beef chuck cut in cubes (1.5kg)", "Burgundy red wine (750ml)", "Pearl onions (300g)", "Button mushrooms (250g)", "Carrots (3 large)", "Bacon lardons (150g)", "Beef stock (500ml)", "Tomato paste (2 tbsp)", "Fresh thyme", "Bay leaves (2)", "Flour (3 tbsp)", "Butter (2 tbsp)"],
@@ -254,6 +260,17 @@ function RecipesPageContent() {
                       <span className="text-sm text-gray-600">{recipe.rating}</span>
                     </div>
                   </div>
+                  
+                  {/* Anonymous Content Disclaimer */}
+                  {!recipe.authorId && (
+                    <div className="mb-3 p-2 bg-amber-50 border border-amber-200 rounded-md">
+                      <div className="flex items-center space-x-1">
+                        <span className="text-amber-600 text-xs">⚠️</span>
+                        <span className="text-xs text-amber-800 font-medium">Unverified Content</span>
+                      </div>
+                      <p className="text-xs text-amber-700 mt-1">Anonymous submission - use caution</p>
+                    </div>
+                  )}
                   
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
                     {recipe.title}

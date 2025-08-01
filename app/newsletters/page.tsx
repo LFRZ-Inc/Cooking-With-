@@ -19,6 +19,7 @@ const newsletters = [
     excerpt: "As the leaves change color and temperatures drop, there's nothing quite like the comfort of hearty, warming dishes. From creamy soups to rich stews, these fall recipes will embrace you with their comforting flavors and fill your home with delicious aromas.",
     content: "Fall is a magical time for cooking. The crisp air calls for meals that warm from the inside out...",
     author: "Emily Chen",
+    authorId: "user_555", // Authenticated user
     authorImage: "https://images.unsplash.com/photo-1494790108755-2616b612b5e5?w=100",
     publishDate: "2024-10-15",
     readTime: "5 min read",
@@ -33,6 +34,7 @@ const newsletters = [
     excerpt: "Master the fundamentals of French pastry with these essential techniques and recipes. From croissants to éclairs, we'll walk you through the delicate art of creating beautiful, buttery pastries that will impress everyone.",
     content: "French pastry is both an art and a science. It requires precision, patience, and practice...",
     author: "Jean-Pierre Dubois",
+    authorId: null, // Anonymous submission
     authorImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
     publishDate: "2024-10-12",
     readTime: "8 min read",
@@ -47,6 +49,7 @@ const newsletters = [
     excerpt: "Discover exciting and delicious plant-based protein sources that will revolutionize your vegetarian cooking. From tempeh to lentils, learn how to create satisfying meals without meat.",
     content: "The world of plant-based proteins extends far beyond tofu and beans...",
     author: "Sarah Green",
+    authorId: "user_666", // Authenticated user
     authorImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100",
     publishDate: "2024-10-08",
     readTime: "6 min read",
@@ -61,6 +64,7 @@ const newsletters = [
     excerpt: "Learn the ancient art of fermentation by making your own kimchi at home. This comprehensive guide covers everything from selecting ingredients to proper fermentation techniques.",
     content: "Fermentation is one of humanity's oldest food preservation methods...",
     author: "Min-Jun Kim",
+    authorId: null, // Anonymous submission
     authorImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100",
     publishDate: "2024-10-05",
     readTime: "7 min read",
@@ -75,6 +79,7 @@ const newsletters = [
     excerpt: "Simplify your holiday entertaining with these make-ahead dessert recipes. From cookies to cakes, these treats can be prepared in advance without sacrificing flavor or quality.",
     content: "The holidays can be stressful, but your desserts don't have to be...",
     author: "Maria Rodriguez",
+    authorId: "user_777", // Authenticated user
     authorImage: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100",
     publishDate: "2024-10-01",
     readTime: "4 min read",
@@ -213,6 +218,17 @@ function NewslettersPageContent() {
                         </div>
                       </div>
                     </div>
+                    
+                    {/* Anonymous Content Disclaimer */}
+                    {!newsletter.authorId && (
+                      <div className="mb-3 p-2 bg-amber-50 border border-amber-200 rounded-md">
+                        <div className="flex items-center space-x-1">
+                          <span className="text-amber-600 text-xs">⚠️</span>
+                          <span className="text-xs text-amber-800 font-medium">Unverified Article</span>
+                        </div>
+                        <p className="text-xs text-amber-700 mt-1">Anonymous submission - verify information independently</p>
+                      </div>
+                    )}
                     
                     <h3 className="text-xl font-serif font-bold text-gray-900 mb-3">
                       {newsletter.title}
