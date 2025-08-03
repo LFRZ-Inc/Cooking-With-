@@ -10,6 +10,8 @@ import {
   UsersIcon,
   HeartIcon
 } from 'lucide-react'
+import LanguageSwitcher from '@/components/LanguageSwitcher'
+import ClientOnly from '@/lib/ClientOnly'
 
 // Mock data for demo
 const featuredRecipes = [
@@ -87,13 +89,22 @@ export default function Home() {
               Discover amazing recipes, share your culinary creations, and stay updated with our delicious newsletters. 
               Join a community of passionate home cooks and professional chefs.
             </p>
-            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
               <Link href="/recipes" className="btn-primary text-lg px-8 py-3">
                 Explore Recipes
               </Link>
               <Link href="/newsletters" className="btn-secondary text-lg px-8 py-3">
                 Read Newsletters
               </Link>
+            </div>
+            
+            {/* Language Switcher */}
+            <div className="flex justify-center">
+              <ClientOnly fallback={<div className="h-12 w-48"></div>}>
+                <div className="bg-white/80 backdrop-blur-sm rounded-lg p-2">
+                  <LanguageSwitcher />
+                </div>
+              </ClientOnly>
             </div>
           </div>
         </div>

@@ -14,6 +14,7 @@ import {
 import { useAuth } from '@/lib/auth'
 import { useLanguage } from '@/lib/language'
 import LanguageSelector from './LanguageSelector'
+import ClientOnly from '@/lib/ClientOnly'
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -74,7 +75,9 @@ export default function Navbar() {
             </div>
 
             {/* Language Selector */}
-            <LanguageSelector />
+            <ClientOnly fallback={<div className="w-8 h-8"></div>}>
+              <LanguageSelector />
+            </ClientOnly>
 
             {/* User Menu */}
             <div className="flex items-center space-x-4">

@@ -15,6 +15,7 @@ import {
 import AuthGuard from '@/components/AuthGuard'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/lib/language'
+import ClientOnly from '@/lib/ClientOnly'
 
 // Demo newsletters - same as in newsletters page
 const demoNewsletters = [
@@ -499,7 +500,18 @@ function NewsletterPageContent({ params }: NewsletterPageProps) {
 export default function NewsletterPage({ params }: NewsletterPageProps) {
   return (
     <AuthGuard>
-      <NewsletterPageContent params={params} />
+      <ClientOnly fallback={
+        <div className="min-h-screen bg-gray-50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+              <span className="ml-3 text-lg text-gray-600">Loading...</span>
+            </div>
+          </div>
+        </div>
+      }>
+        <NewsletterPageContent params={params} />
+      </ClientOnly>
     </AuthGuard>
   )
 } 

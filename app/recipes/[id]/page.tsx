@@ -21,6 +21,7 @@ import VersionNavigator from '@/components/VersionNavigator'
 import { useAuth } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import toast from 'react-hot-toast'
+import ClientOnly from '@/lib/ClientOnly'
 
 // Demo recipes - same as in recipes page
 const demoRecipes = [
@@ -1045,7 +1046,18 @@ function RecipePageContent({ params }: RecipePageProps) {
 export default function RecipePage({ params }: RecipePageProps) {
   return (
     <AuthGuard>
-      <RecipePageContent params={params} />
+      <ClientOnly fallback={
+        <div className="min-h-screen bg-gray-50 py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+              <span className="ml-3 text-lg text-gray-600">Loading...</span>
+            </div>
+          </div>
+        </div>
+      }>
+        <RecipePageContent params={params} />
+      </ClientOnly>
     </AuthGuard>
   )
 } 
