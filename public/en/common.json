@@ -1,0 +1,61 @@
+{
+  "navigation": {
+    "recipes": "Recipes",
+    "newsletters": "Newsletters",
+    "create": "Create",
+    "admin": "Admin",
+    "account": "Account",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "search": "Search recipes...",
+    "backToArticles": "Back to Articles"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "featured": "Featured",
+    "category": "Category",
+    "tags": "Tags",
+    "author": "Author",
+    "readTime": "min read",
+    "publishDate": "Publish Date",
+    "share": "Share",
+    "save": "Save Article",
+    "print": "Print",
+    "relatedArticles": "Related Articles",
+    "stayUpdated": "Stay Updated",
+    "subscribe": "Subscribe"
+  },
+  "newsletters": {
+    "title": "Newsletter Articles",
+    "subtitle": "Discover inspiring cooking stories, tips, and insights from our community",
+    "searchPlaceholder": "Search articles...",
+    "featuredOnly": "Featured only",
+    "noArticlesFound": "No articles found",
+    "noArticlesDescription": "Try adjusting your search or filters, or create the first article!",
+    "loadingArticles": "Loading fresh articles...",
+    "loadingArticle": "Loading article...",
+    "readFullArticle": "Read Full Article",
+    "demoNotice": "Real Articles from Our Community! These are actual articles shared by users like you. Even though some are marked as demos, they are completely real and informative content.",
+    "unverifiedArticle": "Unverified Article",
+    "aboutAuthor": "About",
+    "authorBio": "is a passionate food writer and recipe developer who believes in the power of good food to bring people together. With years of experience in professional kitchens and food journalism, they share insights that make cooking accessible and enjoyable for everyone.",
+    "shareThisArticle": "Share This Article",
+    "emailPlaceholder": "Your email address",
+    "getLatestRecipes": "Get the latest recipes and cooking tips delivered to your inbox."
+  },
+  "errors": {
+    "pageNotFound": "Page not found",
+    "articleNotFound": "Article not found",
+    "loadingError": "Error loading content",
+    "clientSideError": "A client-side error has occurred",
+    "tryAgain": "Try again",
+    "goHome": "Go to Home"
+  },
+  "language": {
+    "english": "English",
+    "spanish": "Español",
+    "selectLanguage": "Select Language"
+  }
+}

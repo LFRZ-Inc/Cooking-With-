@@ -1,0 +1,61 @@
+{
+  "navigation": {
+    "recipes": "Recetas",
+    "newsletters": "Artículos",
+    "create": "Crear",
+    "admin": "Admin",
+    "account": "Cuenta",
+    "login": "Iniciar Sesión",
+    "signup": "Registrarse",
+    "logout": "Cerrar Sesión",
+    "search": "Buscar recetas...",
+    "backToArticles": "Volver a Artículos"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "featured": "Destacado",
+    "category": "Categoría",
+    "tags": "Etiquetas",
+    "author": "Autor",
+    "readTime": "min de lectura",
+    "publishDate": "Fecha de Publicación",
+    "share": "Compartir",
+    "save": "Guardar Artículo",
+    "print": "Imprimir",
+    "relatedArticles": "Artículos Relacionados",
+    "stayUpdated": "Mantente Actualizado",
+    "subscribe": "Suscribirse"
+  },
+  "newsletters": {
+    "title": "Artículos de Boletín",
+    "subtitle": "Descubre historias de cocina inspiradoras, consejos e ideas de nuestra comunidad",
+    "searchPlaceholder": "Buscar artículos...",
+    "featuredOnly": "Solo destacados",
+    "noArticlesFound": "No se encontraron artículos",
+    "noArticlesDescription": "¡Intenta ajustar tu búsqueda o filtros, o crea el primer artículo!",
+    "loadingArticles": "Cargando artículos frescos...",
+    "loadingArticle": "Cargando artículo...",
+    "readFullArticle": "Leer Artículo Completo",
+    "demoNotice": "¡Artículos Reales de Nuestra Comunidad! Estos son artículos reales compartidos por usuarios como tú. Aunque algunos estén marcados como demos, son contenido completamente real e informativo.",
+    "unverifiedArticle": "Artículo No Verificado",
+    "aboutAuthor": "Acerca de",
+    "authorBio": "es un escritor gastronómico apasionado y desarrollador de recetas que cree en el poder de la buena comida para unir a las personas. Con años de experiencia en cocinas profesionales y periodismo gastronómico, comparte ideas que hacen que cocinar sea accesible y agradable para todos.",
+    "shareThisArticle": "Compartir Este Artículo",
+    "emailPlaceholder": "Tu dirección de correo electrónico",
+    "getLatestRecipes": "Recibe las últimas recetas y consejos de cocina en tu bandeja de entrada."
+  },
+  "errors": {
+    "pageNotFound": "Página no encontrada",
+    "articleNotFound": "Artículo no encontrado",
+    "loadingError": "Error al cargar el contenido",
+    "clientSideError": "Ha ocurrido un error del lado del cliente",
+    "tryAgain": "Intentar de nuevo",
+    "goHome": "Ir al Inicio"
+  },
+  "language": {
+    "english": "English",
+    "spanish": "Español",
+    "selectLanguage": "Seleccionar Idioma"
+  }
+}

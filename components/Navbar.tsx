@@ -12,10 +12,13 @@ import {
   LogOutIcon
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
+import { useLanguage } from '@/lib/language'
+import LanguageSelector from './LanguageSelector'
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { user, signOut, loading, isAuthenticated } = useAuth()
+  const { t } = useLanguage()
 
   return (
     <nav className="bg-white shadow-lg sticky top-0 z-50">
@@ -38,26 +41,26 @@ export default function Navbar() {
               className="flex items-center space-x-1 text-gray-700 hover:text-primary-500 transition-colors"
             >
               <BookOpenIcon className="h-5 w-5" />
-              <span>Recipes</span>
+              <span>{t('navigation.recipes')}</span>
             </Link>
             <Link 
               href="/newsletters" 
               className="flex items-center space-x-1 text-gray-700 hover:text-primary-500 transition-colors"
             >
               <NewspaperIcon className="h-5 w-5" />
-              <span>Newsletters</span>
+              <span>{t('navigation.newsletters')}</span>
             </Link>
             <Link 
               href="/create" 
               className="flex items-center space-x-1 text-gray-700 hover:text-primary-500 transition-colors"
             >
-              <span>Create</span>
+              <span>{t('navigation.create')}</span>
             </Link>
             <Link 
               href="/admin" 
               className="flex items-center space-x-1 text-gray-700 hover:text-primary-500 transition-colors"
             >
-              <span>Admin</span>
+              <span>{t('navigation.admin')}</span>
             </Link>
             
             {/* Search Bar */}
@@ -65,10 +68,13 @@ export default function Navbar() {
               <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search recipes..."
+                placeholder={t('navigation.search')}
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
             </div>
+
+            {/* Language Selector */}
+            <LanguageSelector />
 
             {/* User Menu */}
             <div className="flex items-center space-x-4">
@@ -80,7 +86,7 @@ export default function Navbar() {
                   >
                     <UserIcon className="h-5 w-5" />
                     <span>
-                      {user?.user_metadata?.name || user?.email || 'User'}
+                      {user?.user_metadata?.name || user?.email || t('navigation.account')}
                     </span>
                   </Link>
                   <button
@@ -89,7 +95,7 @@ export default function Navbar() {
                     className="flex items-center space-x-1 text-gray-700 hover:text-primary-500 transition-colors disabled:opacity-50"
                   >
                     <LogOutIcon className="h-4 w-4" />
-                    <span>Logout</span>
+                    <span>{t('navigation.logout')}</span>
                   </button>
                 </>
               ) : (
@@ -98,13 +104,13 @@ export default function Navbar() {
                     href="/login" 
                     className="text-gray-700 hover:text-primary-500 transition-colors"
                   >
-                    Login
+                    {t('navigation.login')}
                   </Link>
                   <Link 
                     href="/signup" 
                     className="btn-primary"
                   >
-                    Sign Up
+                    {t('navigation.signup')}
                   </Link>
                 </>
               )}
@@ -135,25 +141,25 @@ export default function Navbar() {
                 className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-md transition-colors"
               >
                 <BookOpenIcon className="h-5 w-5" />
-                <span>Recipes</span>
+                <span>{t('navigation.recipes')}</span>
               </Link>
               <Link 
                 href="/newsletters" 
                 className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-md transition-colors"
               >
                 <NewspaperIcon className="h-5 w-5" />
-                <span>Newsletters</span>
+                <span>{t('navigation.newsletters')}</span>
               </Link>
               <Link 
                 href="/create" 
                 className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-md transition-colors"
               >
-                <span>Create</span>
+                <span>{t('navigation.create')}</span>
               </Link>
               <div className="px-3 py-2">
                 <input
                   type="text"
-                  placeholder="Search recipes..."
+                  placeholder={t('navigation.search')}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
@@ -165,7 +171,7 @@ export default function Navbar() {
                   >
                     <UserIcon className="h-5 w-5" />
                     <span>
-                      {user?.user_metadata?.name || user?.email || 'User'}
+                      {user?.user_metadata?.name || user?.email || t('navigation.account')}
                     </span>
                   </Link>
                   <button
@@ -174,7 +180,7 @@ export default function Navbar() {
                     className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-md transition-colors disabled:opacity-50 w-full"
                   >
                     <LogOutIcon className="h-4 w-4" />
-                    <span>Logout</span>
+                    <span>{t('navigation.logout')}</span>
                   </button>
                 </>
               ) : (
@@ -183,13 +189,13 @@ export default function Navbar() {
                     href="/login" 
                     className="block px-3 py-2 text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-md transition-colors"
                   >
-                    Login
+                    {t('navigation.login')}
                   </Link>
                   <Link 
                     href="/signup" 
                     className="block mx-3 my-2 text-center btn-primary"
                   >
-                    Sign Up
+                    {t('navigation.signup')}
                   </Link>
                 </>
               )}

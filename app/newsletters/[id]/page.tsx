@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import AuthGuard from '@/components/AuthGuard'
 import { supabase } from '@/lib/supabase'
+import { useLanguage } from '@/lib/language'
 
 // Demo newsletters - same as in newsletters page
 const demoNewsletters = [
@@ -190,34 +191,47 @@ interface NewsletterPageProps {
 function NewsletterPageContent({ params }: NewsletterPageProps) {
   const [newsletter, setNewsletter] = useState<Newsletter | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const { t } = useLanguage()
 
   // Fetch newsletter data
   useEffect(() => {
     const fetchNewsletter = async () => {
-      const id = params.id
-      
-      // Check if it's a demo newsletter (numeric ID >= 9000)
-      const numericId = parseInt(id)
-      if (!isNaN(numericId) && numericId >= 9000) {
-        const demoNewsletter = demoNewsletters.find(n => n.id === numericId)
-        if (demoNewsletter) {
-          setNewsletter(demoNewsletter)
-        } else {
-          notFound()
-        }
-        setLoading(false)
-        return
-      }
-
-      // Fetch real newsletter from Supabase (ID is a UUID string)
       try {
+        setLoading(true)
+        setError(null)
+        const id = params.id
+        
+        // Check if it's a demo newsletter (numeric ID >= 9000)
+        const numericId = parseInt(id)
+        if (!isNaN(numericId) && numericId >= 9000) {
+          const demoNewsletter = demoNewsletters.find(n => n.id === numericId)
+          if (demoNewsletter) {
+            setNewsletter(demoNewsletter)
+          } else {
+            setError('Newsletter not found')
+            notFound()
+          }
+          setLoading(false)
+          return
+        }
+
+        // Fetch real newsletter from Supabase (ID is a UUID string)
         const { data: newsletterData, error: newsletterError } = await supabase
           .from('newsletters')
           .select('*')
           .eq('id', id)
           .single()
 
-        if (newsletterError || !newsletterData) {
+        if (newsletterError) {
+          console.error('Supabase error:', newsletterError)
+          setError('Failed to load newsletter')
+          notFound()
+          return
+        }
+
+        if (!newsletterData) {
+          setError('Newsletter not found')
           notFound()
           return
         }
@@ -235,7 +249,7 @@ function NewsletterPageContent({ params }: NewsletterPageProps) {
         setNewsletter(transformedNewsletter)
       } catch (error) {
         console.error('Error fetching newsletter:', error)
-        notFound()
+        setError('An unexpected error occurred')
       } finally {
         setLoading(false)
       }
@@ -250,7 +264,7 @@ function NewsletterPageContent({ params }: NewsletterPageProps) {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-            <span className="ml-3 text-lg text-gray-600">Loading article...</span>
+            <span className="ml-3 text-lg text-gray-600">{t('newsletters.loadingArticle')}</span>
           </div>
         </div>
       </div>
@@ -312,7 +326,7 @@ function NewsletterPageContent({ params }: NewsletterPageProps) {
           className="absolute top-6 left-6 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-lg hover:bg-white/30 transition-colors flex items-center space-x-2"
         >
           <ArrowLeftIcon className="h-5 w-5" />
-          <span>Back to Articles</span>
+          <span>{t('navigation.backToArticles')}</span>
         </Link>
 
         {/* Article Meta */}
@@ -324,7 +338,7 @@ function NewsletterPageContent({ params }: NewsletterPageProps) {
               </span>
               {newsletter.featured && (
                 <span className="bg-yellow-500 px-3 py-1 rounded-full text-sm font-medium text-black">
-                  Featured
+                  {t('common.featured')}
                 </span>
               )}
             </div>
@@ -394,9 +408,9 @@ function NewsletterPageContent({ params }: NewsletterPageProps) {
                     className="w-16 h-16 rounded-full object-cover"
                   />
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">About {newsletter.author}</h4>
+                    <h4 className="font-semibold text-gray-900 mb-1">{t('newsletters.aboutAuthor')} {newsletter.author}</h4>
                     <p className="text-gray-600 text-sm leading-relaxed">
-                      {newsletter.author} is a passionate food writer and recipe developer who believes in the power of good food to bring people together. With years of experience in professional kitchens and food journalism, they share insights that make cooking accessible and enjoyable for everyone.
+                      {newsletter.author} {t('newsletters.authorBio')}
                     </p>
                   </div>
                 </div>
@@ -409,26 +423,26 @@ function NewsletterPageContent({ params }: NewsletterPageProps) {
             <div className="sticky top-8 space-y-6">
               {/* Article Actions */}
               <div className="bg-white rounded-lg p-6 shadow-sm">
-                <h3 className="text-lg font-semibold mb-4">Share This Article</h3>
+                <h3 className="text-lg font-semibold mb-4">{t('newsletters.shareThisArticle')}</h3>
                 <div className="space-y-3">
                   <button className="w-full bg-primary-500 text-white py-2 px-4 rounded-lg hover:bg-primary-600 transition-colors flex items-center justify-center space-x-2">
                     <BookmarkIcon className="h-4 w-4" />
-                    <span>Save Article</span>
+                    <span>{t('common.save')}</span>
                   </button>
                   <button className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2">
                     <ShareIcon className="h-4 w-4" />
-                    <span>Share</span>
+                    <span>{t('common.share')}</span>
                   </button>
                   <button className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2">
                     <PrinterIcon className="h-4 w-4" />
-                    <span>Print</span>
+                    <span>{t('common.print')}</span>
                   </button>
                 </div>
               </div>
 
               {/* Related Articles */}
               <div className="bg-white rounded-lg p-6 shadow-sm">
-                <h3 className="text-lg font-semibold mb-4">Related Articles</h3>
+                <h3 className="text-lg font-semibold mb-4">{t('common.relatedArticles')}</h3>
                 <div className="space-y-4">
                   {demoNewsletters
                     .filter(n => n.id !== newsletter.id && n.category === newsletter.category)
@@ -459,18 +473,18 @@ function NewsletterPageContent({ params }: NewsletterPageProps) {
 
               {/* Newsletter Signup */}
               <div className="bg-primary-50 rounded-lg p-6 border border-primary-200">
-                <h3 className="text-lg font-semibold text-primary-800 mb-2">Stay Updated</h3>
+                <h3 className="text-lg font-semibold text-primary-800 mb-2">{t('common.stayUpdated')}</h3>
                 <p className="text-sm text-primary-700 mb-4">
-                  Get the latest recipes and cooking tips delivered to your inbox.
+                  {t('newsletters.getLatestRecipes')}
                 </p>
                 <div className="space-y-3">
                   <input 
                     type="email" 
-                    placeholder="Your email address"
+                    placeholder={t('newsletters.emailPlaceholder')}
                     className="w-full px-3 py-2 border border-primary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   <button className="w-full bg-primary-500 text-white py-2 px-4 rounded-lg hover:bg-primary-600 transition-colors">
-                    Subscribe
+                    {t('common.subscribe')}
                   </button>
                 </div>
               </div>

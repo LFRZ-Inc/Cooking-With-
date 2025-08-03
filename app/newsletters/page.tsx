@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import AuthGuard from '@/components/AuthGuard'
 import { supabase } from '@/lib/supabase'
+import { useLanguage } from '@/lib/language'
 
 // Mock demo newsletters - these will be mixed with real user submissions
 const demoNewsletters = [
@@ -96,6 +97,7 @@ function NewslettersPageContent() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false)
+  const { t } = useLanguage()
 
   // Fetch newsletters from Supabase and mix with demo newsletters
   const fetchNewsletters = async () => {
@@ -165,7 +167,7 @@ function NewslettersPageContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-            <span className="ml-3 text-lg text-gray-600">Loading fresh articles...</span>
+            <span className="ml-3 text-lg text-gray-600">{t('newsletters.loadingArticles')}</span>
           </div>
         </div>
       </div>
@@ -181,16 +183,16 @@ function NewslettersPageContent() {
           <div className="flex items-center">
             <NewspaperIcon className="h-5 w-5 text-blue-600 mr-2" />
             <div className="text-sm text-blue-800">
-              <strong>Real Articles from Our Community!</strong> These are actual articles shared by users like you. Even though some are marked as demos, they are completely real and informative content.
+              <strong>{t('newsletters.demoNotice')}</strong>
             </div>
           </div>
         </div>
 
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Newsletter Articles</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">{t('newsletters.title')}</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Discover inspiring cooking stories, tips, and insights from our community
+            {t('newsletters.subtitle')}
           </p>
         </div>
 
@@ -202,7 +204,7 @@ function NewslettersPageContent() {
               <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder="Search articles..."
+                placeholder={t('newsletters.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
@@ -228,7 +230,7 @@ function NewslettersPageContent() {
                   onChange={(e) => setShowFeaturedOnly(e.target.checked)}
                   className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
                 />
-                <span>Featured only</span>
+                <span>{t('newsletters.featuredOnly')}</span>
               </label>
             </div>
           </div>
@@ -238,8 +240,8 @@ function NewslettersPageContent() {
         {filteredNewsletters.length === 0 ? (
           <div className="text-center py-12">
             <NewspaperIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-medium text-gray-600 mb-2">No articles found</h3>
-            <p className="text-gray-500">Try adjusting your search or filters, or <Link href="/create/newsletter" className="text-orange-600 hover:text-orange-700">create the first article</Link>!</p>
+            <h3 className="text-xl font-medium text-gray-600 mb-2">{t('newsletters.noArticlesFound')}</h3>
+            <p className="text-gray-500">{t('newsletters.noArticlesDescription').split('create the first article')[0]}<Link href="/create/newsletter" className="text-orange-600 hover:text-orange-700">create the first article</Link>!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -257,7 +259,7 @@ function NewslettersPageContent() {
                   {newsletter.featured && (
                     <div className="absolute top-2 right-2">
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                        Featured
+                        {t('common.featured')}
                       </span>
                     </div>
                   )}
@@ -266,7 +268,7 @@ function NewslettersPageContent() {
                   {!newsletter.author_id && (
                     <div className="absolute top-2 left-2">
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-                        Unverified Article
+                        {t('newsletters.unverifiedArticle')}
                       </span>
                     </div>
                   )}
@@ -328,7 +330,7 @@ function NewslettersPageContent() {
                     href={`/newsletters/${newsletter.id}`}
                     className="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors duration-200 text-center block"
                   >
-                    Read Full Article
+                    {t('newsletters.readFullArticle')}
                   </Link>
                 </div>
               </article>
