@@ -163,6 +163,324 @@ These ingredients open up a world of culinary possibilities while providing comp
     readTime: "6 min read",
     publishDate: "2024-01-08",
     image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600"
+  },
+  {
+    id: 9004,
+    title: "Street Food Revolution: Global Flavors in Your Kitchen",
+    excerpt: "Explore how street food from around the world has influenced modern home cooking. From Korean kimchi to Mexican tacos, discover how to recreate authentic street flavors at home.",
+    content: `Street food represents the heart and soul of culinary culture across the globe. These humble dishes, born from necessity and creativity, have now found their way into high-end restaurants and home kitchens alike.
+
+## The Global Street Food Movement
+
+From the bustling markets of Bangkok to the food trucks of Los Angeles, street food has become a cultural phenomenon. These dishes tell stories of migration, adaptation, and innovation that span generations.
+
+### Why Street Food Matters
+
+- **Authenticity**: Street food often represents the most authentic flavors of a culture
+- **Accessibility**: Simple ingredients transformed into extraordinary meals
+- **Innovation**: Constant evolution and fusion of flavors
+- **Community**: Brings people together around shared culinary experiences
+
+## Bringing Street Flavors Home
+
+### Korean Influence: Beyond Kimchi
+
+Korean street food has revolutionized home cooking with its bold flavors and fermented elements. Dishes like kimchi fried rice and Korean corn dogs have found their way into mainstream cooking.
+
+### Mexican Street Food: The Taco Revolution
+
+Tacos al pastor, elote, and street-style quesadillas have transformed how we think about Mexican cuisine in home kitchens.
+
+### Southeast Asian Inspirations
+
+Pad thai, banh mi, and pho have become household favorites, bringing complex flavors and fresh ingredients to everyday cooking.
+
+## Essential Techniques for Home Cooks
+
+- **High heat cooking**: Many street foods rely on intense heat for char and flavor
+- **Fresh ingredients**: The key to authentic flavors
+- **Simple seasoning**: Let ingredients shine through proper seasoning
+- **Quick assembly**: Street food is about fast, efficient preparation
+
+The beauty of street food lies in its simplicity and bold flavors that can easily be recreated at home.`,
+    author_id: "luisdrod750@gmail.com",
+    category: "International",
+    tags: ["Street Food", "International", "Authentic", "Home Cooking"],
+    featured: true,
+    publish_date: "2024-01-22",
+    read_time_minutes: 7,
+    created_at: "2024-01-22T09:00:00Z",
+    author: "Luis Rodriguez",
+    authorImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
+    readTime: "7 min read",
+    publishDate: "2024-01-22",
+    image: "https://images.unsplash.com/photo-1565299585323-38174c7e9b72?w=600"
+  },
+  {
+    id: 9005,
+    title: "The Science of Fermentation: Ancient Techniques for Modern Health",
+    excerpt: "Dive into the fascinating world of fermentation, from kimchi and sauerkraut to kombucha and kefir. Learn how these age-old preservation methods boost flavor and nutrition.",
+    content: `Fermentation is one of humanity's oldest food preservation techniques, predating recorded history. Today, we're rediscovering the incredible health benefits and complex flavors that fermented foods bring to our tables.
+
+## Understanding Fermentation
+
+### The Science Behind the Magic
+
+Fermentation occurs when beneficial bacteria, yeasts, or molds break down sugars and starches in food, creating lactic acid, alcohol, or other compounds that preserve the food and enhance its nutritional value.
+
+### Types of Fermentation
+
+- **Lactic Acid Fermentation**: Creates sauerkraut, kimchi, and yogurt
+- **Alcoholic Fermentation**: Produces wine, beer, and kombucha
+- **Acetic Acid Fermentation**: Makes vinegar and some pickles
+
+## Health Benefits
+
+### Gut Health Revolution
+
+Fermented foods are rich in probiotics - beneficial bacteria that support digestive health and boost immune function.
+
+### Enhanced Nutrition
+
+- **Increased bioavailability**: Fermentation makes nutrients more accessible
+- **Vitamin production**: Some fermented foods produce B vitamins and vitamin K
+- **Reduced antinutrients**: Fermentation breaks down compounds that inhibit nutrient absorption
+
+## Getting Started at Home
+
+### Easy Fermented Foods to Try
+
+- **Sauerkraut**: Just cabbage and salt
+- **Water kefir**: Simple probiotic drink
+- **Fermented salsa**: Add beneficial bacteria to your favorite recipe
+
+### Safety Tips
+
+- Use clean equipment and proper ratios
+- Monitor pH levels when possible
+- Trust your senses - off smells indicate problems
+
+The ancient art of fermentation offers modern solutions for health and flavor.`,
+    author_id: "luisdrod750@gmail.com",
+    category: "Health",
+    tags: ["Fermentation", "Health", "Probiotics", "Traditional"],
+    featured: false,
+    publish_date: "2024-01-20",
+    read_time_minutes: 6,
+    created_at: "2024-01-20T14:30:00Z",
+    author: "Luis Rodriguez",
+    authorImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
+    readTime: "6 min read",
+    publishDate: "2024-01-20",
+    image: "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=600"
+  },
+  {
+    id: 9006,
+    title: "Mediterranean Diet: More Than Just Olive Oil",
+    excerpt: "Uncover the true secrets of the Mediterranean diet beyond the basics. Explore regional variations, seasonal eating patterns, and the social aspects that make this lifestyle so beneficial.",
+    content: `The Mediterranean diet has gained worldwide recognition for its health benefits, but there's so much more to it than olive oil and fish. This ancient way of eating encompasses a complete lifestyle approach to nutrition.
+
+## Beyond the Basics
+
+### Regional Variations
+
+The Mediterranean spans multiple countries, each with unique culinary traditions:
+
+- **Greek Islands**: Emphasis on herbs, feta, and fresh seafood
+- **Southern Italy**: Pasta, tomatoes, and regional olive varieties
+- **Southern France**: Wine culture and seasonal produce
+- **Spanish Coast**: Rice dishes, seafood, and preserved foods
+
+### The Social Component
+
+Mediterranean eating is inherently social. Meals are community events that strengthen family bonds and social connections.
+
+## Key Principles
+
+### Seasonal Eating
+
+- **Spring**: Fresh greens, herbs, and early vegetables
+- **Summer**: Tomatoes, peppers, and abundant fruit
+- **Fall**: Nuts, grapes, and olive harvest
+- **Winter**: Preserved foods, citrus, and hearty stews
+
+### Quality Over Quantity
+
+- **Fresh, local ingredients**: Prioritize seasonal and regional foods
+- **Minimal processing**: Simple preparation methods
+- **Shared meals**: Eating together enhances satisfaction
+
+## Practical Implementation
+
+### Daily Patterns
+
+- **Breakfast**: Often simple - bread, fruit, coffee
+- **Lunch**: The main meal, eaten leisurely
+- **Dinner**: Light, often featuring vegetables
+
+### Cooking Methods
+
+- **Grilling and roasting**: Enhance natural flavors
+- **Slow cooking**: Stews and braises for complex flavors
+- **Raw preparations**: Salads and fresh combinations
+
+The Mediterranean lifestyle teaches us that good food is about more than nutrition - it's about community, tradition, and joy.`,
+    author_id: "luisdrod750@gmail.com",
+    category: "Health",
+    tags: ["Mediterranean", "Healthy Eating", "Lifestyle", "Regional"],
+    featured: true,
+    publish_date: "2024-01-18",
+    read_time_minutes: 8,
+    created_at: "2024-01-18T11:45:00Z",
+    author: "Luis Rodriguez",
+    authorImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
+    readTime: "8 min read",
+    publishDate: "2024-01-18",
+    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600"
+  },
+  {
+    id: 9007,
+    title: "Kitchen Knife Skills: The Foundation of Great Cooking",
+    excerpt: "Master the essential knife skills that every home cook should know. From proper grip techniques to advanced cuts, learn how good knife work elevates your cooking.",
+    content: `Proper knife skills are the foundation of efficient and safe cooking. Whether you're a beginner or looking to refine your technique, mastering these fundamental skills will transform your time in the kitchen.
+
+## The Fundamentals
+
+### Choosing the Right Knife
+
+- **Chef's knife**: 8-10 inch blade for most tasks
+- **Paring knife**: Small blade for detail work
+- **Serrated knife**: For tomatoes and bread
+- **Utility knife**: Medium-sized for various tasks
+
+### Proper Grip and Stance
+
+- **Pinch grip**: Hold the blade between thumb and forefinger
+- **Guide hand**: Curl fingertips under, knuckles forward
+- **Stable stance**: Feet shoulder-width apart, cutting board at elbow height
+
+## Essential Cuts
+
+### Basic Techniques
+
+- **Slice**: Straight cuts for even cooking
+- **Dice**: Uniform cubes for consistent texture
+- **Julienne**: Thin matchsticks for quick cooking
+- **Chiffonade**: Ribbon cuts for herbs and leafy greens
+
+### Advanced Skills
+
+- **Brunoise**: Fine dice for delicate dishes
+- **Tourne**: Seven-sided cuts for elegant presentation
+- **Batonnet**: Thick matchsticks for french fries
+
+## Safety First
+
+### Knife Care
+
+- **Sharp knives are safer**: Dull blades require more pressure
+- **Proper storage**: Use knife blocks or magnetic strips
+- **Regular maintenance**: Hone before each use, sharpen when needed
+
+### Cutting Board Basics
+
+- **Stable surface**: Use non-slip mats if needed
+- **Separate boards**: Different boards for meat and vegetables
+- **Proper cleaning**: Sanitize after each use
+
+## Practice Makes Perfect
+
+### Daily Exercises
+
+- **Repetition**: Practice cuts on inexpensive vegetables
+- **Speed development**: Focus on consistency first, speed second
+- **Muscle memory**: Regular practice builds confidence
+
+Good knife skills not only make cooking more efficient but also more enjoyable and safe.`,
+    author_id: "luisdrod750@gmail.com",
+    category: "Techniques",
+    tags: ["Knife Skills", "Techniques", "Basics", "Safety"],
+    featured: false,
+    publish_date: "2024-01-16",
+    read_time_minutes: 5,
+    created_at: "2024-01-16T16:20:00Z",
+    author: "Luis Rodriguez",
+    authorImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
+    readTime: "5 min read",
+    publishDate: "2024-01-16",
+    image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600"
+  },
+  {
+    id: 9008,
+    title: "Seasonal Cooking: Winter Comfort Foods Around the World",
+    excerpt: "Explore how different cultures create warming, comforting dishes during cold months. From Japanese hotpot to German stews, discover winter comfort food traditions.",
+    content: `As winter settles in across the northern hemisphere, kitchens around the world come alive with the aromas of hearty, warming dishes. Each culture has developed its own approach to winter comfort foods.
+
+## Global Winter Traditions
+
+### Asian Comfort Foods
+
+- **Japanese Nabe**: Communal hot pot with vegetables and protein
+- **Korean Jjigae**: Spicy stews that warm the soul
+- **Chinese Hot Pot**: Social dining with endless combinations
+- **Thai Khao Tom**: Rice porridge perfect for cold mornings
+
+### European Heartiness
+
+- **German Eintopf**: One-pot meals with meat and vegetables
+- **French Pot-au-Feu**: Classic beef and vegetable stew
+- **Italian Minestrone**: Vegetable-rich soup that varies by region
+- **Hungarian Goulash**: Paprika-spiced beef stew
+
+### Latin American Warmth
+
+- **Mexican Pozole**: Hominy soup with rich, complex flavors
+- **Brazilian Feijoada**: Black bean stew with various meats
+- **Peruvian Sancocho**: Hearty soup with yuca and corn
+
+## Common Elements
+
+### Slow Cooking Methods
+
+Winter dishes often benefit from long, slow cooking that builds complex flavors and tender textures.
+
+### Root Vegetables
+
+- **Nutritional density**: Stored energy for cold months
+- **Natural sweetness**: Balances hearty proteins
+- **Versatile preparation**: From roasted to stewed
+
+### Warming Spices
+
+- **Ginger and garlic**: Natural warming properties
+- **Cinnamon and cloves**: Sweet warming spices
+- **Chili and pepper**: Heat that builds from within
+
+## Modern Applications
+
+### Adapting Traditional Recipes
+
+- **Slow cookers**: Modern tools for ancient techniques
+- **Pressure cooking**: Faster results with similar outcomes
+- **Make-ahead meals**: Batch cooking for busy schedules
+
+### Nutritional Benefits
+
+Winter comfort foods often provide exactly what our bodies need during cold months - warming calories, immune-boosting nutrients, and psychological comfort.
+
+The best winter comfort foods combine tradition, nutrition, and the simple pleasure of a warm meal shared with others.`,
+    author_id: "luisdrod750@gmail.com",
+    category: "Seasonal",
+    tags: ["Winter", "Comfort Food", "International", "Seasonal"],
+    featured: true,
+    publish_date: "2024-01-14",
+    read_time_minutes: 6,
+    created_at: "2024-01-14T13:10:00Z",
+    author: "Luis Rodriguez",
+    authorImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
+    readTime: "6 min read",
+    publishDate: "2024-01-14",
+    image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600"
   }
 ]
 
