@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import ClientOnly from '@/lib/ClientOnly'
+import { useTranslation } from '@/lib/useTranslation'
 
 // Mock data for demo
 const featuredRecipes = [
@@ -75,7 +76,9 @@ const latestNewsletters = [
   }
 ]
 
-export default function Home() {
+function HomeContent() {
+  const { t } = useTranslation()
+  
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -83,18 +86,17 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-5xl md:text-6xl font-serif font-bold text-gray-900 mb-6">
-              Welcome to <span className="text-primary-500">Cooking With!</span>
+              {t('homepage.heroTitle')} <span className="text-primary-500">{t('homepage.heroTitleHighlight')}</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Discover amazing recipes, share your culinary creations, and stay updated with our delicious newsletters. 
-              Join a community of passionate home cooks and professional chefs.
+              {t('homepage.heroSubtitle')}
             </p>
             <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
               <Link href="/recipes" className="btn-primary text-lg px-8 py-3">
-                Explore Recipes
+                {t('homepage.exploreRecipes')}
               </Link>
               <Link href="/newsletters" className="btn-secondary text-lg px-8 py-3">
-                Read Newsletters
+                {t('homepage.readNewsletters')}
               </Link>
             </div>
             
@@ -115,10 +117,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-serif font-bold text-gray-900 mb-4">
-              Why Choose Cooking With!
+              {t('homepage.featuresTitle')}
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Everything you need to elevate your cooking journey
+              {t('homepage.featuresSubtitle')}
             </p>
           </div>
           
@@ -127,9 +129,9 @@ export default function Home() {
               <div className="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <BookOpenIcon className="h-8 w-8 text-primary-500" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Recipe Collection</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('homepage.recipeCollectionTitle')}</h3>
               <p className="text-gray-600">
-                Thousands of recipes from home cooks and professional chefs, all with detailed ingredients and step-by-step instructions.
+                {t('homepage.recipeCollectionDesc')}
               </p>
             </div>
             
@@ -137,9 +139,9 @@ export default function Home() {
               <div className="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <NewspaperIcon className="h-8 w-8 text-primary-500" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Culinary Newsletters</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('homepage.culinaryNewslettersTitle')}</h3>
               <p className="text-gray-600">
-                Stay updated with the latest food trends, cooking tips, and seasonal recipes delivered right to your inbox.
+                {t('homepage.culinaryNewslettersDesc')}
               </p>
             </div>
             
@@ -147,9 +149,9 @@ export default function Home() {
               <div className="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <UsersIcon className="h-8 w-8 text-primary-500" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Community Driven</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('homepage.communityDrivenTitle')}</h3>
               <p className="text-gray-600">
-                Join a vibrant community where everyone can share their favorite recipes and culinary discoveries.
+                {t('homepage.communityDrivenDesc')}
               </p>
             </div>
           </div>
@@ -162,15 +164,15 @@ export default function Home() {
           <div className="flex justify-between items-center mb-12">
             <div>
               <h2 className="text-3xl font-serif font-bold text-gray-900 mb-2">
-                Featured Recipes
+                {t('homepage.featuredRecipesTitle')}
               </h2>
               <p className="text-lg text-gray-600">
-                Hand-picked favorites from our community
+                {t('homepage.featuredRecipesSubtitle')}
               </p>
             </div>
-            <Link href="/recipes" className="btn-primary">
-              View All Recipes
-            </Link>
+                          <Link href="/recipes" className="btn-primary">
+                {t('homepage.exploreRecipes')}
+              </Link>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
@@ -246,7 +248,7 @@ export default function Home() {
                     href={`/recipes/${recipe.id}`}
                     className="block w-full text-center btn-primary mt-4"
                   >
-                    View Recipe
+                    {t('recipes.viewRecipe')}
                   </Link>
                 </div>
               </div>
@@ -261,15 +263,15 @@ export default function Home() {
           <div className="flex justify-between items-center mb-12">
             <div>
               <h2 className="text-3xl font-serif font-bold text-gray-900 mb-2">
-                Latest Newsletters
+                {t('homepage.recentNewslettersTitle')}
               </h2>
               <p className="text-lg text-gray-600">
-                Stay updated with culinary insights and trends
+                {t('homepage.recentNewslettersSubtitle')}
               </p>
             </div>
-            <Link href="/newsletters" className="btn-primary">
-              View All Newsletters
-            </Link>
+                          <Link href="/newsletters" className="btn-primary">
+                {t('homepage.readNewsletters')}
+              </Link>
           </div>
           
           <div className="grid md:grid-cols-2 gap-8">
@@ -324,4 +326,8 @@ export default function Home() {
       </section>
     </div>
   )
+}
+
+export default function Home() {
+  return <HomeContent />
 } 

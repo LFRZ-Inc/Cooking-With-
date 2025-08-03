@@ -11,6 +11,8 @@ import {
 } from 'lucide-react'
 import AuthGuard from '@/components/AuthGuard'
 import { supabase } from '@/lib/supabase'
+import { useLanguage } from '@/lib/language'
+import ClientOnly from '@/lib/ClientOnly'
 
 // Mock demo recipes - these will be mixed with real user submissions
 const demoRecipes = [
@@ -145,6 +147,7 @@ function RecipesPageContent() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [selectedDifficulty, setSelectedDifficulty] = useState('All')
+  const { t } = useLanguage()
 
   // Fetch recipes from Supabase and mix with demo recipes
   const fetchRecipes = async () => {
@@ -393,7 +396,18 @@ function RecipesPageContent() {
 export default function RecipesPage() {
   return (
     <AuthGuard>
-      <RecipesPageContent />
+      <ClientOnly fallback={
+        <div className="min-h-screen bg-gray-50 py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+              <span className="ml-3 text-lg text-gray-600">Loading...</span>
+            </div>
+          </div>
+        </div>
+      }>
+        <RecipesPageContent />
+      </ClientOnly>
     </AuthGuard>
   )
 } 

@@ -25,7 +25,35 @@
     "print": "Imprimir",
     "relatedArticles": "Artículos Relacionados",
     "stayUpdated": "Mantente Actualizado",
-    "subscribe": "Suscribirse"
+    "subscribe": "Suscribirse",
+    "cookTime": "Tiempo de Cocción",
+    "difficulty": "Dificultad",
+    "rating": "Calificación",
+    "servings": "Porciones",
+    "ingredients": "Ingredientes",
+    "instructions": "Instrucciones",
+    "medium": "Medio",
+    "easy": "Fácil",
+    "hard": "Difícil"
+  },
+  "homepage": {
+    "heroTitle": "Bienvenido a",
+    "heroTitleHighlight": "Cooking With!",
+    "heroSubtitle": "Descubre recetas increíbles, comparte tus creaciones culinarias y mantente actualizado con nuestros deliciosos boletines. Únete a una comunidad de cocineros caseros apasionados y chefs profesionales.",
+    "exploreRecipes": "Explorar Recetas",
+    "readNewsletters": "Leer Artículos",
+    "featuresTitle": "¿Por Qué Elegir Cooking With!",
+    "featuresSubtitle": "Todo lo que necesitas para elevar tu viaje culinario",
+    "recipeCollectionTitle": "Colección de Recetas",
+    "recipeCollectionDesc": "Miles de recetas de cocineros caseros y chefs profesionales, todas con ingredientes detallados e instrucciones paso a paso.",
+    "culinaryNewslettersTitle": "Boletines Culinarios",
+    "culinaryNewslettersDesc": "Mantente actualizado con las últimas tendencias gastronómicas, consejos de cocina y recetas de temporada entregadas directamente en tu bandeja de entrada.",
+    "communityDrivenTitle": "Impulsado por la Comunidad",
+    "communityDrivenDesc": "Únete a una comunidad vibrante donde todos pueden compartir sus recetas favoritas y descubrimientos culinarios.",
+    "featuredRecipesTitle": "Recetas Destacadas",
+    "featuredRecipesSubtitle": "Descubre platos increíbles que nuestra comunidad ama",
+    "recentNewslettersTitle": "Artículos Recientes del Boletín",
+    "recentNewslettersSubtitle": "Mantente informado con las últimas ideas y tendencias culinarias"
   },
   "newsletters": {
     "title": "Artículos de Boletín",
@@ -44,6 +72,18 @@
     "shareThisArticle": "Compartir Este Artículo",
     "emailPlaceholder": "Tu dirección de correo electrónico",
     "getLatestRecipes": "Recibe las últimas recetas y consejos de cocina en tu bandeja de entrada."
+  },
+  "recipes": {
+    "title": "Colección de Recetas",
+    "subtitle": "Descubre deliciosas recetas de nuestra comunidad de cocineros apasionados",
+    "searchPlaceholder": "Buscar recetas...",
+    "allCategories": "Todas las Categorías",
+    "featuredOnly": "Solo destacadas",
+    "noRecipesFound": "No se encontraron recetas",
+    "noRecipesDescription": "¡Intenta ajustar tu búsqueda o filtros, o crea la primera receta!",
+    "loadingRecipes": "Cargando recetas deliciosas...",
+    "loadingRecipe": "Cargando receta...",
+    "viewRecipe": "Ver Receta"
   },
   "errors": {
     "pageNotFound": "Página no encontrada",
