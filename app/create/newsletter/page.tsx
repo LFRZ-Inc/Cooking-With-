@@ -11,6 +11,7 @@ import {
 import { useAuth } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import toast from 'react-hot-toast'
+import ImageUpload from '@/components/ImageUpload'
 
 
 function CreateNewsletterPage() {
@@ -23,7 +24,8 @@ function CreateNewsletterPage() {
     tags: [] as string[],
     featured: false,
     publishDate: '',
-    readTime: ''
+    readTime: '',
+    imageUrl: ''
   })
 
   const [newTag, setNewTag] = useState('')
@@ -70,6 +72,7 @@ function CreateNewsletterPage() {
         content: formData.content,
         author_id: user?.id || null, // Use Supabase auth user ID or null for anonymous
         category: formData.category || null,
+        image_url: formData.imageUrl || null,
         featured: formData.featured,
         status: 'published' as const,
         read_time_minutes: formData.readTime ? parseInt(formData.readTime.replace(/\D/g, '')) : null,
@@ -98,7 +101,8 @@ function CreateNewsletterPage() {
         tags: [] as string[],
         featured: false,
         publishDate: '',
-        readTime: ''
+        readTime: '',
+        imageUrl: ''
       })
 
     } catch (error: any) {
@@ -139,6 +143,17 @@ function CreateNewsletterPage() {
               <span>{formData.publishDate || 'Today'}</span>
             </div>
           </div>
+
+          {/* Newsletter Image */}
+          {formData.imageUrl && (
+            <div className="mb-6">
+              <img
+                src={formData.imageUrl}
+                alt="Newsletter header"
+                className="w-full h-64 object-cover rounded-lg"
+              />
+            </div>
+          )}
 
           <div className="prose prose-lg max-w-none">
             {contentParagraphs.length > 0 ? (
@@ -297,10 +312,23 @@ function CreateNewsletterPage() {
                     </label>
                   </div>
                 </div>
-              </div>
-            </div>
+                          </div>
+          </div>
 
-            {/* Content */}
+          {/* Newsletter Image */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              Newsletter Image
+            </h2>
+            
+            <ImageUpload
+              value={formData.imageUrl}
+              onChange={(url) => setFormData(prev => ({...prev, imageUrl: url}))}
+              placeholder="Drag and drop your newsletter image here, or click to browse"
+            />
+          </div>
+
+          {/* Content */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">
                 Content

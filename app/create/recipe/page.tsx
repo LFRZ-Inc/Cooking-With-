@@ -12,6 +12,7 @@ import {
 import { useAuth } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import toast from 'react-hot-toast'
+import ImageUpload from '@/components/ImageUpload'
 
 function CreateRecipePageContent() {
   const { user } = useAuth() // Optional user for attribution
@@ -349,54 +350,11 @@ function CreateRecipePageContent() {
               Recipe Image
             </h2>
             
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Image URL (Optional)
-                </label>
-                <input
-                  type="url"
-                  value={formData.imageUrl}
-                  onChange={(e) => setFormData(prev => ({...prev, imageUrl: e.target.value}))}
-                  className="input-field"
-                  placeholder="https://example.com/your-recipe-image.jpg"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Paste a link to your recipe image. Try free hosting: 
-                  <a href="https://imgur.com" target="_blank" rel="noopener" className="text-primary-600 hover:text-primary-700 ml-1">Imgur</a>,
-                  <a href="https://postimg.cc" target="_blank" rel="noopener" className="text-primary-600 hover:text-primary-700 ml-1">PostImage</a>, or
-                  <a href="https://drive.google.com" target="_blank" rel="noopener" className="text-primary-600 hover:text-primary-700 ml-1">Google Drive</a>
-                </p>
-              </div>
-              
-              {/* Image Preview */}
-              {formData.imageUrl && (
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <p className="text-sm font-medium text-gray-700 mb-2">Preview:</p>
-                  <div className="relative">
-                    <img
-                      src={formData.imageUrl}
-                      alt="Recipe preview"
-                      className="w-full max-w-md h-48 object-cover rounded-lg"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none'
-                        e.currentTarget.nextElementSibling?.classList.remove('hidden')
-                      }}
-                      onLoad={(e) => {
-                        e.currentTarget.style.display = 'block'
-                        e.currentTarget.nextElementSibling?.classList.add('hidden')
-                      }}
-                    />
-                    <div className="hidden w-full max-w-md h-48 bg-red-50 border border-red-200 rounded-lg flex items-center justify-center">
-                      <div className="text-center text-red-600">
-                        <ImageIcon className="h-8 w-8 mx-auto mb-2" />
-                        <p className="text-sm">Invalid image URL</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <ImageUpload
+              value={formData.imageUrl}
+              onChange={(url) => setFormData(prev => ({...prev, imageUrl: url}))}
+              placeholder="Drag and drop your recipe image here, or click to browse"
+            />
           </div>
 
           {/* Ingredients */}
