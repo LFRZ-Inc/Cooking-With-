@@ -1,13 +1,16 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ChefHatIcon, EyeIcon, EyeOffIcon, UserIcon, PenToolIcon } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [userType, setUserType] = useState('viewer')
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const captchaRef = useRef<HCaptcha>(null)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -21,8 +24,14 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
     if (formData.password !== formData.confirmPassword) {
       alert('Passwords do not match!')
+      return
+    }
+    
+    if (!captchaToken) {
+      alert('Please complete the captcha verification!')
       return
     }
     
@@ -30,8 +39,19 @@ export default function SignupPage() {
       await signUp(formData.email, formData.password, formData.name, userType)
       router.push('/') // Redirect after successful signup
     } catch (error) {
+      // Reset captcha on error
+      setCaptchaToken(null)
+      captchaRef.current?.resetCaptcha()
       // Error is handled by the auth context with toast
     }
+  }
+
+  const handleCaptchaVerify = (token: string) => {
+    setCaptchaToken(token)
+  }
+
+  const handleCaptchaExpire = () => {
+    setCaptchaToken(null)
   }
 
   return (
@@ -195,10 +215,21 @@ export default function SignupPage() {
               </label>
             </div>
 
+            {/* hCaptcha Verification */}
+            <div className="flex justify-center">
+              <HCaptcha
+                ref={captchaRef}
+                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || "10000000-ffff-ffff-ffff-000000000001"} // Test key
+                onVerify={handleCaptchaVerify}
+                onExpire={handleCaptchaExpire}
+                theme="light"
+              />
+            </div>
+
             <div>
               <button 
                 type="submit" 
-                disabled={loading}
+                disabled={loading || !captchaToken}
                 className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Creating Account...' : 'Create Account'}
