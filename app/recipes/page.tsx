@@ -13,104 +13,7 @@ import AuthGuard from '@/components/AuthGuard'
 import { supabase } from '@/lib/supabase'
 
 // Mock demo recipes - these will be mixed with real user submissions
-const demoRecipes = [
-  {
-    id: "9001", // High ID to avoid conflicts - string to match UUID pattern
-    title: "Creamy Mushroom Risotto",
-    description: "A rich and creamy Italian classic made with arborio rice and fresh porcini mushrooms.",
-    image_url: "https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=400",
-    prep_time_minutes: 15,
-    cook_time_minutes: 20,
-    difficulty: "medium" as const,
-    servings: 4,
-    author_id: "demo_user_123", // Demo user
-    category: "Italian",
-    tags: ["Italian", "Vegetarian", "Rice"],
-    created_at: "2024-01-15T10:00:00Z",
-    rating: 4.8,
-    author: "Chef Maria",
-    dietType: "Vegetarian",
-    version_number: 1,
-    parent_recipe_id: null,
-    is_original: true,
-    branch_name: null,
-    ingredients: ["Arborio rice (1 cup)", "Porcini mushrooms (200g)", "Parmigiano-Reggiano (100g)", "Dry white wine (1/2 cup)", "Warm vegetable broth (1 liter)", "Onion (1 medium)", "Butter (4 tbsp)", "Extra virgin olive oil (2 tbsp)", "Fresh parsley", "Salt and white pepper"],
-    inventor: "Traditional Northern Italian dish",
-    history: "Risotto originated in Northern Italy during the 14th century when rice cultivation began in the Po Valley. The technique of slowly adding warm broth to rice was perfected by Milanese cooks, creating the signature creamy texture without cream. This mushroom variation became popular in the 19th century when dried porcini mushrooms became widely available."
-  },
-  {
-    id: "9002",
-    title: "Classic Margherita Pizza",
-    description: "Traditional Neapolitan pizza with San Marzano tomatoes, fresh mozzarella di bufala, and basil.",
-    image_url: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=400",
-    prep_time_minutes: 30,
-    cook_time_minutes: 15,
-    difficulty: "medium" as const,
-    servings: 2,
-    author_id: "demo_user_456", // Demo user
-    category: "Italian",
-    tags: ["Italian", "Pizza", "Vegetarian"],
-    created_at: "2024-01-12T14:30:00Z",
-    rating: 4.9,
-    author: "Pizzaiolo Antonio",
-    dietType: "Vegetarian",
-    version_number: 1,
-    parent_recipe_id: null,
-    is_original: true,
-    branch_name: null,
-    ingredients: ["Neapolitan pizza dough (300g)", "San Marzano tomatoes (200g)", "Mozzarella di bufala (150g)", "Fresh basil leaves", "Extra virgin olive oil", "Sea salt", "Tipo 00 flour for dusting"],
-    inventor: "Raffaele Esposito (1889)",
-    history: "Created in 1889 by pizzaiolo Raffaele Esposito at Pizzeria Brandi in Naples for Queen Margherita of Savoy. The pizza featured the colors of the Italian flag: red tomatoes, white mozzarella, and green basil. This was the birth of the modern pizza as we know it, transforming from a simple flatbread into an artistic culinary expression."
-  },
-  {
-    id: "9003",
-    title: "Chocolate Lava Cake",
-    description: "Decadent individual chocolate cake with a molten center, invented by Jean-Georges Vongerichten.",
-    image_url: "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400",
-    prep_time_minutes: 15,
-    cook_time_minutes: 12,
-    difficulty: "hard" as const,
-    servings: 4,
-    author_id: undefined, // Anonymous demo submission
-    category: "Dessert",
-    tags: ["Dessert", "Chocolate", "French"],
-    created_at: "2024-01-10T16:45:00Z",
-    rating: 4.7,
-    author: "Anonymous Chef",
-    dietType: "Vegetarian",
-    version_number: 1,
-    parent_recipe_id: null,
-    is_original: true,
-    branch_name: null,
-    ingredients: ["Dark chocolate 70% (100g)", "Unsalted butter (100g)", "Large eggs (2 whole + 2 yolks)", "Caster sugar (60g)", "Plain flour (30g)", "Butter for ramekins", "Cocoa powder for dusting", "Vanilla ice cream (to serve)"],
-    inventor: "Jean-Georges Vongerichten (1987)",
-    history: "Invented by accident in 1987 by chef Jean-Georges Vongerichten at Lafayette Restaurant in New York. He was baking chocolate sponge cakes when he pulled one out too early and discovered the molten center. This happy accident became one of the most iconic desserts of the late 20th century, popularizing the concept of 'controlled undercooking' in fine dining."
-  },
-  {
-    id: "9004",
-    title: "Grilled Salmon with Herbs",
-    description: "Wild-caught salmon grilled to perfection with a Mediterranean herb crust and lemon.",
-    image_url: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400",
-    prep_time_minutes: 10,
-    cook_time_minutes: 15,
-    difficulty: "easy" as const,
-    servings: 4,
-    author_id: "demo_user_789", // Demo user
-    category: "Seafood",
-    tags: ["Seafood", "Mediterranean", "Keto"],
-    created_at: "2024-01-08T12:20:00Z",
-    rating: 4.6,
-    author: "Chef Dimitris",
-    dietType: "Keto",
-    version_number: 1,
-    parent_recipe_id: null,
-    is_original: true,
-    branch_name: null,
-    ingredients: ["Wild salmon fillets (4 x 150g)", "Fresh dill (2 tbsp)", "Fresh oregano (1 tbsp)", "Lemon zest and juice", "Extra virgin olive oil (3 tbsp)", "Garlic (2 cloves)", "Sea salt", "Freshly ground black pepper", "Capers (optional)"],
-    inventor: "Ancient Mediterranean tradition",
-    history: "Grilling fish over open flames dates back to ancient Mediterranean civilizations, particularly the Greeks and Romans around 800 BCE. The combination of herbs like oregano and dill with fish was documented in ancient Greek cooking texts. This preparation method preserved the fish's natural flavors while the herbs provided antimicrobial properties, crucial before refrigeration."
-  }
-]
+// Demo recipes removed - only show real user content
 
 interface Recipe {
   id: string
@@ -157,8 +60,8 @@ function RecipesPageContent() {
 
       if (error) {
         console.error('Error fetching recipes:', error)
-        // If there's an error, just show demo recipes
-        setRecipes(demoRecipes)
+        // If there's an error, show empty recipes
+        setRecipes([])
         return
       }
 
@@ -173,15 +76,15 @@ function RecipesPageContent() {
         history: 'This recipe was shared by our community members.'
       })) || []
 
-      // Mix demo recipes with real recipes, sorting by creation date
-      const allRecipes = [...demoRecipes, ...transformedRealRecipes]
+      // Sort real recipes by creation date
+      const sortedRecipes = transformedRealRecipes
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
-      setRecipes(allRecipes)
+      setRecipes(sortedRecipes)
     } catch (error) {
       console.error('Error fetching recipes:', error)
-      // If there's an error, just show demo recipes
-      setRecipes(demoRecipes)
+      // If there's an error, show empty recipes
+      setRecipes([])
     } finally {
       setLoading(false)
     }
