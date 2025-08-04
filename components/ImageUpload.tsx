@@ -9,6 +9,47 @@ import {
   AlertCircleIcon 
 } from 'lucide-react'
 
+// Privacy-focused image processing - strips ALL EXIF data including location
+const stripExifData = (file: File): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    const img = new Image()
+    
+    img.onload = () => {
+      canvas.width = img.width
+      canvas.height = img.height
+      
+      if (ctx) {
+        // Draw image to canvas (this strips all EXIF data)
+        ctx.drawImage(img, 0, 0)
+        
+        // Convert back to file with privacy protection
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const strippedFile = new File([blob], file.name, {
+                type: file.type,
+                lastModified: Date.now()
+              })
+              resolve(strippedFile)
+            } else {
+              reject(new Error('Failed to process image'))
+            }
+          },
+          file.type,
+          0.95 // High quality but compressed
+        )
+      } else {
+        reject(new Error('Canvas context not available'))
+      }
+    }
+    
+    img.onerror = () => reject(new Error('Failed to load image'))
+    img.src = URL.createObjectURL(file)
+  })
+}
+
 interface ImageUploadProps {
   value?: string
   onChange: (url: string) => void
@@ -73,7 +114,7 @@ export default function ImageUpload({
     return data.data.url
   }
 
-  // Handle file upload
+  // Handle file upload with privacy protection
   const handleFileUpload = async (file: File) => {
     setError(null)
     setIsUploading(true)
@@ -86,8 +127,10 @@ export default function ImageUpload({
     }
 
     try {
-      // For now, convert to data URL for immediate preview
-      // In production, you'd upload to your preferred hosting service
+      // PRIVACY PROTECTION: Strip all EXIF data including GPS location
+      const strippedFile = await stripExifData(file)
+      
+      // Convert privacy-protected file to data URL
       const reader = new FileReader()
       reader.onload = () => {
         const dataUrl = reader.result as string
@@ -98,9 +141,9 @@ export default function ImageUpload({
         setError('Failed to read file')
         setIsUploading(false)
       }
-      reader.readAsDataURL(file)
+      reader.readAsDataURL(strippedFile)
     } catch (err) {
-      setError('Failed to upload image')
+      setError('Failed to process image for privacy protection')
       setIsUploading(false)
     }
   }
@@ -303,12 +346,15 @@ export default function ImageUpload({
         </div>
       )}
 
-      {/* Hosting Suggestions */}
+      {/* Privacy & Hosting Information */}
       {!value && (
         <div className="text-xs text-gray-500 space-y-2">
           <div>
             <p>📷 <strong>Professional food photography welcome!</strong></p>
             <p>Upload high-quality images up to 50MB - perfect for DSLR, mirrorless cameras, and food book quality photos.</p>
+          </div>
+          <div className="bg-green-50 border border-green-200 rounded p-2 text-green-800">
+            <p>🔒 <strong>Privacy Protection:</strong> All images are automatically processed to remove location data, camera information, and other metadata before upload. Your privacy is protected!</p>
           </div>
           <div>
             <p>💡 <strong>Free hosting suggestions:</strong></p>

@@ -3,6 +3,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from '@/lib/auth'
 import { LanguageProvider } from '@/lib/language'
@@ -24,11 +25,12 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <LanguageProvider>
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-gray-50 flex flex-col">
               <Navbar />
               <main className="flex-1">
                 {children}
               </main>
+              <Footer />
               <Toaster 
                 position="top-right"
                 toastOptions={{
