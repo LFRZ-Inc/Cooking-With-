@@ -1,8 +1,8 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { ChefHatIcon, EyeIcon, EyeOffIcon } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { ChefHatIcon, EyeIcon, EyeOffIcon, CheckCircleIcon, XCircleIcon } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 
 export default function LoginPage() {
@@ -13,6 +13,25 @@ export default function LoginPage() {
   })
   const { signIn, loading } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const [message, setMessage] = useState<{type: 'success' | 'error', text: string} | null>(null)
+
+  useEffect(() => {
+    const verified = searchParams.get('verified')
+    const error = searchParams.get('error')
+    
+    if (verified === 'true') {
+      setMessage({
+        type: 'success',
+        text: 'Email verified successfully! You can now sign in.'
+      })
+    } else if (error === 'verification_failed') {
+      setMessage({
+        type: 'error',
+        text: 'Email verification failed. Please try again or contact support.'
+      })
+    }
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,6 +58,19 @@ export default function LoginPage() {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        {message && (
+          <div className={`mb-4 p-4 rounded-md flex items-center ${
+            message.type === 'success' 
+              ? 'bg-green-50 border border-green-200 text-green-800' 
+              : 'bg-red-50 border border-red-200 text-red-800'
+          }`}>
+            {message.type === 'success' 
+              ? <CheckCircleIcon className="h-5 w-5 mr-2" />
+              : <XCircleIcon className="h-5 w-5 mr-2" />
+            }
+            <span className="text-sm">{message.text}</span>
+          </div>
+        )}
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
