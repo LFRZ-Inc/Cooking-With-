@@ -216,7 +216,7 @@ function RecipePageContent({ params }: RecipePageProps) {
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
       if (!uuidRegex.test(id)) {
         console.log('Invalid recipe ID format. Expected UUID or demo recipe ID (900X):', id)
-        notFound()
+          notFound()
         return
       }
 
@@ -452,7 +452,7 @@ function RecipePageContent({ params }: RecipePageProps) {
     parseIngredient(ingredient, servingScale)
   ) || []
 
-    return (
+  return (
     <div className="min-h-screen bg-gray-50">
       {/* Version Navigator */}
       {recipe && recipe.version_number && recipe.version_number > 1 && (
@@ -466,12 +466,12 @@ function RecipePageContent({ params }: RecipePageProps) {
       )}
 
       {/* Hero Section */}
-        <div className="relative h-96 bg-gray-900">
-          <img 
+      <div className="relative h-96 bg-gray-900">
+        <img 
             src={displayedRecipe.image_url || "https://via.placeholder.com/800x600"} 
             alt={displayedRecipe.title}
-            className="w-full h-full object-cover opacity-70"
-          />
+          className="w-full h-full object-cover opacity-70"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         
         {/* Back Button */}
@@ -855,7 +855,7 @@ export default function RecipePage({ params }: RecipePageProps) {
           </div>
         </div>
       }>
-        <RecipePageContent params={params} />
+      <RecipePageContent params={params} />
       </ClientOnly>
     </AuthGuard>
   )

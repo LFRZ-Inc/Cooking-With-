@@ -18,7 +18,7 @@ import { supabase } from '@/lib/supabase'
 import AuthGuard from '@/components/AuthGuard'
 
 interface UserRecipe {
-  id: number
+  id: string
   title: string
   description: string
   image_url?: string
@@ -27,10 +27,11 @@ interface UserRecipe {
   difficulty: 'easy' | 'medium' | 'hard'
   servings: number
   created_at: string
+  updated_at?: string
 }
 
 interface UserNewsletter {
-  id: number
+  id: string
   title: string
   excerpt: string
   category?: string
@@ -38,6 +39,7 @@ interface UserNewsletter {
   publish_date: string
   read_time_minutes: number
   created_at: string
+  updated_at?: string
 }
 
 function AccountPageContent() {
@@ -90,6 +92,58 @@ function AccountPageContent() {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString()
+  }
+
+  // Delete recipe with confirmation
+  const handleDeleteRecipe = async (recipeId: string, recipeTitle: string) => {
+    if (!confirm(`Are you sure you want to delete "${recipeTitle}"? This action cannot be undone.`)) {
+      return
+    }
+
+    try {
+      const { error } = await supabase
+        .from('recipes')
+        .delete()
+        .eq('id', recipeId)
+        .eq('author_id', user?.id) // Ensure user can only delete their own recipes
+
+      if (error) {
+        throw error
+      }
+
+      // Remove from local state
+      setUserRecipes(prev => prev.filter(recipe => recipe.id !== recipeId))
+      alert('Recipe deleted successfully!')
+    } catch (error: any) {
+      console.error('Error deleting recipe:', error)
+      alert('Failed to delete recipe: ' + error.message)
+    }
+  }
+
+  // Delete newsletter with confirmation
+  const handleDeleteNewsletter = async (newsletterId: string, newsletterTitle: string) => {
+    if (!confirm(`Are you sure you want to delete "${newsletterTitle}"? This action cannot be undone.`)) {
+      return
+    }
+
+    try {
+      const { error } = await supabase
+        .from('newsletters')
+        .delete()
+        .eq('id', newsletterId)
+        .eq('author_id', user?.id) // Ensure user can only delete their own newsletters
+
+      if (error) {
+        throw error
+      }
+
+      // Remove from local state
+      setUserNewsletters(prev => prev.filter(newsletter => newsletter.id !== newsletterId))
+      alert('Article deleted successfully!')
+    } catch (error: any) {
+      console.error('Error deleting newsletter:', error)
+      alert('Failed to delete article: ' + error.message)
+    }
   }
 
   const tabs = [
@@ -279,10 +333,24 @@ function AccountPageContent() {
                             <Link
                               href={`/recipes/${recipe.id}`}
                               className="p-1 text-gray-600 hover:text-blue-600 transition-colors"
-                              title="View"
+                              title="View Recipe"
                             >
                               <EyeIcon className="h-4 w-4" />
                             </Link>
+                            <Link
+                              href={`/recipes/${recipe.id}/edit`}
+                              className="p-1 text-gray-600 hover:text-orange-600 transition-colors"
+                              title="Edit Recipe"
+                            >
+                              <EditIcon className="h-4 w-4" />
+                            </Link>
+                            <button
+                              onClick={() => handleDeleteRecipe(recipe.id, recipe.title)}
+                              className="p-1 text-gray-600 hover:text-red-600 transition-colors"
+                              title="Delete Recipe"
+                            >
+                              <TrashIcon className="h-4 w-4" />
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -359,10 +427,24 @@ function AccountPageContent() {
                           <Link
                             href={`/newsletters/${newsletter.id}`}
                             className="p-1 text-gray-600 hover:text-blue-600 transition-colors"
-                            title="View"
+                            title="View Article"
                           >
                             <EyeIcon className="h-4 w-4" />
                           </Link>
+                          <Link
+                            href={`/newsletters/${newsletter.id}/edit`}
+                            className="p-1 text-gray-600 hover:text-orange-600 transition-colors"
+                            title="Edit Article"
+                          >
+                            <EditIcon className="h-4 w-4" />
+                          </Link>
+                          <button
+                            onClick={() => handleDeleteNewsletter(newsletter.id, newsletter.title)}
+                            className="p-1 text-gray-600 hover:text-red-600 transition-colors"
+                            title="Delete Article"
+                          >
+                            <TrashIcon className="h-4 w-4" />
+                          </button>
                         </div>
                       </div>
                     </div>
