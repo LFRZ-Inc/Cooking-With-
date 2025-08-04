@@ -11,11 +11,15 @@ import {
   TrashIcon,
   EyeIcon,
   CalendarIcon,
-  ClockIcon
+  ClockIcon,
+  CameraIcon,
+  MapPinIcon,
+  SmartphoneIcon
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import AuthGuard from '@/components/AuthGuard'
+import ImagePrivacySettings from '@/components/ImagePrivacySettings'
 
 interface UserRecipe {
   id: string
@@ -48,12 +52,42 @@ function AccountPageContent() {
   const [userRecipes, setUserRecipes] = useState<UserRecipe[]>([])
   const [userNewsletters, setUserNewsletters] = useState<UserNewsletter[]>([])
   const [loading, setLoading] = useState(true)
+  const [privacySettings, setPrivacySettings] = useState({
+    keepLocation: false,
+    keepCameraInfo: false,
+    keepTimestamp: false,
+    keepDeviceInfo: false
+  })
 
-  // Fetch user's content
+  // Fetch user's content and settings
   const fetchUserContent = async () => {
     if (!user?.id) return
 
     try {
+      // Fetch privacy settings
+      const { data: settings, error: settingsError } = await supabase
+        .from('user_settings')
+        .select('*')
+        .eq('user_id', user.id)
+        .single()
+
+      if (settingsError) {
+        if (settingsError.code === 'PGRST116') {
+          // No settings found, create default settings
+          const { error: createError } = await supabase
+            .from('user_settings')
+            .insert([{
+              user_id: user.id,
+              privacy_settings: privacySettings
+            }])
+          if (createError) throw createError
+        } else {
+          throw settingsError
+        }
+      } else if (settings) {
+        setPrivacySettings(settings.privacy_settings)
+      }
+
       // Fetch user's recipes
       const { data: recipes, error: recipesError } = await supabase
         .from('recipes')
@@ -143,6 +177,28 @@ function AccountPageContent() {
     } catch (error: any) {
       console.error('Error deleting newsletter:', error)
       alert('Failed to delete article: ' + error.message)
+    }
+  }
+
+  // Update privacy settings
+  const handlePrivacySettingsChange = async (newSettings: typeof privacySettings) => {
+    if (!user?.id) return
+
+    try {
+      const { error } = await supabase
+        .from('user_settings')
+        .upsert({
+          user_id: user.id,
+          privacy_settings: newSettings,
+          updated_at: new Date().toISOString()
+        })
+
+      if (error) throw error
+
+      setPrivacySettings(newSettings)
+    } catch (error) {
+      console.error('Error updating privacy settings:', error)
+      alert('Failed to update privacy settings')
     }
   }
 
@@ -472,6 +528,15 @@ function AccountPageContent() {
                       <p className="text-sm text-gray-600">{user?.created_at ? formatDate(user.created_at) : 'Unknown'}</p>
                     </div>
                   </div>
+                </div>
+
+                {/* Image Privacy Settings */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Photo Privacy Settings</h3>
+                  <ImagePrivacySettings 
+                    settings={privacySettings}
+                    onChange={handlePrivacySettingsChange}
+                  />
                 </div>
 
                 {/* Preferences */}
