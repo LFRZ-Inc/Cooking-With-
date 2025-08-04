@@ -11,6 +11,8 @@ import {
 } from 'lucide-react'
 import AuthGuard from '@/components/AuthGuard'
 import { supabase } from '@/lib/supabase'
+import { useLanguage } from '@/lib/language'
+import ClientOnly from '@/lib/ClientOnly'
 
 // Mock demo newsletters - these will be mixed with real user submissions
 const demoNewsletters = [
@@ -67,6 +69,96 @@ const demoNewsletters = [
     readTime: "6 min read",
     publishDate: "2024-01-08",
     image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600"
+  },
+  {
+    id: 9004,
+    title: "Street Food Revolution: Global Flavors in Your Kitchen",
+    excerpt: "Explore how street food from around the world has influenced modern home cooking. From Korean kimchi to Mexican tacos, discover how to recreate authentic street flavors at home.",
+    content: "Street food represents the heart and soul of culinary culture across the globe. These humble dishes, born from necessity and creativity, have now found their way into high-end restaurants and home kitchens alike...",
+    author_id: "luisdrod750@gmail.com",
+    category: "International",
+    tags: ["Street Food", "International", "Authentic", "Home Cooking"],
+    featured: true,
+    publish_date: "2024-01-22",
+    read_time_minutes: 7,
+    created_at: "2024-01-22T09:00:00Z",
+    author: "Luis Rodriguez",
+    authorImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
+    readTime: "7 min read",
+    publishDate: "2024-01-22",
+    image: "https://images.unsplash.com/photo-1565299585323-38174c7e9b72?w=600"
+  },
+  {
+    id: 9005,
+    title: "The Science of Fermentation: Ancient Techniques for Modern Health",
+    excerpt: "Dive into the fascinating world of fermentation, from kimchi and sauerkraut to kombucha and kefir. Learn how these age-old preservation methods boost flavor and nutrition.",
+    content: "Fermentation is one of humanity's oldest food preservation techniques, predating recorded history. Today, we're rediscovering the incredible health benefits and complex flavors that fermented foods bring to our tables...",
+    author_id: "luisdrod750@gmail.com",
+    category: "Health",
+    tags: ["Fermentation", "Health", "Probiotics", "Traditional"],
+    featured: false,
+    publish_date: "2024-01-20",
+    read_time_minutes: 6,
+    created_at: "2024-01-20T14:30:00Z",
+    author: "Luis Rodriguez",
+    authorImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
+    readTime: "6 min read",
+    publishDate: "2024-01-20",
+    image: "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=600"
+  },
+  {
+    id: 9006,
+    title: "Mediterranean Diet: More Than Just Olive Oil",
+    excerpt: "Uncover the true secrets of the Mediterranean diet beyond the basics. Explore regional variations, seasonal eating patterns, and the social aspects that make this lifestyle so beneficial.",
+    content: "The Mediterranean diet has gained worldwide recognition for its health benefits, but there's so much more to it than olive oil and fish. This ancient way of eating encompasses a complete lifestyle approach to nutrition...",
+    author_id: "luisdrod750@gmail.com",
+    category: "Health",
+    tags: ["Mediterranean", "Healthy Eating", "Lifestyle", "Regional"],
+    featured: true,
+    publish_date: "2024-01-18",
+    read_time_minutes: 8,
+    created_at: "2024-01-18T11:45:00Z",
+    author: "Luis Rodriguez",
+    authorImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
+    readTime: "8 min read",
+    publishDate: "2024-01-18",
+    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600"
+  },
+  {
+    id: 9007,
+    title: "Kitchen Knife Skills: The Foundation of Great Cooking",
+    excerpt: "Master the essential knife skills that every home cook should know. From proper grip techniques to advanced cuts, learn how good knife work elevates your cooking.",
+    content: "Proper knife skills are the foundation of efficient and safe cooking. Whether you're a beginner or looking to refine your technique, mastering these fundamental skills will transform your time in the kitchen...",
+    author_id: "luisdrod750@gmail.com",
+    category: "Techniques",
+    tags: ["Knife Skills", "Techniques", "Basics", "Safety"],
+    featured: false,
+    publish_date: "2024-01-16",
+    read_time_minutes: 5,
+    created_at: "2024-01-16T16:20:00Z",
+    author: "Luis Rodriguez",
+    authorImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
+    readTime: "5 min read",
+    publishDate: "2024-01-16",
+    image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600"
+  },
+  {
+    id: 9008,
+    title: "Seasonal Cooking: Winter Comfort Foods Around the World",
+    excerpt: "Explore how different cultures create warming, comforting dishes during cold months. From Japanese hotpot to German stews, discover winter comfort food traditions.",
+    content: "As winter settles in across the northern hemisphere, kitchens around the world come alive with the aromas of hearty, warming dishes. Each culture has developed its own approach to winter comfort foods...",
+    author_id: "luisdrod750@gmail.com",
+    category: "Seasonal",
+    tags: ["Winter", "Comfort Food", "International", "Seasonal"],
+    featured: true,
+    publish_date: "2024-01-14",
+    read_time_minutes: 6,
+    created_at: "2024-01-14T13:10:00Z",
+    author: "Luis Rodriguez",
+    authorImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
+    readTime: "6 min read",
+    publishDate: "2024-01-14",
+    image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600"
   }
 ]
 
@@ -96,6 +188,7 @@ function NewslettersPageContent() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false)
+  const { t } = useLanguage()
 
   // Fetch newsletters from Supabase and mix with demo newsletters
   const fetchNewsletters = async () => {
@@ -165,7 +258,7 @@ function NewslettersPageContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-            <span className="ml-3 text-lg text-gray-600">Loading fresh articles...</span>
+            <span className="ml-3 text-lg text-gray-600">{t('newsletters.loadingArticles')}</span>
           </div>
         </div>
       </div>
@@ -181,16 +274,16 @@ function NewslettersPageContent() {
           <div className="flex items-center">
             <NewspaperIcon className="h-5 w-5 text-blue-600 mr-2" />
             <div className="text-sm text-blue-800">
-              <strong>Real Articles from Our Community!</strong> These are actual articles shared by users like you. Even though some are marked as demos, they are completely real and informative content.
+              <strong>{t('newsletters.demoNotice')}</strong>
             </div>
           </div>
         </div>
 
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Newsletter Articles</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">{t('newsletters.title')}</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Discover inspiring cooking stories, tips, and insights from our community
+            {t('newsletters.subtitle')}
           </p>
         </div>
 
@@ -202,7 +295,7 @@ function NewslettersPageContent() {
               <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder="Search articles..."
+                placeholder={t('newsletters.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
@@ -228,7 +321,7 @@ function NewslettersPageContent() {
                   onChange={(e) => setShowFeaturedOnly(e.target.checked)}
                   className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
                 />
-                <span>Featured only</span>
+                <span>{t('newsletters.featuredOnly')}</span>
               </label>
             </div>
           </div>
@@ -238,8 +331,8 @@ function NewslettersPageContent() {
         {filteredNewsletters.length === 0 ? (
           <div className="text-center py-12">
             <NewspaperIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-medium text-gray-600 mb-2">No articles found</h3>
-            <p className="text-gray-500">Try adjusting your search or filters, or <Link href="/create/newsletter" className="text-orange-600 hover:text-orange-700">create the first article</Link>!</p>
+            <h3 className="text-xl font-medium text-gray-600 mb-2">{t('newsletters.noArticlesFound')}</h3>
+            <p className="text-gray-500">{t('newsletters.noArticlesDescription').split('create the first article')[0]}<Link href="/create/newsletter" className="text-orange-600 hover:text-orange-700">create the first article</Link>!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -257,7 +350,7 @@ function NewslettersPageContent() {
                   {newsletter.featured && (
                     <div className="absolute top-2 right-2">
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                        Featured
+                        {t('common.featured')}
                       </span>
                     </div>
                   )}
@@ -266,7 +359,7 @@ function NewslettersPageContent() {
                   {!newsletter.author_id && (
                     <div className="absolute top-2 left-2">
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-                        Unverified Article
+                        {t('newsletters.unverifiedArticle')}
                       </span>
                     </div>
                   )}
@@ -328,7 +421,7 @@ function NewslettersPageContent() {
                     href={`/newsletters/${newsletter.id}`}
                     className="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors duration-200 text-center block"
                   >
-                    Read Full Article
+                    {t('newsletters.readFullArticle')}
                   </Link>
                 </div>
               </article>
@@ -343,7 +436,18 @@ function NewslettersPageContent() {
 export default function NewslettersPage() {
   return (
     <AuthGuard>
-      <NewslettersPageContent />
+      <ClientOnly fallback={
+        <div className="min-h-screen bg-gray-50 py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+              <span className="ml-3 text-lg text-gray-600">Loading...</span>
+            </div>
+          </div>
+        </div>
+      }>
+        <NewslettersPageContent />
+      </ClientOnly>
     </AuthGuard>
   )
 } 
