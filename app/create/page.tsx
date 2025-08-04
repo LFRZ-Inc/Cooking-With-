@@ -114,50 +114,7 @@ function CreatePageContent() {
           </div>
         </div>
 
-        {/* Recent Activity */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Your Recent Activity
-          </h3>
-          
-          <div className="space-y-3">
-            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <BookOpenIcon className="h-5 w-5 text-primary-500" />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">Chocolate Lava Cake</p>
-                <p className="text-xs text-gray-500">Recipe • Published 2 days ago</p>
-              </div>
-              <span className="text-xs text-green-600 font-medium">Published</span>
-            </div>
-            
-            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <NewspaperIcon className="h-5 w-5 text-blue-500" />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">Fall Comfort Foods</p>
-                <p className="text-xs text-gray-500">Newsletter • Published 1 week ago</p>
-              </div>
-              <span className="text-xs text-green-600 font-medium">Published</span>
-            </div>
-            
-            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <BookOpenIcon className="h-5 w-5 text-primary-500" />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">Mushroom Risotto</p>
-                <p className="text-xs text-gray-500">Recipe • Draft</p>
-              </div>
-              <span className="text-xs text-yellow-600 font-medium">Draft</span>
-            </div>
-          </div>
-          
-          <div className="mt-4 pt-4 border-t border-gray-200">
-            <Link 
-              href="/dashboard" 
-              className="text-primary-500 hover:text-primary-600 text-sm font-medium transition-colors"
-            >
-              View all your content →
-            </Link>
-          </div>
-        </div>
+
 
         {/* Tips */}
         <div className="mt-8 bg-primary-50 rounded-lg p-6">
