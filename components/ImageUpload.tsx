@@ -34,15 +34,15 @@ export default function ImageUpload({
 
   // File validation
   const validateFile = (file: File): string | null => {
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
-    const maxSize = 10 * 1024 * 1024 // 10MB
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/tiff', 'image/heic', 'image/heif']
+    const maxSize = 50 * 1024 * 1024 // 50MB - supports professional food photography
 
     if (!validTypes.includes(file.type)) {
-      return 'Please upload a valid image file (JPEG, PNG, GIF, or WebP)'
+      return 'Please upload a valid image file (JPEG, PNG, GIF, WebP, TIFF, or HEIC)'
     }
 
     if (file.size > maxSize) {
-      return 'Image size must be less than 10MB'
+      return 'Image size must be less than 50MB'
     }
 
     return null
@@ -217,7 +217,7 @@ export default function ImageUpload({
                     {placeholder}
                   </p>
                   <p className="text-sm text-gray-500">
-                    Supports JPEG, PNG, GIF, WebP up to 10MB
+                    Supports JPEG, PNG, GIF, WebP, TIFF, HEIC up to 50MB
                   </p>
                 </div>
                 <div className="flex justify-center">
@@ -305,16 +305,22 @@ export default function ImageUpload({
 
       {/* Hosting Suggestions */}
       {!value && (
-        <div className="text-xs text-gray-500 space-y-1">
-          <p>💡 <strong>Free hosting suggestions:</strong></p>
-          <div className="flex flex-wrap gap-2">
-            <a href="https://imgur.com" target="_blank" rel="noopener" className="text-blue-600 hover:text-blue-700">Imgur</a>
-            <span>•</span>
-            <a href="https://postimg.cc" target="_blank" rel="noopener" className="text-blue-600 hover:text-blue-700">PostImage</a>
-            <span>•</span>
-            <a href="https://imgbb.com" target="_blank" rel="noopener" className="text-blue-600 hover:text-blue-700">ImgBB</a>
-            <span>•</span>
-            <a href="https://drive.google.com" target="_blank" rel="noopener" className="text-blue-600 hover:text-blue-700">Google Drive</a>
+        <div className="text-xs text-gray-500 space-y-2">
+          <div>
+            <p>📷 <strong>Professional food photography welcome!</strong></p>
+            <p>Upload high-quality images up to 50MB - perfect for DSLR, mirrorless cameras, and food book quality photos.</p>
+          </div>
+          <div>
+            <p>💡 <strong>Free hosting suggestions:</strong></p>
+            <div className="flex flex-wrap gap-2">
+              <a href="https://imgur.com" target="_blank" rel="noopener" className="text-blue-600 hover:text-blue-700">Imgur</a>
+              <span>•</span>
+              <a href="https://postimg.cc" target="_blank" rel="noopener" className="text-blue-600 hover:text-blue-700">PostImage</a>
+              <span>•</span>
+              <a href="https://imgbb.com" target="_blank" rel="noopener" className="text-blue-600 hover:text-blue-700">ImgBB</a>
+              <span>•</span>
+              <a href="https://drive.google.com" target="_blank" rel="noopener" className="text-blue-600 hover:text-blue-700">Google Drive</a>
+            </div>
           </div>
         </div>
       )}
