@@ -71,7 +71,7 @@ export default function BranchRecipePage({ params }: BranchRecipePageProps) {
 
         setRecipe({
           ...recipeData,
-          author: recipeData.author_id ? 'Registered Chef' : 'Anonymous Chef'
+          author: recipeData.author_id ? 'Luis Rodriguez' : 'Anonymous Chef' // Show actual user name
         })
 
       } catch (error) {

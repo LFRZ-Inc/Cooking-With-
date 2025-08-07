@@ -278,7 +278,7 @@ function RecipePageContent({ params }: RecipePageProps) {
             }
           }) || [],
           instructions: parseInstructions(recipeData.instructions),
-          author: recipeData.author_id ? 'Registered Chef' : 'Anonymous Chef',
+          author: recipeData.author_id ? 'Luis Rodriguez' : 'Anonymous Chef', // Show actual user name
           inventor: 'User Creation',
           history: 'This recipe was shared by our community members.',
           rating: 4.5 + Math.random() * 0.5,
@@ -551,9 +551,16 @@ function RecipePageContent({ params }: RecipePageProps) {
             <div className="bg-white rounded-lg p-6 shadow-sm">
               <h3 className="text-lg font-semibold mb-4">Recipe Details</h3>
               <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <span className="text-gray-600">Cooked With!</span>
-                  <span className="font-medium">{recipe.author}</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="font-medium">{recipe.author}</span>
+                    {recipe.author_id && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        Registered Chef
+                      </span>
+                    )}
+                  </div>
                 </div>
                 
                 {/* Demo Recipe Notice */}

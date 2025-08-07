@@ -1,43 +1,91 @@
 'use client'
 import React, { useState } from 'react'
-import { 
-  PlusIcon,
-  XIcon,
-  ImageIcon,
-  ClockIcon,
-  UsersIcon,
-  ChefHatIcon
-} from 'lucide-react'
-
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
-import toast from 'react-hot-toast'
 import ImageUpload from '@/components/ImageUpload'
+import toast from 'react-hot-toast'
 
-function CreateRecipePageContent() {
-  const { user } = useAuth() // Optional user for attribution
-  const [formData, setFormData] = useState({
+interface RecipeFormData {
+  title: string
+  description: string
+  imageUrl: string
+  prepTime: number
+  cookTime: number
+  servings: number
+  difficulty: 'easy' | 'medium' | 'hard'
+  ingredients: string[]
+  instructions: string[]
+  selfRating: number
+  originalCreator?: string
+  culturalOrigin?: string
+}
+
+export default function CreateRecipePage() {
+  const router = useRouter()
+  const { user } = useAuth()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [formData, setFormData] = useState<RecipeFormData>({
     title: '',
     description: '',
-    category: '',
-    dietType: '',
-    difficulty: '',
-    prepTime: '',
-    cookTime: '',
-    servings: '',
     imageUrl: '',
-    ingredients: [{ item: '', amount: '', unit: '' }],
+    prepTime: 15,
+    cookTime: 30,
+    servings: 4,
+    difficulty: 'medium',
+    ingredients: [''],
     instructions: [''],
-    tips: '',
-    tags: [] as string[]
+    selfRating: 5
   })
 
-  const [newTag, setNewTag] = useState('')
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!user) {
+      toast.error('You must be logged in to create a recipe')
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      const { data, error } = await supabase
+        .from('recipes')
+        .insert([
+          {
+            title: formData.title,
+            description: formData.description,
+            image_url: formData.imageUrl || null,
+            prep_time_minutes: formData.prepTime,
+            cook_time_minutes: formData.cookTime,
+            servings: formData.servings,
+            difficulty: formData.difficulty,
+            ingredients: JSON.stringify(formData.ingredients.filter(ing => ing.trim())),
+            instructions: JSON.stringify(formData.instructions.filter(inst => inst.trim())),
+            author_id: user.id,
+            self_rating: formData.selfRating,
+            original_creator: formData.originalCreator || null,
+            cultural_origin: formData.culturalOrigin || null,
+            is_original: true
+          }
+        ])
+        .select()
+
+      if (error) throw error
+
+      toast.success('Recipe created successfully!')
+      router.push(`/recipes/${data[0].id}`)
+    } catch (error: any) {
+      console.error('Error creating recipe:', error)
+      toast.error('Failed to create recipe: ' + error.message)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   const addIngredient = () => {
     setFormData(prev => ({
       ...prev,
-      ingredients: [...prev.ingredients, { item: '', amount: '', unit: '' }]
+      ingredients: [...prev.ingredients, '']
     }))
   }
 
@@ -48,12 +96,10 @@ function CreateRecipePageContent() {
     }))
   }
 
-  const updateIngredient = (index: number, field: string, value: string) => {
+  const updateIngredient = (index: number, value: string) => {
     setFormData(prev => ({
       ...prev,
-      ingredients: prev.ingredients.map((ing, i) => 
-        i === index ? { ...ing, [field]: value } : ing
-      )
+      ingredients: prev.ingredients.map((ing, i) => i === index ? value : ing)
     }))
   }
 
@@ -74,483 +120,404 @@ function CreateRecipePageContent() {
   const updateInstruction = (index: number, value: string) => {
     setFormData(prev => ({
       ...prev,
-      instructions: prev.instructions.map((inst, i) => 
-        i === index ? value : inst
-      )
+      instructions: prev.instructions.map((inst, i) => i === index ? value : inst)
     }))
   }
 
-  const addTag = () => {
-    if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        tags: [...prev.tags, newTag.trim()]
-      }))
-      setNewTag('')
+  // Pre-filled recipe data for testing
+  const sampleRecipes = [
+    {
+      title: "Classic Margherita Pizza",
+      description: "A traditional Neapolitan pizza with fresh mozzarella, basil, and San Marzano tomatoes. This recipe honors the original 1889 creation by pizzaiolo Raffaele Esposito for Queen Margherita of Savoy.",
+      imageUrl: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=800",
+      prepTime: 30,
+      cookTime: 12,
+      servings: 4,
+      difficulty: "medium" as const,
+      ingredients: [
+        "2 cups (00 flour) for authentic Neapolitan style",
+        "1 cup warm water",
+        "1 tsp active dry yeast",
+        "1 tsp salt",
+        "1 tbsp olive oil",
+        "8 oz fresh mozzarella di bufala",
+        "1/2 cup San Marzano tomato sauce",
+        "Fresh basil leaves",
+        "Extra virgin olive oil for drizzling"
+      ],
+      instructions: [
+        "Mix flour, yeast, and salt in a large bowl",
+        "Gradually add warm water and olive oil, kneading until smooth",
+        "Let dough rise for 2 hours in a warm place",
+        "Preheat oven to 500°F (260°C) with a pizza stone",
+        "Roll out dough into 12-inch circle",
+        "Spread tomato sauce, add torn mozzarella",
+        "Bake for 10-12 minutes until crust is golden",
+        "Add fresh basil and drizzle with olive oil"
+      ],
+      selfRating: 5,
+      originalCreator: "Raffaele Esposito (1889)",
+      culturalOrigin: "Neapolitan, Italy"
+    },
+    {
+      title: "Pad Thai",
+      description: "Thailand's most famous noodle dish, adapted from traditional Chinese stir-fry techniques. This version balances sweet, sour, salty, and spicy flavors authentically.",
+      imageUrl: "https://images.unsplash.com/photo-1559314809-0d155014e29e?w=800",
+      prepTime: 20,
+      cookTime: 15,
+      servings: 4,
+      difficulty: "medium" as const,
+      ingredients: [
+        "8 oz rice noodles",
+        "2 tbsp tamarind paste",
+        "2 tbsp fish sauce",
+        "2 tbsp palm sugar",
+        "2 eggs",
+        "8 oz shrimp or chicken",
+        "2 cups bean sprouts",
+        "4 green onions, chopped",
+        "1/4 cup crushed peanuts",
+        "2 limes, cut into wedges",
+        "2 tbsp vegetable oil",
+        "2 cloves garlic, minced"
+      ],
+      instructions: [
+        "Soak rice noodles in warm water for 30 minutes",
+        "Mix tamarind paste, fish sauce, and palm sugar for sauce",
+        "Heat oil in wok, add garlic and protein",
+        "Push ingredients aside, scramble eggs",
+        "Add drained noodles and sauce",
+        "Toss until noodles are coated and heated through",
+        "Add bean sprouts and green onions",
+        "Garnish with peanuts and lime wedges"
+      ],
+      selfRating: 5,
+      originalCreator: "Traditional Thai cuisine",
+      culturalOrigin: "Thailand"
+    },
+    {
+      title: "Beef Bourguignon",
+      description: "A classic French stew from Burgundy, made famous by Julia Child. This slow-cooked dish features tender beef braised in red wine with pearl onions and mushrooms.",
+      imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?w=800",
+      prepTime: 45,
+      cookTime: 180,
+      servings: 6,
+      difficulty: "hard" as const,
+      ingredients: [
+        "3 lbs beef chuck, cut into 2-inch cubes",
+        "1 bottle Burgundy red wine",
+        "2 cups beef stock",
+        "1 lb pearl onions",
+        "1 lb mushrooms, quartered",
+        "4 carrots, sliced",
+        "4 cloves garlic, minced",
+        "2 tbsp tomato paste",
+        "2 bay leaves",
+        "1 tsp thyme",
+        "4 tbsp butter",
+        "4 tbsp flour",
+        "Salt and pepper to taste"
+      ],
+      instructions: [
+        "Pat beef dry and season with salt and pepper",
+        "Brown beef in batches in a Dutch oven",
+        "Remove beef, add onions and carrots, cook until softened",
+        "Add garlic and tomato paste, cook 1 minute",
+        "Return beef, add wine, stock, bay leaves, and thyme",
+        "Simmer covered for 2-3 hours until beef is tender",
+        "Sauté mushrooms separately in butter",
+        "Add mushrooms and pearl onions to stew",
+        "Simmer 30 minutes more until sauce thickens"
+      ],
+      selfRating: 5,
+      originalCreator: "Traditional Burgundian cuisine",
+      culturalOrigin: "Burgundy, France"
     }
-  }
+  ]
 
-  const removeTag = (tagToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
-    }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    try {
-      // Prepare recipe data for Supabase (anonymous or authenticated)
-      const recipeData = {
-        title: formData.title,
-        description: formData.description,
-        author_id: user?.id || null, // Use Supabase auth user ID or null for anonymous
-        difficulty: formData.difficulty.toLowerCase() as 'easy' | 'medium' | 'hard',
-        prep_time_minutes: parseInt(formData.prepTime) || 0,
-        cook_time_minutes: parseInt(formData.cookTime) || 0,
-        servings: parseInt(formData.servings) || 1,
-        instructions: JSON.stringify(formData.instructions.filter(inst => inst.trim() !== '')),
-        tips: formData.tips || null,
-        image_url: formData.imageUrl || null,
-        status: 'published' as const,
-        rating: 0,
-        rating_count: 0,
-        view_count: 0,
-        version_number: 1,
-        parent_recipe_id: null,
-        is_original: true,
-        branch_name: null
-      }
-
-      const { data: recipe, error: recipeError } = await supabase
-        .from('recipes')
-        .insert([recipeData])
-        .select()
-        .single()
-
-      if (recipeError) {
-        throw recipeError
-      }
-
-      // Add ingredients
-      if (recipe && formData.ingredients.length > 0) {
-        const ingredientsData = formData.ingredients
-          .filter(ing => ing.item.trim() !== '')
-          .map((ingredient, index) => ({
-            recipe_id: recipe.id,
-            name: `${ingredient.amount} ${ingredient.unit} ${ingredient.item}`.trim(),
-            amount: parseFloat(ingredient.amount) || null,
-            unit: ingredient.unit || null,
-            order_index: index
-          }))
-
-        const { error: ingredientsError } = await supabase
-          .from('recipe_ingredients')
-          .insert(ingredientsData)
-
-        if (ingredientsError) {
-          console.error('Error adding ingredients:', ingredientsError)
-        }
-      }
-
-      toast.success('Recipe created successfully!')
-      
-      // Reset form
-      setFormData({
-        title: '',
-        description: '',
-        category: '',
-        dietType: '',
-        difficulty: '',
-        prepTime: '',
-        cookTime: '',
-        servings: '',
-        imageUrl: '',
-        ingredients: [{ item: '', amount: '', unit: '' }],
-        instructions: [''],
-        tips: '',
-        tags: [] as string[]
-      })
-
-    } catch (error: any) {
-      console.error('Error creating recipe:', error)
-      toast.error(error.message || 'Failed to create recipe')
-    }
+  const loadSampleRecipe = (recipe: typeof sampleRecipes[0]) => {
+    setFormData({
+      title: recipe.title,
+      description: recipe.description,
+      imageUrl: recipe.imageUrl,
+      prepTime: recipe.prepTime,
+      cookTime: recipe.cookTime,
+      servings: recipe.servings,
+      difficulty: recipe.difficulty,
+      ingredients: recipe.ingredients,
+      instructions: recipe.instructions,
+      selfRating: recipe.selfRating,
+      originalCreator: recipe.originalCreator,
+      culturalOrigin: recipe.culturalOrigin
+    })
   }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-serif font-bold text-gray-900 mb-2">
-            Create New Recipe
-          </h1>
-          <p className="text-gray-600">
-            Share your culinary creation with the community
-          </p>
-        </div>
+        <div className="bg-white rounded-lg shadow-sm p-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">Create New Recipe</h1>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Basic Information */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Basic Information
-            </h2>
-            
-            <div className="grid gap-6">
+          {/* Sample Recipe Loader */}
+          <div className="mb-8 p-4 bg-blue-50 rounded-lg">
+            <h3 className="text-lg font-semibold text-blue-900 mb-4">Quick Start - Load Sample Recipes</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {sampleRecipes.map((recipe, index) => (
+                <button
+                  key={index}
+                  onClick={() => loadSampleRecipe(recipe)}
+                  className="p-3 text-left bg-white border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors"
+                >
+                  <h4 className="font-medium text-blue-900">{recipe.title}</h4>
+                  <p className="text-sm text-blue-700 mt-1">{recipe.culturalOrigin}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Basic Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Recipe Title *
                 </label>
                 <input
                   type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData(prev => ({...prev, title: e.target.value}))}
-                  className="input-field"
-                  placeholder="e.g., Grandma's Chocolate Chip Cookies"
                   required
+                  value={formData.title}
+                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  placeholder="e.g., Classic Margherita Pizza"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description *
+                  Difficulty Level *
                 </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData(prev => ({...prev, description: e.target.value}))}
-                  rows={3}
-                  className="input-field"
-                  placeholder="Describe your recipe, what makes it special, and any background story..."
-                  required
-                />
-              </div>
-
-              <div className="grid md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category *
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData(prev => ({...prev, category: e.target.value}))}
-                    className="input-field"
-                    required
-                  >
-                    <option value="">Select category</option>
-                    <option value="Appetizer">Appetizer</option>
-                    <option value="Main Course">Main Course</option>
-                    <option value="Dessert">Dessert</option>
-                    <option value="Breakfast">Breakfast</option>
-                    <option value="Lunch">Lunch</option>
-                    <option value="Dinner">Dinner</option>
-                    <option value="Snack">Snack</option>
-                    <option value="Beverage">Beverage</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Diet Type
-                  </label>
-                  <select
-                    value={formData.dietType}
-                    onChange={(e) => setFormData(prev => ({...prev, dietType: e.target.value}))}
-                    className="input-field"
-                  >
-                    <option value="">Select diet type</option>
-                    <option value="Vegetarian">Vegetarian</option>
-                    <option value="Vegan">Vegan</option>
-                    <option value="Gluten-Free">Gluten-Free</option>
-                    <option value="Keto">Keto</option>
-                    <option value="Paleo">Paleo</option>
-                    <option value="Low-Carb">Low-Carb</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Difficulty *
-                  </label>
-                  <select
-                    value={formData.difficulty}
-                    onChange={(e) => setFormData(prev => ({...prev, difficulty: e.target.value}))}
-                    className="input-field"
-                    required
-                  >
-                    <option value="">Select difficulty</option>
-                    <option value="Easy">Easy</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Hard">Hard</option>
-                  </select>
-                </div>
+                <select
+                  value={formData.difficulty}
+                  onChange={(e) => setFormData(prev => ({ ...prev, difficulty: e.target.value as 'easy' | 'medium' | 'hard' }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                >
+                  <option value="easy">Easy</option>
+                  <option value="medium">Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
               </div>
             </div>
-          </div>
 
-          {/* Time and Servings */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Time & Servings
-            </h2>
-            
-            <div className="grid md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Description *
+              </label>
+              <textarea
+                required
+                value={formData.description}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                placeholder="Describe your recipe, its origins, and what makes it special..."
+              />
+            </div>
+
+            {/* Attribution Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <ClockIcon className="h-4 w-4 inline mr-1" />
+                  Original Creator (if adapted)
+                </label>
+                <input
+                  type="text"
+                  value={formData.originalCreator || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, originalCreator: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  placeholder="e.g., Julia Child, Traditional Italian cuisine"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Cultural Origin
+                </label>
+                <input
+                  type="text"
+                  value={formData.culturalOrigin || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, culturalOrigin: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  placeholder="e.g., Neapolitan, Italy"
+                />
+              </div>
+            </div>
+
+            {/* Image Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Recipe Image
+              </label>
+              <ImageUpload
+                value={formData.imageUrl}
+                onChange={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))}
+                placeholder="Upload a beautiful photo of your dish..."
+              />
+            </div>
+
+            {/* Time and Servings */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Prep Time (minutes) *
                 </label>
                 <input
                   type="number"
-                  value={formData.prepTime}
-                  onChange={(e) => setFormData(prev => ({...prev, prepTime: e.target.value}))}
-                  className="input-field"
-                  placeholder="15"
                   required
+                  min="0"
+                  value={formData.prepTime}
+                  onChange={(e) => setFormData(prev => ({ ...prev, prepTime: parseInt(e.target.value) }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <ChefHatIcon className="h-4 w-4 inline mr-1" />
                   Cook Time (minutes) *
                 </label>
                 <input
                   type="number"
-                  value={formData.cookTime}
-                  onChange={(e) => setFormData(prev => ({...prev, cookTime: e.target.value}))}
-                  className="input-field"
-                  placeholder="30"
                   required
+                  min="0"
+                  value={formData.cookTime}
+                  onChange={(e) => setFormData(prev => ({ ...prev, cookTime: parseInt(e.target.value) }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <UsersIcon className="h-4 w-4 inline mr-1" />
                   Servings *
                 </label>
                 <input
                   type="number"
-                  value={formData.servings}
-                  onChange={(e) => setFormData(prev => ({...prev, servings: e.target.value}))}
-                  className="input-field"
-                  placeholder="4"
                   required
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Recipe Images */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Recipe Image
-            </h2>
-            
-            <ImageUpload
-              value={formData.imageUrl}
-              onChange={(url) => setFormData(prev => ({...prev, imageUrl: url}))}
-              placeholder="Drag and drop your recipe image here, or click to browse"
-            />
-          </div>
-
-          {/* Ingredients */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">
-                Ingredients
-              </h2>
-              <button
-                type="button"
-                onClick={addIngredient}
-                className="btn-secondary flex items-center space-x-1"
-              >
-                <PlusIcon className="h-4 w-4" />
-                <span>Add Ingredient</span>
-              </button>
-            </div>
-            
-            <div className="space-y-3">
-              {formData.ingredients.map((ingredient, index) => (
-                <div key={index} className="flex gap-3 items-center">
-                  <input
-                    type="text"
-                    value={ingredient.amount}
-                    onChange={(e) => updateIngredient(index, 'amount', e.target.value)}
-                    className="w-20 input-field"
-                    placeholder="1"
-                  />
-                  <select
-                    value={ingredient.unit}
-                    onChange={(e) => updateIngredient(index, 'unit', e.target.value)}
-                    className="w-32 input-field"
-                  >
-                    <option value="">Unit</option>
-                    <option value="cup">cup</option>
-                    <option value="tbsp">tbsp</option>
-                    <option value="tsp">tsp</option>
-                    <option value="lb">lb</option>
-                    <option value="oz">oz</option>
-                    <option value="g">g</option>
-                    <option value="kg">kg</option>
-                    <option value="ml">ml</option>
-                    <option value="l">l</option>
-                    <option value="piece">piece</option>
-                  </select>
-                  <input
-                    type="text"
-                    value={ingredient.item}
-                    onChange={(e) => updateIngredient(index, 'item', e.target.value)}
-                    className="flex-1 input-field"
-                    placeholder="Ingredient name"
-                    required
-                  />
-                  {formData.ingredients.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeIngredient(index)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <XIcon className="h-5 w-5" />
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Instructions */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">
-                Instructions
-              </h2>
-              <button
-                type="button"
-                onClick={addInstruction}
-                className="btn-secondary flex items-center space-x-1"
-              >
-                <PlusIcon className="h-4 w-4" />
-                <span>Add Step</span>
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              {formData.instructions.map((instruction, index) => (
-                <div key={index} className="flex gap-3 items-start">
-                  <div className="bg-primary-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-medium flex-shrink-0 mt-1">
-                    {index + 1}
-                  </div>
-                  <textarea
-                    value={instruction}
-                    onChange={(e) => updateInstruction(index, e.target.value)}
-                    rows={2}
-                    className="flex-1 input-field"
-                    placeholder="Describe this cooking step in detail..."
-                    required
-                  />
-                  {formData.instructions.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeInstruction(index)}
-                      className="text-red-500 hover:text-red-700 mt-2"
-                    >
-                      <XIcon className="h-5 w-5" />
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Tips and Tags */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Additional Information
-            </h2>
-            
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Cooking Tips & Notes
-                </label>
-                <textarea
-                  value={formData.tips}
-                  onChange={(e) => setFormData(prev => ({...prev, tips: e.target.value}))}
-                  rows={3}
-                  className="input-field"
-                  placeholder="Share any helpful tips, substitutions, or notes about this recipe..."
+                  min="1"
+                  value={formData.servings}
+                  onChange={(e) => setFormData(prev => ({ ...prev, servings: parseInt(e.target.value) }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Tags
+                  Your Rating (1-5)
                 </label>
-                <div className="flex gap-2 mb-3">
-                  <input
-                    type="text"
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                    className="flex-1 input-field"
-                    placeholder="Add a tag (e.g., comfort food, quick meal)"
-                  />
-                  <button
-                    type="button"
-                    onClick={addTag}
-                    className="btn-secondary"
-                  >
-                    Add
-                  </button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {formData.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm flex items-center space-x-1"
-                    >
-                      <span>{tag}</span>
+                <input
+                  type="number"
+                  min="1"
+                  max="5"
+                  value={formData.selfRating}
+                  onChange={(e) => setFormData(prev => ({ ...prev, selfRating: parseInt(e.target.value) }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            {/* Ingredients */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Ingredients *
+                </label>
+                <button
+                  type="button"
+                  onClick={addIngredient}
+                  className="text-sm text-orange-600 hover:text-orange-700"
+                >
+                  + Add Ingredient
+                </button>
+              </div>
+              <div className="space-y-2">
+                {formData.ingredients.map((ingredient, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <input
+                      type="text"
+                      required
+                      value={ingredient}
+                      onChange={(e) => updateIngredient(index, e.target.value)}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      placeholder="e.g., 2 cups all-purpose flour"
+                    />
+                    {formData.ingredients.length > 1 && (
                       <button
                         type="button"
-                        onClick={() => removeTag(tag)}
-                        className="text-primary-500 hover:text-primary-700"
+                        onClick={() => removeIngredient(index)}
+                        className="text-red-600 hover:text-red-700"
                       >
-                        <XIcon className="h-3 w-3" />
+                        Remove
                       </button>
-                    </span>
-                  ))}
-                </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
 
-          {/* Submit */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex justify-between">
-              <button
-                type="button"
-                className="btn-secondary"
-              >
-                Save as Draft
-              </button>
+            {/* Instructions */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Instructions *
+                </label>
+                <button
+                  type="button"
+                  onClick={addInstruction}
+                  className="text-sm text-orange-600 hover:text-orange-700"
+                >
+                  + Add Step
+                </button>
+              </div>
+              <div className="space-y-2">
+                {formData.instructions.map((instruction, index) => (
+                  <div key={index} className="flex items-start space-x-2">
+                    <span className="flex-shrink-0 w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-medium mt-2">
+                      {index + 1}
+                    </span>
+                    <div className="flex-1">
+                      <textarea
+                        required
+                        value={instruction}
+                        onChange={(e) => updateInstruction(index, e.target.value)}
+                        rows={2}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        placeholder="Describe this step..."
+                      />
+                    </div>
+                    {formData.instructions.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeInstruction(index)}
+                        className="text-red-600 hover:text-red-700 mt-2"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-end">
               <button
                 type="submit"
-                className="btn-primary"
+                disabled={isSubmitting}
+                className="bg-orange-600 text-white px-8 py-3 rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Publish Recipe
+                {isSubmitting ? 'Creating Recipe...' : 'Create Recipe'}
               </button>
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   )
-}
-
-export default function CreateRecipePage() {
-  return <CreateRecipePageContent />
 } 

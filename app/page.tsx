@@ -191,7 +191,12 @@ function HomeContent() {
                 
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-500">Cooked With! {recipe.author}</span>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-gray-500">Cooked With! {recipe.author}</span>
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        Registered Chef
+                      </span>
+                    </div>
                     <div className="flex items-center space-x-1">
                       <StarIcon className="h-4 w-4 text-yellow-400 fill-current" />
                       <span className="text-sm text-gray-600">{recipe.rating}</span>
