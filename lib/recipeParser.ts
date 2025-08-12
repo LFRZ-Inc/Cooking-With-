@@ -1,6 +1,5 @@
-'use client'
-
 import { supabase } from './supabase'
+import { parse } from 'node-html-parser'
 
 export interface ParsedRecipe {
   title: string
@@ -122,19 +121,37 @@ export class RecipeParser {
   // Parse webpage with specific template
   private async parseWithTemplate(url: string, source: ImportSource): Promise<ParsedRecipe | null> {
     try {
-      // In a real implementation, this would fetch the webpage and extract content
-      // For now, we'll simulate the extraction process
-      const mockContent = await this.fetchWebpageContent(url)
-      
+      const html = await this.fetchWebpageContent(url)
+      const root = parse(html)
+      const selectText = (selector?: string) => selector ? root.querySelector(selector)?.text.trim() : undefined
+      const selectImage = (selector?: string) => {
+        if (!selector) return undefined
+        const el = root.querySelector(selector)
+        return el?.getAttribute('src') || el?.querySelector('img')?.getAttribute('src') || undefined
+      }
+      const selectList = (selector: string) => root
+        .querySelectorAll(selector)
+        .map(el => el.text.replace(/\s+/g, ' ').trim())
+        .filter(Boolean)
+
+      const title = selectText(source.extraction_rules.title) || this.extractGenericTitle(html)
+      const description = selectText(source.extraction_rules.description)
+      const ingredients = source.extraction_rules.ingredients ? selectList(source.extraction_rules.ingredients) : this.extractGenericIngredients(html)
+      const instructions = source.extraction_rules.instructions ? selectList(source.extraction_rules.instructions) : this.extractGenericInstructions(html)
+      const image_url = selectImage(source.extraction_rules.image)
+      const prep_time_minutes = this.extractPrepTime(html, source.extraction_rules.prep_time)
+      const cook_time_minutes = this.extractCookTime(html, source.extraction_rules.cook_time)
+      const servings = this.extractServings(html, source.extraction_rules.servings)
+
       return {
-        title: this.extractTitle(mockContent, source.extraction_rules.title),
-        description: this.extractDescription(mockContent, source.extraction_rules.description),
-        ingredients: this.extractIngredients(mockContent, source.extraction_rules.ingredients),
-        instructions: this.extractInstructions(mockContent, source.extraction_rules.instructions),
-        prep_time_minutes: this.extractPrepTime(mockContent, source.extraction_rules.prep_time),
-        cook_time_minutes: this.extractCookTime(mockContent, source.extraction_rules.cook_time),
-        servings: this.extractServings(mockContent, source.extraction_rules.servings),
-        image_url: this.extractImage(mockContent, source.extraction_rules.image),
+        title,
+        description,
+        ingredients,
+        instructions,
+        prep_time_minutes,
+        cook_time_minutes,
+        servings,
+        image_url,
         source_url: url,
         confidence_score: 0.85
       }
@@ -148,7 +165,23 @@ export class RecipeParser {
   private async parseGenericWebpage(url: string): Promise<ParsedRecipe | null> {
     try {
       const mockContent = await this.fetchWebpageContent(url)
-      
+      // Fallback generic extraction via node-html-parser when no template exists
+      try {
+        const root = parse(mockContent)
+        const title = root.querySelector('h1')?.text.trim() || this.extractGenericTitle(mockContent)
+        const ingredients = root.querySelectorAll('li').map(el => el.text.trim()).filter(Boolean)
+        const instructionCandidates = root.querySelectorAll('ol li, .instructions li, .method li').map(el => el.text.trim()).filter(Boolean)
+        const instructions = instructionCandidates.length ? instructionCandidates : ingredients.slice(-6)
+
+        return {
+          title,
+          ingredients,
+          instructions,
+          source_url: url,
+          confidence_score: 0.65
+        }
+      } catch {}
+
       return {
         title: this.extractGenericTitle(mockContent),
         ingredients: this.extractGenericIngredients(mockContent),
@@ -371,75 +404,33 @@ export class RecipeParser {
     return undefined
   }
 
-  // Mock methods for demonstration
   private async fetchWebpageContent(url: string): Promise<string> {
-    // In a real implementation, this would fetch the actual webpage
-    // For now, return mock content
-    return `
-      <html>
-        <head><title>Delicious Chocolate Cake Recipe</title></head>
-        <body>
-          <h1>Delicious Chocolate Cake Recipe</h1>
-          <p>This is a wonderful chocolate cake recipe that everyone will love.</p>
-          <h2>Ingredients</h2>
-          <ul>
-            <li>2 cups all-purpose flour</li>
-            <li>1 3/4 cups sugar</li>
-            <li>3/4 cup unsweetened cocoa powder</li>
-            <li>1 1/2 teaspoons baking soda</li>
-            <li>1 1/2 teaspoons baking powder</li>
-            <li>1 teaspoon salt</li>
-            <li>2 eggs</li>
-            <li>1 cup milk</li>
-            <li>1/2 cup vegetable oil</li>
-            <li>2 teaspoons vanilla extract</li>
-            <li>1 cup hot water</li>
-          </ul>
-          <h2>Instructions</h2>
-          <ol>
-            <li>Preheat oven to 350°F (175°C). Grease and flour a 9x13 inch pan.</li>
-            <li>In a large bowl, combine flour, sugar, cocoa, baking soda, baking powder and salt.</li>
-            <li>Add eggs, milk, oil and vanilla. Mix until smooth.</li>
-            <li>Stir in hot water. Batter will be very thin.</li>
-            <li>Pour into prepared pan and bake for 30 to 35 minutes.</li>
-            <li>Cool in pan for 10 minutes, then remove from pan and cool completely.</li>
-          </ol>
-          <p>Prep time: 15 minutes | Cook time: 35 minutes | Serves: 12</p>
-        </body>
-      </html>
-    `
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; CookingWithBot/1.0; +https://example.com/bot)',
+        'Accept': 'text/html,application/xhtml+xml',
+      },
+    })
+    if (!res.ok) {
+      throw new Error(`Failed to fetch page: ${res.status}`)
+    }
+    return await res.text()
   }
 
   private async performOCR(imageData: string): Promise<string> {
-    // Mock OCR implementation
-    return `
-      Delicious Chocolate Cake Recipe
-      
-      Ingredients:
-      - 2 cups all-purpose flour
-      - 1 3/4 cups sugar
-      - 3/4 cup unsweetened cocoa powder
-      - 1 1/2 teaspoons baking soda
-      - 1 1/2 teaspoons baking powder
-      - 1 teaspoon salt
-      - 2 eggs
-      - 1 cup milk
-      - 1/2 cup vegetable oil
-      - 2 teaspoons vanilla extract
-      - 1 cup hot water
-      
-      Instructions:
-      1. Preheat oven to 350°F (175°C). Grease and flour a 9x13 inch pan.
-      2. In a large bowl, combine flour, sugar, cocoa, baking soda, baking powder and salt.
-      3. Add eggs, milk, oil and vanilla. Mix until smooth.
-      4. Stir in hot water. Batter will be very thin.
-      5. Pour into prepared pan and bake for 30 to 35 minutes.
-      6. Cool in pan for 10 minutes, then remove from pan and cool completely.
-      
-      Prep time: 15 minutes
-      Cook time: 35 minutes
-      Serves: 12
-    `
+    // Use Tesseract.js in Node to OCR base64 image data
+    const { createWorker } = await import('tesseract.js')
+    const worker = await createWorker('eng')
+    try {
+      const { data } = await worker.recognize(imageData)
+      await worker.terminate()
+      return data.text || ''
+    } catch (e) {
+      try { await worker.terminate() } catch {}
+      console.error('OCR error:', e)
+      return ''
+    }
   }
 
   // Extract methods for specific fields

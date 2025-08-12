@@ -32,13 +32,37 @@ export async function POST(request: NextRequest) {
 
     switch (import_type) {
       case 'webpage':
+        // Ensure import sources are loaded before parsing
+        try { await recipeParser.loadImportSources() } catch {}
         parsedRecipe = await recipeParser.parseFromWebpage(source_data)
         break
       case 'image':
         parsedRecipe = await recipeParser.parseFromImage(source_data)
         break
       case 'text':
-        parsedRecipe = await recipeParser.parseFromText(source_data)
+        // Accept either raw text or a JSON-encoded ParsedRecipe from the editor
+        try {
+          const maybeParsed = JSON.parse(source_data)
+          if (maybeParsed && typeof maybeParsed === 'object' && Array.isArray(maybeParsed.ingredients) && Array.isArray(maybeParsed.instructions)) {
+            parsedRecipe = {
+              title: maybeParsed.title || 'Untitled Recipe',
+              description: maybeParsed.description || '',
+              ingredients: maybeParsed.ingredients,
+              instructions: maybeParsed.instructions,
+              prep_time_minutes: maybeParsed.prep_time_minutes || 0,
+              cook_time_minutes: maybeParsed.cook_time_minutes || 0,
+              servings: maybeParsed.servings || 4,
+              difficulty: maybeParsed.difficulty || 'medium',
+              image_url: maybeParsed.image_url,
+              source_url: maybeParsed.source_url,
+              confidence_score: maybeParsed.confidence_score ?? 0.9,
+            }
+          } else {
+            parsedRecipe = await recipeParser.parseFromText(source_data)
+          }
+        } catch {
+          parsedRecipe = await recipeParser.parseFromText(source_data)
+        }
         break
       default:
         return NextResponse.json(
@@ -193,7 +217,7 @@ function extractDomain(url: string): string {
 
 // Helper function to queue translation
 async function queueTranslation(recipeId: string, targetLanguage: string, priority: 'low' | 'normal' | 'high' | 'urgent') {
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('translation_jobs')
     .insert({
       content_type: 'recipe',
@@ -204,8 +228,22 @@ async function queueTranslation(recipeId: string, targetLanguage: string, priori
       retry_count: 0,
       max_retries: 3
     })
+    .select('*')
+    .single()
 
   if (error) throw error
+
+  // Trigger processing in the background
+  if (data?.id) {
+    try {
+      const base = getBaseUrl()
+      await fetch(`${base}/api/translate/process`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobId: data.id })
+      })
+    } catch {}
+  }
 }
 
 // Helper function to update import analytics
@@ -252,3 +290,12 @@ async function updateImportAnalytics(domain: string, importMethod: string, succe
     console.error('Error updating import analytics:', error)
   }
 } 
+
+// Build an absolute base URL for server-side fetches
+function getBaseUrl() {
+  const site = process.env.NEXT_PUBLIC_SITE_URL
+  const vercel = process.env.VERCEL_URL
+  if (site) return site
+  if (vercel) return `https://${vercel}`
+  return 'http://localhost:3000'
+}

@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 
+// Build an absolute base URL for server-side fetches
+function getBaseUrl() {
+  const site = process.env.NEXT_PUBLIC_SITE_URL
+  const vercel = process.env.VERCEL_URL
+  if (site) return site
+  if (vercel) return `https://${vercel}`
+  return 'http://localhost:3000'
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { jobId } = await request.json()
@@ -190,7 +199,7 @@ async function translateFields(fields: { name: string; text: string }[], targetL
   const texts = fields.map(field => field.text)
   
   try {
-    const response = await fetch('/api/translate', {
+    const response = await fetch(`${getBaseUrl()}/api/translate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -226,7 +235,7 @@ async function translateFields(fields: { name: string; text: string }[], targetL
     // Fallback to individual translations
     for (const field of fields) {
       try {
-        const response = await fetch('/api/translate', {
+        const response = await fetch(`${getBaseUrl()}/api/translate`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -3,6 +3,12 @@
 import { useTranslation } from './useTranslation'
 import { supabase } from './supabase'
 
+// Build an absolute base URL for server-side fetches (used by API calls invoked from client as well)
+function getBaseUrl() {
+  const site = typeof window === 'undefined' ? (process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000') : ''
+  return site
+}
+
 // Translation service for database content
 export class TranslationService {
   private static instance: TranslationService
@@ -140,6 +146,8 @@ export class TranslationService {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
+        .select('*')
+        .single()
 
       if (error) throw error
       return data
@@ -392,8 +400,19 @@ export class TranslationService {
         return existingJob
       }
 
-      // Create new job
-      return await this.createTranslationJob(contentType, contentId, targetLanguage, priority)
+      // Create new job and immediately trigger processing
+      const job = await this.createTranslationJob(contentType, contentId, targetLanguage, priority)
+
+      // Fire-and-forget processing call
+      if (job && job.id) {
+        fetch('/api/translate/process', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jobId: job.id })
+        }).catch(() => {})
+      }
+
+      return job
     } catch (error) {
       console.error('Error queuing content for translation:', error)
       throw error
