@@ -4,6 +4,9 @@ import { NextRequest, NextResponse } from 'next/server'
 const LIBRETRANSLATE_URL = process.env.LIBRETRANSLATE_URL || 'https://libretranslate.com'
 const LIBRETRANSLATE_API_KEY = process.env.LIBRETRANSLATE_API_KEY
 
+// Fallback translation service (MyMemory API - no key required)
+const MYMEMORY_URL = 'https://api.mymemory.translated.net/get'
+
 export async function POST(request: NextRequest) {
   try {
     const { text, targetLanguage, sourceLanguage = 'en', batch = false, texts = [] } = await request.json()
@@ -31,6 +34,7 @@ export async function POST(request: NextRequest) {
 }
 
 async function handleSingleTranslation(text: string, targetLanguage: string, sourceLanguage: string) {
+  // Try LibreTranslate first
   try {
     const response = await fetch(`${LIBRETRANSLATE_URL}/translate`, {
       method: 'POST',
@@ -44,27 +48,57 @@ async function handleSingleTranslation(text: string, targetLanguage: string, sou
       }),
     })
 
-    if (!response.ok) {
-      const body = await response.text()
-      throw new Error(`LibreTranslate error: ${response.status} ${body}`)
+    if (response.ok) {
+      const data = await response.json()
+      const translatedText = data.translatedText || data.translation || data?.[0]?.translatedText
+
+      if (translatedText) {
+        return NextResponse.json({
+          translatedText,
+          sourceLanguage,
+          targetLanguage,
+          confidence: 0.8,
+        })
+      }
     }
-
-    const data = await response.json()
-    const translatedText = data.translatedText || data.translation || data?.[0]?.translatedText
-
-    return NextResponse.json({
-      translatedText,
-      sourceLanguage,
-      targetLanguage,
-      confidence: 0.8,
-    })
   } catch (error) {
-    console.error('LibreTranslate single error:', error)
-    return NextResponse.json({ error: 'Translation service unavailable' }, { status: 503 })
+    console.error('LibreTranslate error:', error)
   }
+
+  // Fallback to MyMemory API
+  try {
+    const response = await fetch(`${MYMEMORY_URL}?q=${encodeURIComponent(text)}&langpair=${sourceLanguage}|${targetLanguage}`)
+    
+    if (response.ok) {
+      const data = await response.json()
+      const translatedText = data.responseData?.translatedText
+
+      if (translatedText) {
+        return NextResponse.json({
+          translatedText,
+          sourceLanguage,
+          targetLanguage,
+          confidence: 0.6,
+        })
+      }
+    }
+  } catch (error) {
+    console.error('MyMemory API error:', error)
+  }
+
+  // Final fallback - return original text with warning
+  console.warn('All translation services failed, returning original text')
+  return NextResponse.json({
+    translatedText: text,
+    sourceLanguage,
+    targetLanguage,
+    confidence: 0.0,
+    warning: 'Translation service unavailable, showing original text'
+  })
 }
 
 async function handleBatchTranslation(texts: string[], targetLanguage: string, sourceLanguage: string) {
+  // Try LibreTranslate first
   try {
     const response = await fetch(`${LIBRETRANSLATE_URL}/translate`, {
       method: 'POST',
@@ -78,19 +112,58 @@ async function handleBatchTranslation(texts: string[], targetLanguage: string, s
       }),
     })
 
-    if (!response.ok) {
-      const body = await response.text()
-      throw new Error(`LibreTranslate batch error: ${response.status} ${body}`)
+    if (response.ok) {
+      const data = await response.json()
+      const normalized = Array.isArray(data)
+        ? data.map((t: any, i: number) => ({ originalText: texts[i], translatedText: t.translatedText || t.translation, confidence: 0.8 }))
+        : (data.translations || []).map((t: any, i: number) => ({ originalText: texts[i], translatedText: t.translatedText || t.translation, confidence: 0.8 }))
+
+      if (normalized.length > 0) {
+        return NextResponse.json({ translations: normalized, sourceLanguage, targetLanguage })
+      }
     }
-
-    const data = await response.json()
-    const normalized = Array.isArray(data)
-      ? data.map((t: any, i: number) => ({ originalText: texts[i], translatedText: t.translatedText || t.translation, confidence: 0.8 }))
-      : (data.translations || []).map((t: any, i: number) => ({ originalText: texts[i], translatedText: t.translatedText || t.translation, confidence: 0.8 }))
-
-    return NextResponse.json({ translations: normalized, sourceLanguage, targetLanguage })
   } catch (error) {
     console.error('LibreTranslate batch error:', error)
-    return NextResponse.json({ error: 'Batch translation service unavailable' }, { status: 503 })
   }
+
+  // Fallback to MyMemory API (translate one by one)
+  try {
+    const translations = []
+    for (const text of texts) {
+      const response = await fetch(`${MYMEMORY_URL}?q=${encodeURIComponent(text)}&langpair=${sourceLanguage}|${targetLanguage}`)
+      
+      if (response.ok) {
+        const data = await response.json()
+        const translatedText = data.responseData?.translatedText || text
+        translations.push({ originalText: text, translatedText, confidence: 0.6 })
+      } else {
+        translations.push({ originalText: text, translatedText: text, confidence: 0.0 })
+      }
+    }
+
+    if (translations.length > 0) {
+      return NextResponse.json({ 
+        translations, 
+        sourceLanguage, 
+        targetLanguage,
+        warning: 'Using fallback translation service'
+      })
+    }
+  } catch (error) {
+    console.error('MyMemory batch API error:', error)
+  }
+
+  // Final fallback - return original texts
+  const fallbackTranslations = texts.map(text => ({ 
+    originalText: text, 
+    translatedText: text, 
+    confidence: 0.0 
+  }))
+
+  return NextResponse.json({ 
+    translations: fallbackTranslations, 
+    sourceLanguage, 
+    targetLanguage,
+    warning: 'Translation service unavailable, showing original text'
+  })
 }

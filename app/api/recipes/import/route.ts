@@ -30,45 +30,56 @@ export async function POST(request: NextRequest) {
     // Parse recipe based on import type
     let parsedRecipe: ParsedRecipe | null = null
 
-    switch (import_type) {
-      case 'webpage':
-        // Ensure import sources are loaded before parsing
-        try { await recipeParser.loadImportSources() } catch {}
-        parsedRecipe = await recipeParser.parseFromWebpage(source_data)
-        break
-      case 'image':
-        parsedRecipe = await recipeParser.parseFromImage(source_data)
-        break
-      case 'text':
-        // Accept either raw text or a JSON-encoded ParsedRecipe from the editor
-        try {
-          const maybeParsed = JSON.parse(source_data)
-          if (maybeParsed && typeof maybeParsed === 'object' && Array.isArray(maybeParsed.ingredients) && Array.isArray(maybeParsed.instructions)) {
-            parsedRecipe = {
-              title: maybeParsed.title || 'Untitled Recipe',
-              description: maybeParsed.description || '',
-              ingredients: maybeParsed.ingredients,
-              instructions: maybeParsed.instructions,
-              prep_time_minutes: maybeParsed.prep_time_minutes || 0,
-              cook_time_minutes: maybeParsed.cook_time_minutes || 0,
-              servings: maybeParsed.servings || 4,
-              difficulty: maybeParsed.difficulty || 'medium',
-              image_url: maybeParsed.image_url,
-              source_url: maybeParsed.source_url,
-              confidence_score: maybeParsed.confidence_score ?? 0.9,
+    try {
+      switch (import_type) {
+        case 'webpage':
+          // Ensure import sources are loaded before parsing
+          try { await recipeParser.loadImportSources() } catch (e) {
+            console.warn('Failed to load import sources:', e)
+          }
+          parsedRecipe = await recipeParser.parseFromWebpage(source_data)
+          break
+        case 'image':
+          parsedRecipe = await recipeParser.parseFromImage(source_data)
+          break
+        case 'text':
+          // Accept either raw text or a JSON-encoded ParsedRecipe from the editor
+          try {
+            const maybeParsed = JSON.parse(source_data)
+            if (maybeParsed && typeof maybeParsed === 'object' && Array.isArray(maybeParsed.ingredients) && Array.isArray(maybeParsed.instructions)) {
+              parsedRecipe = {
+                title: maybeParsed.title || 'Untitled Recipe',
+                description: maybeParsed.description || '',
+                ingredients: maybeParsed.ingredients,
+                instructions: maybeParsed.instructions,
+                prep_time_minutes: maybeParsed.prep_time_minutes || 0,
+                cook_time_minutes: maybeParsed.cook_time_minutes || 0,
+                servings: maybeParsed.servings || 4,
+                difficulty: maybeParsed.difficulty || 'medium',
+                image_url: maybeParsed.image_url,
+                source_url: maybeParsed.source_url,
+                confidence_score: maybeParsed.confidence_score ?? 0.9,
+              }
+            } else {
+              parsedRecipe = await recipeParser.parseFromText(source_data)
             }
-          } else {
+          } catch (parseError) {
+            console.log('Not JSON, parsing as raw text')
             parsedRecipe = await recipeParser.parseFromText(source_data)
           }
-        } catch {
-          parsedRecipe = await recipeParser.parseFromText(source_data)
-        }
-        break
-      default:
-        return NextResponse.json(
-          { error: 'Unsupported import type' },
-          { status: 400 }
-        )
+          break
+        default:
+          return NextResponse.json(
+            { error: 'Unsupported import type' },
+            { status: 400 }
+          )
+      }
+    } catch (parseError) {
+      console.error('Recipe parsing error:', parseError)
+      return NextResponse.json(
+        { error: 'Failed to parse recipe content' },
+        { status: 422 }
+      )
     }
 
     if (!parsedRecipe) {

@@ -122,17 +122,30 @@ export class RecipeParser {
   private async parseWithTemplate(url: string, source: ImportSource): Promise<ParsedRecipe | null> {
     try {
       const html = await this.fetchWebpageContent(url)
+      if (!html) {
+        console.error('Failed to fetch webpage content')
+        return null
+      }
+      
       const root = parse(html)
-      const selectText = (selector?: string) => selector ? root.querySelector(selector)?.text.trim() : undefined
+      const selectText = (selector?: string) => {
+        if (!selector) return undefined
+        const element = root.querySelector(selector)
+        return element?.text?.replace(/\s+/g, ' ').trim() || undefined
+      }
       const selectImage = (selector?: string) => {
         if (!selector) return undefined
-        const el = root.querySelector(selector)
-        return el?.getAttribute('src') || el?.querySelector('img')?.getAttribute('src') || undefined
+        const element = root.querySelector(selector)
+        return element?.getAttribute('src') || element?.querySelector('img')?.getAttribute('src') || undefined
       }
-      const selectList = (selector: string) => root
-        .querySelectorAll(selector)
-        .map(el => el.text.replace(/\s+/g, ' ').trim())
-        .filter(Boolean)
+      const selectList = (selector: string) => {
+        const items: string[] = []
+        root.querySelectorAll(selector).forEach(el => {
+          const txt = el.text?.replace(/\s+/g, ' ').trim()
+          if (txt) items.push(txt)
+        })
+        return items
+      }
 
       const title = selectText(source.extraction_rules.title) || this.extractGenericTitle(html)
       const description = selectText(source.extraction_rules.description)

@@ -193,10 +193,18 @@ export class TranslationService {
       })
 
       if (!response.ok) {
-        throw new Error('Translation failed')
+        const errorData = await response.text()
+        console.error('Translation API error:', response.status, errorData)
+        throw new Error(`Translation failed: ${response.status}`)
       }
 
       const result = await response.json()
+      
+      if (!result.translatedText) {
+        console.error('Translation API returned no translated text:', result)
+        throw new Error('No translation received')
+      }
+      
       const translatedText = result.translatedText
 
       // Cache the result
@@ -213,7 +221,7 @@ export class TranslationService {
             translated_text: translatedText,
             source_language: sourceLanguage,
             target_language: targetLanguage,
-            translation_provider: 'google_translate',
+            translation_provider: 'libretranslate',
             confidence_score: 0.9
           })
         } catch (error) {
