@@ -1,219 +1,282 @@
-# 🍳 Cooking With! - Recipe Book & Culinary Newsletter Platform
+# Cooking With! 🍳
 
-A modern, beautiful web application that combines a community-driven recipe book with culinary newsletters. Built with Next.js, React, and Tailwind CSS.
+A comprehensive culinary platform that goes beyond recipe sharing - it's your complete kitchen companion with advanced features inspired by ReciMe and more!
 
-## ✨ Features
+## 🚀 Features
 
-### 🍽️ Recipe Features
-- **Recipe Collection**: Browse thousands of recipes from the community
-- **Advanced Search & Filtering**: Find recipes by ingredients, diet type, difficulty, and cooking time
-- **Recipe Creation**: Publishers can add detailed recipes with ingredients, instructions, and photos
-- **Interactive Recipe Cards**: Beautiful recipe displays with ratings, cooking time, and ingredient previews
-- **Visual Ingredient Display**: Show ingredients with images and descriptions (as requested)
-- **Recipe Categories**: Organized by meal type, cuisine, diet restrictions, and more
-- **Favorites System**: Save and organize your favorite recipes
+### ✅ **Recipe Importing System** (Phase 1)
+- **Multi-Source Import**: Import recipes from webpages, images, or text
+- **AI-Powered Parsing**: Smart field detection and extraction
+- **Confidence Scoring**: Quality assessment of imported content
+- **Review System**: Edit and refine imported recipes before saving
+- **Translation Integration**: Automatic translation of imported content
 
-### 📰 Newsletter Features
-- **Culinary Newsletters**: Read and write food-related articles and insights
-- **Rich Content**: Featured articles with beautiful layouts and images
-- **Email Subscriptions**: Stay updated with the latest culinary trends
-- **Publisher Tools**: Create newsletters with rich text editing and scheduling
-- **Newsletter Archives**: Browse past newsletters by category and author
+### ✅ **Advanced Recipe Organization** (Phase 2)
+- **Recipe Collections**: Create custom collections with privacy settings
+- **Enhanced Categories & Tags**: Hierarchical organization system
+- **Meal Types & Cuisines**: International cuisine classification
+- **Dietary Restrictions**: Allergen and diet tracking
+- **Advanced Search**: Multi-dimensional filtering capabilities
+- **AI Recommendations**: Smart recipe suggestions based on preferences
+- **Analytics Dashboard**: User insights and cooking statistics
 
-### 👥 User System
-- **Two User Types**:
-  - **Viewers**: Browse recipes, read newsletters, save favorites
-  - **Publishers**: All viewer features + create recipes and write newsletters
-- **User Profiles**: Personalized profiles with activity tracking
-- **Community Interaction**: Follow publishers, rate recipes, and leave reviews
+### ✅ **Meal Planning & Shopping Lists** (Phase 3)
+- **Weekly/Monthly Planning**: Calendar-based meal planning
+- **Smart Shopping Lists**: Auto-generate from selected recipes
+- **Cost Tracking**: Budget management and expense tracking
+- **Category Organization**: Store-optimized shopping lists
+- **Priority System**: High/urgent priority items
+- **Check-off Lists**: Interactive shopping list management
 
-### 🎨 Modern UI/UX
-- **Beautiful Design**: Modern, clean interface with food-focused aesthetics
-- **Mobile Responsive**: Perfect experience on all devices
-- **Fast Performance**: Optimized loading and smooth interactions
-- **Accessibility**: Built with accessibility best practices
+### ✅ **Recipe Adjustments & Conversions** (Phase 4)
+- **Dynamic Scaling**: Scale ingredients and times proportionally
+- **Unit Conversions**: Convert between metric/imperial units
+- **Ingredient Substitutions**: Community-driven substitution database
+- **Equipment Adjustments**: Cooking time modifications based on equipment
+- **Scaling History**: Track all scaling operations
+- **Pro Tips**: Expert advice for best practices
 
-## 🚀 Getting Started
+### 🌟 **Premium Features** (Beyond ReciMe)
+- **Translation System**: Multi-language support with automatic translation
+- **Community Features**: Recipe sharing and collaboration
+- **Mobile-First Design**: Responsive and accessible interface
+- **SEO Optimized**: Search engine friendly
+- **Real-time Updates**: Live collaboration and updates
 
-### Prerequisites
-- Node.js 18+ 
-- npm or yarn
+## 🛠️ Technology Stack
 
-### Installation
+- **Frontend**: Next.js 14, React 18, TypeScript
+- **Styling**: Tailwind CSS, Headless UI
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **Icons**: Lucide React
+- **Forms**: React Hook Form
+- **Notifications**: React Hot Toast
+- **Rich Text**: React Quill
 
-1. **Clone and navigate to the project**:
+## 📦 Installation
+
+1. **Clone the repository**
    ```bash
-   cd "Cooking With!"
+   git clone https://github.com/yourusername/cooking-with.git
+   cd cooking-with
    ```
 
-2. **Install dependencies**:
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. **Start the development server**:
+3. **Set up environment variables**
+   Create a `.env.local` file with:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   GOOGLE_TRANSLATE_API_KEY=your_google_translate_key
+   ```
+
+4. **Run the development server**
    ```bash
    npm run dev
    ```
 
-4. **Open your browser**:
+5. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
-## 📁 Project Structure
+## 🗄️ Database Setup
 
-```
-Cooking With!/
-├── app/                          # Next.js 13+ App Router
-│   ├── globals.css              # Global styles with Tailwind
-│   ├── layout.tsx               # Root layout component
-│   ├── page.tsx                 # Homepage with featured content
-│   ├── recipes/
-│   │   └── page.tsx            # Recipe browsing page
-│   ├── newsletters/
-│   │   └── page.tsx            # Newsletter browsing page
-│   ├── create/
-│   │   ├── page.tsx            # Publisher creation hub
-│   │   └── recipe/
-│   │       └── page.tsx        # Recipe creation form
-│   ├── login/
-│   │   └── page.tsx            # User login
-│   └── signup/
-│       └── page.tsx            # User registration
-├── components/
-│   └── Navbar.tsx              # Navigation component
-├── public/                      # Static assets
-├── package.json                # Dependencies and scripts
-├── tailwind.config.js          # Tailwind CSS configuration
-├── tsconfig.json               # TypeScript configuration
-└── next.config.js              # Next.js configuration
-```
+The application uses Supabase with the following key tables:
 
-## 🎯 Key Pages & Features
+### Core Tables
+- `users` - User accounts and profiles
+- `recipes` - Recipe content and metadata
+- `recipe_ingredients` - Recipe ingredients
+- `categories` - Recipe categories
+- `newsletters` - Newsletter content
 
-### 🏠 Homepage (`/`)
-- Hero section with call-to-action
-- Featured recipes carousel
-- Latest newsletters preview
-- Community highlights
+### Import System Tables
+- `recipe_imports` - Import history and metadata
+- `import_sources` - Source tracking and analytics
+- `import_templates` - Import templates for different sources
+- `import_queue` - Background import processing
+- `import_analytics` - Import performance metrics
 
-### 🍽️ Recipes (`/recipes`)
-- Recipe grid with filtering
-- Search by ingredients, cuisine, diet type
-- Recipe cards with ratings and quick info
-- Advanced filtering options
+### Organization Tables
+- `recipe_collections` - User-created recipe collections
+- `recipe_collection_items` - Items in collections
+- `recipe_categories` - Enhanced category system
+- `recipe_tags` - Tagging system
+- `recipe_meal_types` - Meal type classification
+- `recipe_cuisine_types` - Cuisine type classification
+- `recipe_dietary_restrictions` - Dietary restriction tracking
 
-### 📰 Newsletters (`/newsletters`)
-- Featured articles section
-- Newsletter browsing with categories
-- Author profiles and publish dates
-- Tag-based organization
+### Meal Planning Tables
+- `meal_plans` - User meal plans
+- `meal_plan_items` - Items in meal plans
+- `shopping_lists` - Shopping lists
+- `shopping_list_items` - Items in shopping lists
 
-### ✍️ Create Hub (`/create`)
-- Choose between recipe or newsletter creation
-- Recent activity tracking
-- Content creation tips
-- Draft management
+### Adjustment Tables
+- `measurement_units` - Unit definitions
+- `unit_conversions` - Conversion rules
+- `recipe_scaling_history` - Scaling history
+- `ingredient_substitutions` - Substitution database
+- `cooking_equipment` - Equipment definitions
+- `cooking_time_adjustments` - Time adjustment history
 
-### 👤 Authentication
-- **Sign Up** (`/signup`): Choose between Viewer/Publisher roles
-- **Login** (`/login`): Secure authentication with social options
+### Translation Tables
+- `translations` - Translation cache
+- `translation_jobs` - Background translation processing
+- `user_language_preferences` - User language settings
 
-## 🎨 Design System
+## 🚀 Key Features in Detail
 
-### Color Palette
-- **Primary Orange**: Warm, food-inspired orange tones (#f97316)
-- **Neutral Grays**: Clean, modern gray palette
-- **Success Green**: For positive actions
-- **Semantic Colors**: Red for warnings, blue for info
-
-### Typography
-- **Headings**: Playfair Display (serif) - elegant and readable
-- **Body**: Inter (sans-serif) - modern and clean
-
-### Components
-- **Recipe Cards**: Hover effects, image overlays, ingredient tags
-- **Form Controls**: Consistent styling with focus states
-- **Buttons**: Primary, secondary, and tertiary variants
-- **Navigation**: Sticky header with mobile-responsive design
-
-## 🔧 Technical Stack
-
-- **Framework**: Next.js 14 with App Router
-- **Frontend**: React 18 + TypeScript
-- **Styling**: Tailwind CSS with custom components
-- **Icons**: Lucide React (beautiful, consistent icons)
-- **Forms**: React Hook Form for form management
-- **Notifications**: React Hot Toast for user feedback
-
-## 🚧 Development Features
-
-### Current Implementation
-- ✅ Responsive design system
-- ✅ Recipe browsing and filtering
-- ✅ Newsletter reading interface
-- ✅ User authentication UI
-- ✅ Recipe creation form
-- ✅ Publisher/Viewer role system
-- ✅ Modern, accessible UI components
-
-### Planned Features
-- 🔄 Backend API integration
-- 🔄 Database connectivity (Prisma + PostgreSQL)
-- 🔄 Image upload functionality
-- 🔄 Email newsletter system
-- 🔄 User profiles and dashboards
-- 🔄 Recipe rating and review system
-- 🔄 Social features (following, comments)
-- 🔄 Advanced search with AI
-- 🔄 Meal planning tools
-- 🔄 Shopping list generation
-
-## 📱 Responsive Design
-
-The app is fully responsive with breakpoints for:
-- **Mobile**: Optimized for touch interaction
-- **Tablet**: Balanced layouts for medium screens
-- **Desktop**: Full-featured experience with sidebars and grids
-
-## 🎨 Customization
-
-### Adding New Recipe Categories
-Edit the categories array in `app/recipes/page.tsx`:
-
+### Recipe Importing
 ```typescript
-const categories = ["All", "Italian", "French", "Your New Category"]
+// Import from webpage
+const recipe = await recipeParser.parseFromWebpage(url)
+
+// Import from image (OCR)
+const recipe = await recipeParser.parseFromImage(imageFile)
+
+// Import from text
+const recipe = await recipeParser.parseFromText(textContent)
 ```
 
-### Styling Customization
-Modify `tailwind.config.js` to customize:
-- Color palette
-- Font families
-- Spacing scales
-- Component styles
+### Recipe Organization
+```typescript
+// Create collection
+const collection = await recipeOrganizationService.createCollection({
+  name: "Family Favorites",
+  description: "Our go-to recipes",
+  is_public: false
+})
 
-### Adding New Features
-The modular structure makes it easy to add:
-- New pages in the `app/` directory
-- Reusable components in `components/`
-- New API routes (when backend is implemented)
+// Add recipe to collection
+await recipeOrganizationService.addRecipeToCollection(collectionId, recipeId)
+```
 
-## 📞 Support & Contribution
+### Meal Planning
+```typescript
+// Create meal plan
+const mealPlan = await mealPlanningService.createMealPlan({
+  name: "Week 1",
+  start_date: "2024-01-01",
+  end_date: "2024-01-07"
+})
 
-This is a demo application showcasing modern web development practices for a recipe and newsletter platform. The codebase is well-structured and ready for:
+// Generate shopping list from meal plan
+const shoppingList = await mealPlanningService.generateShoppingListFromMealPlan(mealPlanId)
+```
 
-- Backend integration
-- Database implementation  
-- Advanced features like search, recommendations, and social features
-- Deployment to production
+### Recipe Adjustments
+```typescript
+// Scale recipe
+const scaledRecipe = await recipeAdjustmentService.scaleRecipe(recipeId, 8, userId)
 
-## 🌟 What Makes This Special
+// Convert units
+const converted = await recipeAdjustmentService.convertUnit(2, "cups", "ml")
 
-- **Community-Driven**: Everyone can contribute recipes and newsletters
-- **Publisher-Friendly**: Easy content creation tools for food writers
-- **Visual-First**: Beautiful ingredient displays and recipe photography
-- **Modern Tech Stack**: Built with the latest web technologies
-- **Scalable Architecture**: Ready for growth and additional features
+// Get substitutions
+const substitutions = await recipeAdjustmentService.getSubstitutions("butter")
+```
+
+## 🎯 Competitive Advantages
+
+Your "Cooking With!" platform now offers **significantly more advanced features** than ReciMe:
+
+1. **Comprehensive Import System** - Beyond basic URL importing
+2. **Advanced Organization** - Collections, tags, categories, recommendations
+3. **Smart Meal Planning** - Auto-generated shopping lists, cost tracking
+4. **Dynamic Recipe Adjustments** - Scaling, conversions, substitutions
+5. **Translation System** - Multi-language support
+6. **Analytics Dashboard** - User insights and statistics
+7. **Community Features** - Recipe sharing and collaboration
+
+## 📱 Pages & Routes
+
+### Core Pages
+- `/` - Homepage with featured recipes
+- `/recipes` - Recipe listing with search and filters
+- `/recipes/[id]` - Individual recipe view
+- `/create/recipe` - Recipe creation form
+
+### Import System
+- `/recipes/import` - Recipe import wizard
+- `/recipes/import/[id]` - Import review and editing
+
+### Organization
+- `/recipes/organize` - Recipe organization dashboard
+- `/collections/[id]` - Collection view
+
+### Meal Planning
+- `/meal-plans` - Meal planning interface
+- `/shopping-lists` - Shopping list management
+
+### Recipe Adjustments
+- `/recipes/adjust` - Recipe adjustment tools
+- `/converter` - Unit conversion calculator
+
+### Admin
+- `/admin` - Admin dashboard
+- `/admin/translations` - Translation management
+
+## 🔧 Development
+
+### Project Structure
+```
+├── app/                    # Next.js app directory
+│   ├── api/               # API routes
+│   ├── recipes/           # Recipe-related pages
+│   ├── admin/             # Admin pages
+│   └── globals.css        # Global styles
+├── components/            # React components
+├── lib/                   # Utility functions and services
+├── public/                # Static assets
+└── types/                 # TypeScript type definitions
+```
+
+### Key Services
+- `recipeParser.ts` - Recipe parsing and import logic
+- `recipeOrganizationService.ts` - Organization and search
+- `mealPlanningService.ts` - Meal planning and shopping lists
+- `recipeAdjustmentService.ts` - Scaling and conversions
+- `translationService.ts` - Translation management
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+1. Connect your GitHub repository to Vercel
+2. Set environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
+
+### Other Platforms
+The app can be deployed to any platform that supports Next.js:
+- Netlify
+- Railway
+- DigitalOcean App Platform
+- AWS Amplify
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Inspired by ReciMe's innovative features
+- Built with Next.js and Supabase
+- Icons from Lucide React
+- UI components from Headless UI
 
 ---
 
-**Ready to start cooking?** Run `npm run dev` and explore your new culinary platform! 🍳✨ 
+**Ready to revolutionize your cooking experience? Start exploring the advanced features of Cooking With! today!** 🎉 

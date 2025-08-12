@@ -13,8 +13,10 @@ import {
   PrinterIcon
 } from 'lucide-react'
 import AuthGuard from '@/components/AuthGuard'
+import TranslationStatus from '@/components/TranslationStatus'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/lib/language'
+import { useTranslationService } from '@/lib/translationService'
 import ClientOnly from '@/lib/ClientOnly'
 
 // Demo newsletters - same as in newsletters page
@@ -512,6 +514,7 @@ function NewsletterPageContent({ params }: NewsletterPageProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { t } = useLanguage()
+  const { translateContent, currentLanguage } = useTranslationService()
 
   // Fetch newsletter data
   useEffect(() => {
@@ -565,7 +568,15 @@ function NewsletterPageContent({ params }: NewsletterPageProps) {
           image: "https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=600"
         }
 
-        setNewsletter(transformedNewsletter)
+        // Translate newsletter if not in English
+        try {
+          const translatedNewsletter = await translateContent(transformedNewsletter, 'newsletter')
+          setNewsletter(translatedNewsletter)
+        } catch (error) {
+          console.error('Translation error for newsletter:', error)
+          // Fallback to original newsletter
+          setNewsletter(transformedNewsletter)
+        }
       } catch (error) {
         console.error('Error fetching newsletter:', error)
         setError('An unexpected error occurred')
@@ -693,6 +704,14 @@ function NewsletterPageContent({ params }: NewsletterPageProps) {
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
+        {/* Translation Status */}
+        <TranslationStatus
+          contentType="newsletter"
+          contentId={newsletter.id.toString()}
+          originalLanguage="en"
+          translatedLanguage={currentLanguage !== 'en' ? currentLanguage : undefined}
+        />
+
         <div className="grid lg:grid-cols-4 gap-8">
           {/* Article Content */}
           <div className="lg:col-span-3">

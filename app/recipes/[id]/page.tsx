@@ -18,8 +18,10 @@ import {
 import AuthGuard from '@/components/AuthGuard'
 import StarRating, { DualRatingDisplay } from '@/components/StarRating'
 import VersionNavigator from '@/components/VersionNavigator'
+import TranslationStatus from '@/components/TranslationStatus'
 import { useAuth } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
+import { useTranslationService } from '@/lib/translationService'
 import toast from 'react-hot-toast'
 import ClientOnly from '@/lib/ClientOnly'
 
@@ -195,6 +197,7 @@ function formatQuantity(num: number): string {
 
 function RecipePageContent({ params }: RecipePageProps) {
   const { user } = useAuth()
+  const { translateContent } = useTranslationService()
   const [recipe, setRecipe] = useState<Recipe | null>(null)
   const [loading, setLoading] = useState(true)
   const [servings, setServings] = useState(4)
@@ -286,9 +289,19 @@ function RecipePageContent({ params }: RecipePageProps) {
           cookTime: `${recipeData.cook_time_minutes} min`
         }
 
-        setRecipe(transformedRecipe)
-        setDisplayedRecipe(transformedRecipe)
-        setServings(transformedRecipe.servings)
+        // Translate recipe if not in English
+        try {
+          const translatedRecipe = await translateContent(transformedRecipe, 'recipe')
+          setRecipe(translatedRecipe)
+          setDisplayedRecipe(translatedRecipe)
+          setServings(translatedRecipe.servings)
+        } catch (error) {
+          console.error('Translation error for recipe:', error)
+          // Fallback to original recipe
+          setRecipe(transformedRecipe)
+          setDisplayedRecipe(transformedRecipe)
+          setServings(transformedRecipe.servings)
+        }
       } catch (error) {
         console.error('Error fetching recipe:', error)
         notFound()
@@ -543,6 +556,14 @@ function RecipePageContent({ params }: RecipePageProps) {
             </div>
           </div>
         )}
+
+        {/* Translation Status */}
+        <TranslationStatus
+          contentType="recipe"
+          contentId={recipe.id}
+          originalLanguage="en"
+          translatedLanguage="en"
+        />
 
         <div className="grid md:grid-cols-3 gap-8">
           {/* Left Column - Ingredients & Info */}

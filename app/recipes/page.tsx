@@ -7,11 +7,15 @@ import {
   ClockIcon,
   StarIcon,
   HeartIcon,
-  ChefHatIcon
+  ChefHatIcon,
+  Upload,
+  Folder,
+  Scale
 } from 'lucide-react'
 import AuthGuard from '@/components/AuthGuard'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/lib/language'
+import { useTranslationService } from '@/lib/translationService'
 import ClientOnly from '@/lib/ClientOnly'
 
 // Demo recipes removed - only show real user content
@@ -50,6 +54,7 @@ function RecipesPageContent() {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [selectedDifficulty, setSelectedDifficulty] = useState('All')
   const { t } = useLanguage()
+  const { translateContent } = useTranslationService()
 
   // Fetch recipes from Supabase and mix with demo recipes
   const fetchRecipes = async () => {
@@ -82,7 +87,19 @@ function RecipesPageContent() {
       const sortedRecipes = transformedRealRecipes
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
-      setRecipes(sortedRecipes)
+      // Translate recipes if not in English
+      const translatedRecipes = await Promise.all(
+        sortedRecipes.map(async (recipe) => {
+          try {
+            return await translateContent(recipe, 'recipe')
+          } catch (error) {
+            console.error('Translation error for recipe:', recipe.id, error)
+            return recipe // Fallback to original recipe
+          }
+        })
+      )
+
+      setRecipes(translatedRecipes)
     } catch (error) {
       console.error('Error fetching recipes:', error)
       // If there's an error, show empty recipes
@@ -146,9 +163,39 @@ function RecipesPageContent() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Recipe Collection</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-6">
             Discover amazing recipes shared by our community of passionate cooks and chefs
           </p>
+          <div className="flex justify-center space-x-4">
+            <Link
+              href="/create/recipe"
+              className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors flex items-center"
+            >
+              <ChefHatIcon className="h-5 w-5 mr-2" />
+              Create Recipe
+            </Link>
+                            <Link
+                  href="/recipes/import"
+                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+                >
+                  <Upload className="h-5 w-5 mr-2" />
+                  Import Recipe
+                </Link>
+                <Link
+                  href="/recipes/organize"
+                  className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center"
+                >
+                  <Folder className="h-5 w-5 mr-2" />
+                  Organize Recipes
+                </Link>
+                <Link
+                  href="/recipes/adjust"
+                  className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors flex items-center"
+                >
+                  <Scale className="h-5 w-5 mr-2" />
+                  Adjust Recipes
+                </Link>
+          </div>
         </div>
 
         {/* Search and Filters */}
