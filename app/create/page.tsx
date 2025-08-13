@@ -8,20 +8,21 @@ import {
   ChefHatIcon,
   PenToolIcon
 } from 'lucide-react'
+import { useLanguage } from '@/lib/language'
 
 
 function CreatePageContent() {
+  const { t } = useLanguage()
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-serif font-bold text-gray-900 mb-4">
-            Share Your Culinary Creativity
+            {t('create.shareCulinaryCreativity')}
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Whether you have an amazing recipe to share or culinary insights to publish, 
-            choose how you'd like to contribute to our community.
+            {t('create.chooseContribution')}
           </p>
         </div>
 
@@ -34,10 +35,10 @@ function CreatePageContent() {
                 <ChefHatIcon className="h-10 w-10 text-primary-500" />
               </div>
               <h2 className="text-2xl font-serif font-bold text-gray-900 mb-2">
-                Share a Recipe
+                {t('create.shareRecipe')}
               </h2>
               <p className="text-gray-600">
-                Add your favorite recipe with ingredients, instructions, and cooking tips
+                {t('create.addFavoriteRecipe')}
               </p>
             </div>
             
@@ -45,19 +46,19 @@ function CreatePageContent() {
               <div className="space-y-3 mb-6">
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
-                  <span className="text-sm text-gray-600">Upload photos of your dish and ingredients</span>
+                  <span className="text-sm text-gray-600">{t('create.uploadPhotos')}</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
-                  <span className="text-sm text-gray-600">Add detailed ingredient measurements</span>
+                  <span className="text-sm text-gray-600">{t('create.addMeasurements')}</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
-                  <span className="text-sm text-gray-600">Include step-by-step cooking instructions</span>
+                  <span className="text-sm text-gray-600">{t('create.stepByStep')}</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
-                  <span className="text-sm text-gray-600">Set difficulty level and cooking time</span>
+                  <span className="text-sm text-gray-600">{t('create.setDifficulty')}</span>
                 </div>
               </div>
               
@@ -65,7 +66,7 @@ function CreatePageContent() {
                 href="/create/recipe" 
                 className="block w-full text-center btn-primary"
               >
-                Create Recipe
+                {t('create.createRecipe')}
               </Link>
             </div>
           </div>
@@ -77,10 +78,10 @@ function CreatePageContent() {
                 <PenToolIcon className="h-10 w-10 text-blue-500" />
               </div>
               <h2 className="text-2xl font-serif font-bold text-gray-900 mb-2">
-                Write a Newsletter
+                {t('create.writeNewsletter')}
               </h2>
               <p className="text-gray-600">
-                Share culinary insights, cooking tips, and food trends with the community
+                {t('create.shareCulinaryInsights')}
               </p>
             </div>
             
@@ -88,19 +89,19 @@ function CreatePageContent() {
               <div className="space-y-3 mb-6">
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm text-gray-600">Rich text editor with formatting options</span>
+                  <span className="text-sm text-gray-600">{t('create.richTextEditor')}</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm text-gray-600">Add images and recipe references</span>
+                  <span className="text-sm text-gray-600">{t('create.addImages')}</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm text-gray-600">Categorize your content with tags</span>
+                  <span className="text-sm text-gray-600">{t('create.categorizeContent')}</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm text-gray-600">Schedule publishing for optimal reach</span>
+                  <span className="text-sm text-gray-600">{t('create.schedulePublishing')}</span>
                 </div>
               </div>
               
@@ -108,7 +109,7 @@ function CreatePageContent() {
                 href="/create/newsletter" 
                 className="block w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
               >
-                Write Newsletter
+                {t('create.writeNewsletterButton')}
               </Link>
             </div>
           </div>

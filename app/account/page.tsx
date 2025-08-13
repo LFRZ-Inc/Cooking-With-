@@ -17,6 +17,7 @@ import {
   SmartphoneIcon
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
+import { useLanguage } from '@/lib/language'
 import { supabase } from '@/lib/supabase'
 import AuthGuard from '@/components/AuthGuard'
 import ImagePrivacySettings from '@/components/ImagePrivacySettings'
@@ -48,6 +49,7 @@ interface UserNewsletter {
 
 function AccountPageContent() {
   const { user, signOut } = useAuth()
+  const { t } = useLanguage()
   const [activeTab, setActiveTab] = useState('overview')
   const [userRecipes, setUserRecipes] = useState<UserRecipe[]>([])
   const [userNewsletters, setUserNewsletters] = useState<UserNewsletter[]>([])
@@ -203,10 +205,10 @@ function AccountPageContent() {
   }
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: UserIcon },
-    { id: 'recipes', label: 'My Recipes', icon: ChefHatIcon },
-    { id: 'newsletters', label: 'My Articles', icon: NewspaperIcon },
-    { id: 'settings', label: 'Settings', icon: SettingsIcon }
+    { id: 'overview', label: t('account.overview'), icon: UserIcon },
+    { id: 'recipes', label: t('account.myRecipes'), icon: ChefHatIcon },
+    { id: 'newsletters', label: t('account.myArticles'), icon: NewspaperIcon },
+    { id: 'settings', label: t('account.settings'), icon: SettingsIcon }
   ]
 
   return (
@@ -219,7 +221,7 @@ function AccountPageContent() {
               <UserIcon className="h-8 w-8 text-orange-600" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">My Account</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{t('account.myAccount')}</h1>
               <p className="text-gray-600">{user?.email}</p>
             </div>
           </div>
@@ -254,7 +256,7 @@ function AccountPageContent() {
         <div className="bg-white rounded-lg shadow-sm p-6">
           {activeTab === 'overview' && (
             <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-6">Account Overview</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-6">{t('account.accountOverview')}</h2>
               
               {loading ? (
                 <div className="flex justify-center py-8">
@@ -266,7 +268,7 @@ function AccountPageContent() {
                   <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg p-6 text-white">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-orange-100">Total Recipes</p>
+                        <p className="text-orange-100">{t('account.totalRecipes')}</p>
                         <p className="text-2xl font-bold">{userRecipes.length}</p>
                       </div>
                       <ChefHatIcon className="h-8 w-8 text-orange-200" />
@@ -276,7 +278,7 @@ function AccountPageContent() {
                   <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-blue-100">Total Articles</p>
+                        <p className="text-blue-100">{t('account.totalArticles')}</p>
                         <p className="text-2xl font-bold">{userNewsletters.length}</p>
                       </div>
                       <NewspaperIcon className="h-8 w-8 text-blue-200" />
@@ -286,8 +288,8 @@ function AccountPageContent() {
                   <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-green-100">Account Status</p>
-                        <p className="text-lg font-semibold">Active</p>
+                        <p className="text-green-100">{t('account.accountStatus')}</p>
+                        <p className="text-lg font-semibold">{t('account.active')}</p>
                       </div>
                       <UserIcon className="h-8 w-8 text-green-200" />
                     </div>
@@ -297,7 +299,7 @@ function AccountPageContent() {
 
               {/* Quick Actions */}
               <div className="mt-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('account.quickActions')}</h3>
                 <div className="grid md:grid-cols-2 gap-4">
                   <Link
                     href="/create/recipe"
@@ -305,8 +307,8 @@ function AccountPageContent() {
                   >
                     <ChefHatIcon className="h-6 w-6 text-orange-600" />
                     <div>
-                      <p className="font-medium text-gray-900">Create New Recipe</p>
-                      <p className="text-sm text-gray-600">Share your culinary creations</p>
+                      <p className="font-medium text-gray-900">{t('account.createNewRecipe')}</p>
+                      <p className="text-sm text-gray-600">{t('account.shareCulinaryCreations')}</p>
                     </div>
                   </Link>
 
@@ -316,8 +318,8 @@ function AccountPageContent() {
                   >
                     <NewspaperIcon className="h-6 w-6 text-blue-600" />
                     <div>
-                      <p className="font-medium text-gray-900">Write Article</p>
-                      <p className="text-sm text-gray-600">Share cooking tips and stories</p>
+                      <p className="font-medium text-gray-900">{t('account.writeArticle')}</p>
+                      <p className="text-sm text-gray-600">{t('account.shareCookingTips')}</p>
                     </div>
                   </Link>
                 </div>
@@ -328,12 +330,12 @@ function AccountPageContent() {
           {activeTab === 'recipes' && (
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900">My Recipes ({userRecipes.length})</h2>
+                <h2 className="text-xl font-bold text-gray-900">{t('account.myRecipes')} ({userRecipes.length})</h2>
                 <Link
                   href="/create/recipe"
                   className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors"
                 >
-                  Create New Recipe
+                  {t('account.createNewRecipe')}
                 </Link>
               </div>
 
@@ -344,13 +346,13 @@ function AccountPageContent() {
               ) : userRecipes.length === 0 ? (
                 <div className="text-center py-12">
                   <ChefHatIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-600 mb-2">No recipes yet</h3>
-                  <p className="text-gray-500 mb-4">Start sharing your culinary creations!</p>
+                  <h3 className="text-lg font-medium text-gray-600 mb-2">{t('account.noRecipesFound')}</h3>
+                  <p className="text-gray-500 mb-4">{t('account.shareCulinaryCreations')}</p>
                   <Link
                     href="/create/recipe"
                     className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors"
                   >
-                    Create Your First Recipe
+                    {t('account.createNewRecipe')}
                   </Link>
                 </div>
               ) : (
@@ -378,32 +380,32 @@ function AccountPageContent() {
                         <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
                           <div className="flex items-center space-x-1">
                             <ClockIcon className="h-4 w-4" />
-                            <span>{recipe.prep_time_minutes + recipe.cook_time_minutes} min</span>
+                            <span>{recipe.prep_time_minutes + recipe.cook_time_minutes} {t('account.min')}</span>
                           </div>
                           <span className="capitalize">{recipe.difficulty}</span>
                         </div>
 
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-500">Created {formatDate(recipe.created_at)}</span>
+                          <span className="text-xs text-gray-500">{t('account.created')} {formatDate(recipe.created_at)}</span>
                           <div className="flex space-x-2">
                             <Link
                               href={`/recipes/${recipe.id}`}
                               className="p-1 text-gray-600 hover:text-blue-600 transition-colors"
-                              title="View Recipe"
+                              title={t('account.view')}
                             >
                               <EyeIcon className="h-4 w-4" />
                             </Link>
                             <Link
                               href={`/recipes/${recipe.id}/edit`}
                               className="p-1 text-gray-600 hover:text-orange-600 transition-colors"
-                              title="Edit Recipe"
+                              title={t('account.edit')}
                             >
                               <EditIcon className="h-4 w-4" />
                             </Link>
                             <button
                               onClick={() => handleDeleteRecipe(recipe.id, recipe.title)}
                               className="p-1 text-gray-600 hover:text-red-600 transition-colors"
-                              title="Delete Recipe"
+                              title={t('account.delete')}
                             >
                               <TrashIcon className="h-4 w-4" />
                             </button>

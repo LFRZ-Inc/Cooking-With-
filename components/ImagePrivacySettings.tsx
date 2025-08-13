@@ -1,6 +1,7 @@
 import React from 'react'
 import { Switch } from '@headlessui/react'
 import { CameraIcon, MapPinIcon, ClockIcon, SmartphoneIcon } from 'lucide-react'
+import { useLanguage } from '@/lib/language'
 
 interface ImagePrivacySettingsProps {
   settings: {
@@ -18,6 +19,7 @@ interface ImagePrivacySettingsProps {
 }
 
 export default function ImagePrivacySettings({ settings, onChange }: ImagePrivacySettingsProps) {
+  const { t } = useLanguage()
   const handleToggle = (setting: keyof typeof settings) => {
     onChange({
       ...settings,
@@ -28,9 +30,9 @@ export default function ImagePrivacySettings({ settings, onChange }: ImagePrivac
   return (
     <div className="space-y-6 bg-white p-6 rounded-lg shadow-sm">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">Photo Privacy Settings</h3>
+        <h3 className="text-lg font-semibold text-gray-900">{t('account.photoPrivacySettings')}</h3>
         <div className="text-sm text-gray-500">
-          All settings off by default for privacy
+          {t('account.allSettingsOff')}
         </div>
       </div>
 
@@ -41,9 +43,9 @@ export default function ImagePrivacySettings({ settings, onChange }: ImagePrivac
             <MapPinIcon className="h-5 w-5 text-blue-600" />
           </div>
           <div>
-            <div className="font-medium">Location Data</div>
+            <div className="font-medium">{t('account.locationData')}</div>
             <div className="text-sm text-gray-500">
-              Allow photos to include where they were taken
+              {t('account.allowPhotosLocation')}
             </div>
           </div>
         </div>
@@ -70,9 +72,9 @@ export default function ImagePrivacySettings({ settings, onChange }: ImagePrivac
             <CameraIcon className="h-5 w-5 text-purple-600" />
           </div>
           <div>
-            <div className="font-medium">Camera Information</div>
+            <div className="font-medium">{t('account.cameraInformation')}</div>
             <div className="text-sm text-gray-500">
-              Keep camera settings for photography enthusiasts
+              {t('account.keepCameraSettings')}
             </div>
           </div>
         </div>
@@ -99,9 +101,9 @@ export default function ImagePrivacySettings({ settings, onChange }: ImagePrivac
             <ClockIcon className="h-5 w-5 text-amber-600" />
           </div>
           <div>
-            <div className="font-medium">Photo Timestamps</div>
+            <div className="font-medium">{t('account.photoTimestamps')}</div>
             <div className="text-sm text-gray-500">
-              Keep original date and time information
+              {t('account.keepOriginalDateTime')}
             </div>
           </div>
         </div>
@@ -128,9 +130,9 @@ export default function ImagePrivacySettings({ settings, onChange }: ImagePrivac
             <SmartphoneIcon className="h-5 w-5 text-green-600" />
           </div>
           <div>
-            <div className="font-medium">Device Information</div>
+            <div className="font-medium">{t('account.deviceInformation')}</div>
             <div className="text-sm text-gray-500">
-              Include which device took the photo
+              {t('account.includeDeviceInfo')}
             </div>
           </div>
         </div>
@@ -152,14 +154,9 @@ export default function ImagePrivacySettings({ settings, onChange }: ImagePrivac
 
       {/* Info Box */}
       <div className="mt-6 bg-gray-50 p-4 rounded-lg text-sm text-gray-600">
-        <p className="font-medium mb-2">📸 For Photographers & Food Artists:</p>
+        <p className="font-medium mb-2">📸 {t('account.forPhotographers')}</p>
         <p>
-          These settings let you choose what information to keep in your photos. 
-          By default, all settings are off for maximum privacy, but you can enable 
-          them to preserve camera settings, location context, and more.
-        </p>
-        <p className="mt-2">
-          Your choices are saved and will apply to all future photo uploads.
+          {t('account.photoSettingsDescription')}
         </p>
       </div>
     </div>

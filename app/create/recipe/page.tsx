@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth'
+import { useLanguage } from '@/lib/language'
 import { supabase } from '@/lib/supabase'
 import ImageUpload from '@/components/ImageUpload'
 import toast from 'react-hot-toast'
@@ -24,6 +25,7 @@ interface RecipeFormData {
 export default function CreateRecipePage() {
   const router = useRouter()
   const { user } = useAuth()
+  const { t } = useLanguage()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState<RecipeFormData>({
     title: '',
@@ -256,11 +258,11 @@ export default function CreateRecipePage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow-sm p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Create New Recipe</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('create.createNewRecipe')}</h1>
 
           {/* Sample Recipe Loader */}
           <div className="mb-8 p-4 bg-blue-50 rounded-lg">
-            <h3 className="text-lg font-semibold text-blue-900 mb-4">Quick Start - Load Sample Recipes</h3>
+            <h3 className="text-lg font-semibold text-blue-900 mb-4">{t('create.quickStart')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {sampleRecipes.map((recipe, index) => (
                 <button
@@ -280,7 +282,7 @@ export default function CreateRecipePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Recipe Title *
+                  {t('create.recipeTitle')} *
                 </label>
                 <input
                   type="text"
@@ -294,7 +296,7 @@ export default function CreateRecipePage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Difficulty Level *
+                  {t('create.difficultyLevel')} *
                 </label>
                 <select
                   value={formData.difficulty}
@@ -310,7 +312,7 @@ export default function CreateRecipePage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description *
+                {t('create.description')} *
               </label>
               <textarea
                 required
@@ -326,7 +328,7 @@ export default function CreateRecipePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Original Creator (if adapted)
+                  {t('create.originalCreator')}
                 </label>
                 <input
                   type="text"
@@ -339,7 +341,7 @@ export default function CreateRecipePage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Cultural Origin
+                  {t('create.culturalOrigin')}
                 </label>
                 <input
                   type="text"
@@ -354,7 +356,7 @@ export default function CreateRecipePage() {
             {/* Image Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Recipe Image
+                {t('create.recipeImage')}
               </label>
               <ImageUpload
                 value={formData.imageUrl}
@@ -512,7 +514,7 @@ export default function CreateRecipePage() {
                 disabled={isSubmitting}
                 className="bg-orange-600 text-white px-8 py-3 rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {isSubmitting ? 'Creating Recipe...' : 'Create Recipe'}
+                {isSubmitting ? t('create.creatingRecipe') : t('create.createRecipe')}
               </button>
             </div>
           </form>
