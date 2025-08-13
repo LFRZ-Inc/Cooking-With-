@@ -1,8 +1,12 @@
+'use client'
 import React from 'react'
 import Link from 'next/link'
 import { ArrowLeftIcon, ShieldIcon } from 'lucide-react'
+import { useLanguage } from '@/lib/language'
 
 export default function PrivacyPolicy() {
+  const { t } = useLanguage()
+  
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -13,13 +17,13 @@ export default function PrivacyPolicy() {
             className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4"
           >
             <ArrowLeftIcon className="h-4 w-4 mr-2" />
-            Back to Home
+            {t('legal.backToHome')}
           </Link>
           <div className="flex items-center space-x-3 mb-4">
             <ShieldIcon className="h-8 w-8 text-green-600" />
-            <h1 className="text-4xl font-bold text-gray-900">Privacy Policy</h1>
+            <h1 className="text-4xl font-bold text-gray-900">{t('legal.privacyPolicy')}</h1>
           </div>
-          <p className="text-gray-600">Last updated: {new Date().toLocaleDateString()}</p>
+          <p className="text-gray-600">{t('legal.lastUpdated')} {new Date().toLocaleDateString()}</p>
         </div>
 
         {/* Privacy Commitment Banner */}
@@ -27,10 +31,9 @@ export default function PrivacyPolicy() {
           <div className="flex items-start space-x-3">
             <ShieldIcon className="h-6 w-6 text-green-600 mt-1" />
             <div>
-              <h3 className="text-lg font-semibold text-green-900 mb-2">Our Privacy Commitment</h3>
+              <h3 className="text-lg font-semibold text-green-900 mb-2">{t('legal.privacyCommitment')}</h3>
               <p className="text-green-800">
-                Cooking With is designed with privacy first. We automatically strip location data from all images, 
-                collect only essential information, and never sell your personal data.
+                {t('legal.privacyCommitmentText')}
               </p>
             </div>
           </div>
@@ -38,155 +41,147 @@ export default function PrivacyPolicy() {
 
         {/* Content */}
         <div className="bg-white rounded-lg shadow-sm p-8 prose prose-lg max-w-none">
-          <h2>1. Information We Collect</h2>
+          <h2>{t('legal.informationWeCollect')}</h2>
           
-          <h3>1.1 Account Information</h3>
-          <p>When you create an account, we collect:</p>
+          <h3>{t('legal.accountInformation')}</h3>
+          <p>{t('legal.accountInfoText')}</p>
           <ul>
-            <li>Email address (for account access and notifications)</li>
-            <li>Username/display name</li>
-            <li>Account creation date</li>
+            <li>{t('legal.emailAddress')}</li>
+            <li>{t('legal.username')}</li>
+            <li>{t('legal.accountCreationDate')}</li>
           </ul>
 
-          <h3>1.2 Content You Create</h3>
+          <h3>{t('legal.contentYouCreate')}</h3>
           <ul>
-            <li>Recipes and cooking instructions</li>
-            <li>Articles and blog posts</li>
-            <li>Comments and ratings</li>
-            <li>Images (automatically processed for privacy - see section 3)</li>
+            <li>{t('legal.recipesAndInstructions')}</li>
+            <li>{t('legal.articlesAndPosts')}</li>
+            <li>{t('legal.commentsAndRatings')}</li>
+            <li>{t('legal.images')}</li>
           </ul>
 
-          <h3>1.3 Usage Analytics</h3>
-          <p>We collect basic, non-personal usage statistics to improve the platform:</p>
+          <h3>{t('legal.usageAnalytics')}</h3>
+          <p>{t('legal.usageAnalyticsText')}</p>
           <ul>
-            <li>Page views and interaction patterns</li>
-            <li>Feature usage statistics</li>
-            <li>Error logs for technical improvements</li>
+            <li>{t('legal.pageViews')}</li>
+            <li>{t('legal.featureUsage')}</li>
+            <li>{t('legal.errorLogs')}</li>
           </ul>
 
-          <h2>2. What We DON'T Collect</h2>
+          <h2>{t('legal.whatWeDontCollect')}</h2>
           <div className="bg-red-50 border border-red-200 rounded p-4 my-4">
-            <h3 className="text-red-900 mt-0">We explicitly do NOT collect:</h3>
+            <h3 className="text-red-900 mt-0">{t('legal.weExplicitlyDontCollect')}</h3>
             <ul className="text-red-800">
-              <li>❌ Location data from images (automatically stripped)</li>
-              <li>❌ Camera information or device metadata</li>
-              <li>❌ Your real name (unless you choose to share it)</li>
-              <li>❌ Phone numbers or addresses</li>
-              <li>❌ Browsing history outside our platform</li>
-              <li>❌ Third-party social media data</li>
+              <li>{t('legal.noLocationData')}</li>
+              <li>{t('legal.noCameraInfo')}</li>
+              <li>{t('legal.noRealName')}</li>
+              <li>{t('legal.noPhoneNumbers')}</li>
+              <li>{t('legal.noBrowsingHistory')}</li>
+              <li>{t('legal.noSocialMediaData')}</li>
             </ul>
           </div>
 
-          <h2>3. Image Privacy Protection</h2>
+          <h2>{t('legal.imagePrivacyProtection')}</h2>
           <div className="bg-blue-50 border border-blue-200 rounded p-4 my-4">
-            <h3 className="text-blue-900 mt-0">🔒 Automatic Privacy Protection</h3>
+            <h3 className="text-blue-900 mt-0">{t('legal.automaticPrivacyProtection')}</h3>
             <p className="text-blue-800">
-              <strong>All uploaded images are automatically processed to remove:</strong>
+              <strong>{t('legal.allUploadedImages')}</strong>
             </p>
             <ul className="text-blue-800">
-              <li>GPS location data</li>
-              <li>Camera make and model</li>
-              <li>Date and time stamps</li>
-              <li>Camera settings (ISO, aperture, etc.)</li>
-              <li>Any other embedded metadata (EXIF data)</li>
+              <li>{t('legal.gpsLocationData')}</li>
+              <li>{t('legal.cameraMakeModel')}</li>
+              <li>{t('legal.dateTimeStamps')}</li>
+              <li>{t('legal.cameraSettings')}</li>
+              <li>{t('legal.embeddedMetadata')}</li>
             </ul>
             <p className="text-blue-800">
-              This happens automatically before your image is stored, ensuring your privacy is protected.
+              {t('legal.automaticProcessing')}
             </p>
           </div>
 
-          <h2>4. How We Use Your Information</h2>
-          <p>We use your information only for:</p>
+          <h2>{t('legal.howWeUseInformation')}</h2>
+          <p>{t('legal.weUseInformationFor')}</p>
           <ul>
-            <li>Providing and improving the cooking platform</li>
-            <li>Enabling you to share and discover recipes</li>
-            <li>Sending account-related notifications (if enabled)</li>
-            <li>Maintaining platform security and preventing abuse</li>
-            <li>Preserving culinary attribution and recipe history</li>
+            <li>{t('legal.providingPlatform')}</li>
+            <li>{t('legal.sharingRecipes')}</li>
+            <li>{t('legal.accountNotifications')}</li>
+            <li>{t('legal.platformSecurity')}</li>
+            <li>{t('legal.preservingAttribution')}</li>
           </ul>
 
-          <h2>5. Information Sharing</h2>
-          <h3>5.1 What We Share</h3>
+          <h2>{t('legal.informationSharing')}</h2>
+          <h3>{t('legal.whatWeShare')}</h3>
           <ul>
-            <li>Your public recipes and articles (as intended by the platform)</li>
-            <li>Your username on content you create</li>
-            <li>Aggregated, anonymous usage statistics for platform improvement</li>
+            <li>{t('legal.publicRecipes')}</li>
+            <li>{t('legal.usernameOnContent')}</li>
+            <li>{t('legal.aggregatedStats')}</li>
           </ul>
 
-          <h3>5.2 What We Never Share</h3>
+          <h3>{t('legal.whatWeNeverShare')}</h3>
           <ul>
-            <li>Your email address</li>
-            <li>Private account information</li>
-            <li>Usage patterns linked to your identity</li>
-            <li>Any personal data with advertisers or third parties</li>
+            <li>{t('legal.emailAddress')}</li>
+            <li>{t('legal.privateAccountInfo')}</li>
+            <li>{t('legal.usagePatterns')}</li>
+            <li>{t('legal.personalDataWithAdvertisers')}</li>
           </ul>
 
-          <h2>6. Data Security</h2>
-          <p>We protect your data through:</p>
+          <h2>{t('legal.dataSecurity')}</h2>
+          <p>{t('legal.weProtectDataThrough')}</p>
           <ul>
-            <li>Encrypted data transmission (HTTPS)</li>
-            <li>Secure database storage with access controls</li>
-            <li>Regular security audits and updates</li>
-            <li>Limited employee access on a need-to-know basis</li>
+            <li>{t('legal.encryptedTransmission')}</li>
+            <li>{t('legal.secureDatabase')}</li>
+            <li>{t('legal.securityAudits')}</li>
+            <li>{t('legal.limitedAccess')}</li>
           </ul>
 
-          <h2>7. Your Rights and Control</h2>
-          <h3>7.1 Account Management</h3>
+          <h2>{t('legal.yourRightsAndControl')}</h2>
+          <h3>{t('legal.accountManagement')}</h3>
           <ul>
-            <li>Edit or delete your recipes and articles at any time</li>
-            <li>Update your account information</li>
-            <li>Control notification preferences</li>
-            <li>Download your data</li>
+            <li>{t('legal.editDeleteContent')}</li>
+            <li>{t('legal.updateAccountInfo')}</li>
+            <li>{t('legal.controlNotifications')}</li>
+            <li>{t('legal.downloadData')}</li>
           </ul>
 
-          <h3>7.2 Data Deletion</h3>
+          <h3>{t('legal.dataDeletion')}</h3>
           <p>
-            You can delete your account and all associated data at any time through your account settings. 
-            Upon deletion, we remove all personal information while preserving anonymous recipe contributions 
-            to maintain the community knowledge base.
+            {t('legal.dataDeletionText')}
           </p>
 
-          <h2>8. Cookies and Tracking</h2>
-          <p>We use minimal, essential cookies for:</p>
+          <h2>{t('legal.cookiesAndTracking')}</h2>
+          <p>{t('legal.weUseMinimalCookies')}</p>
           <ul>
-            <li>Keeping you logged in</li>
-            <li>Remembering your preferences</li>
-            <li>Basic analytics (anonymous)</li>
+            <li>{t('legal.keepingLoggedIn')}</li>
+            <li>{t('legal.rememberingPreferences')}</li>
+            <li>{t('legal.basicAnalytics')}</li>
           </ul>
-          <p>We do not use tracking cookies for advertising or share data with ad networks.</p>
+          <p>{t('legal.noTrackingCookies')}</p>
 
-          <h2>9. Children's Privacy</h2>
+          <h2>{t('legal.childrensPrivacy')}</h2>
           <p>
-            Our platform is designed for general audiences. We do not knowingly collect personal information 
-            from children under 13. If you believe a child has provided personal information, please contact us 
-            to have it removed.
+            {t('legal.childrensPrivacyText')}
           </p>
 
-          <h2>10. International Users</h2>
+          <h2>{t('legal.internationalUsers')}</h2>
           <p>
-            By using Cooking With, you consent to the transfer and processing of your information in accordance 
-            with this privacy policy, regardless of your location.
+            {t('legal.internationalUsersText')}
           </p>
 
-          <h2>11. Changes to Privacy Policy</h2>
+          <h2>{t('legal.changesToPrivacyPolicy')}</h2>
           <p>
-            We will notify users of material changes to this privacy policy by posting updates on this page 
-            and updating the "last modified" date. Continued use constitutes acceptance of changes.
+            {t('legal.changesToPrivacyText')}
           </p>
 
-          <h2>12. Contact Us</h2>
-          <p>Questions about privacy or data handling?</p>
+          <h2>{t('legal.contactUs')}</h2>
+          <p>{t('legal.questionsAboutPrivacy')}</p>
           <ul>
-            <li>TikTok: <a href="https://tiktok.com/@earthtoluis" target="_blank" rel="noopener" className="text-blue-600 hover:text-blue-700">@earthtoluis</a></li>
-            <li>Platform: Use the contact form in your account dashboard</li>
+            <li>{t('legal.tiktok')} <a href="https://tiktok.com/@earthtoluis" target="_blank" rel="noopener" className="text-blue-600 hover:text-blue-700">@earthtoluis</a></li>
+            <li>{t('legal.platform')} {t('legal.useContactForm')}</li>
           </ul>
 
           <div className="mt-12 pt-8 border-t border-gray-200 bg-gray-50 rounded p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Summary: Your Privacy Matters</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('legal.summaryYourPrivacyMatters')}</h3>
             <p className="text-gray-700 text-sm">
-              Cooking With is built on the principle that sharing recipes shouldn't compromise your privacy. 
-              We collect only what's necessary, protect what we have, and give you full control over your data. 
-              Your location, personal details, and browsing habits stay private.
+              {t('legal.summaryText')}
             </p>
           </div>
         </div>

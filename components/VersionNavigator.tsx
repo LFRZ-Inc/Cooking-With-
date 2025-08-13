@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { ChevronLeftIcon, ChevronRightIcon, ClockIcon, UserIcon } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { useLanguage } from '@/lib/language'
 
 interface RecipeVersion {
   id: string
@@ -40,6 +41,7 @@ export default function VersionNavigator({
   currentVersion, 
   onVersionChange 
 }: VersionNavigatorProps) {
+  const { t } = useLanguage()
   const [versions, setVersions] = useState<RecipeVersion[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedVersion, setSelectedVersion] = useState(currentVersion)
@@ -111,15 +113,15 @@ export default function VersionNavigator({
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-2">
           <ClockIcon className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-blue-900">Recipe Versions</h3>
+          <h3 className="font-semibold text-blue-900">{t('versionNavigator.recipeVersions')}</h3>
           <span className="text-sm text-blue-700">
-            ({currentVersion} versions available)
+            ({currentVersion} {t('versionNavigator.versionsAvailable')})
           </span>
         </div>
         
         {/* Version Counter */}
         <div className="text-sm font-medium text-blue-800">
-          Version {selectedVersion} of {currentVersion}
+          {t('versionNavigator.versionOf').replace('{current}', selectedVersion.toString()).replace('{total}', currentVersion.toString())}
         </div>
       </div>
 
@@ -180,18 +182,18 @@ export default function VersionNavigator({
       <div className="grid md:grid-cols-2 gap-4 text-sm">
         <div>
           <p className="text-blue-700">
-            <strong>Viewing:</strong> {selectedVersion === currentVersion ? 'Current Version' : `Version ${selectedVersion}`}
+            <strong>{t('versionNavigator.viewing')}</strong> {selectedVersion === currentVersion ? t('versionNavigator.currentVersion') : t('versionNavigator.version').replace('{number}', selectedVersion.toString())}
           </p>
           {selectedVersionData?.change_summary && (
             <p className="text-blue-600 mt-1">
-              <strong>Changes:</strong> {selectedVersionData.change_summary}
+              <strong>{t('versionNavigator.changes')}</strong> {selectedVersionData.change_summary}
             </p>
           )}
         </div>
         
         <div className="text-right">
           <p className="text-blue-700">
-            <strong>Created:</strong> {selectedVersion === currentVersion 
+            <strong>{t('versionNavigator.created')}</strong> {selectedVersion === currentVersion 
               ? new Date(recipe.created_at).toLocaleDateString()
               : selectedVersionData 
                 ? new Date(selectedVersionData.created_at).toLocaleDateString()
@@ -200,7 +202,7 @@ export default function VersionNavigator({
           </p>
           {selectedVersion !== currentVersion && (
             <p className="text-blue-600 mt-1 text-xs">
-              Historical version - changes not editable
+              {t('versionNavigator.historicalVersion')}
             </p>
           )}
         </div>
@@ -212,7 +214,7 @@ export default function VersionNavigator({
           onClick={() => handleVersionChange(1)}
           className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
         >
-          ← Go to Original
+          {t('versionNavigator.goToOriginal')}
         </button>
         
         {selectedVersion !== currentVersion && (
@@ -220,7 +222,7 @@ export default function VersionNavigator({
             onClick={() => handleVersionChange(currentVersion)}
             className="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition-colors"
           >
-            Back to Current Version
+            {t('versionNavigator.backToCurrentVersion')}
           </button>
         )}
       </div>
