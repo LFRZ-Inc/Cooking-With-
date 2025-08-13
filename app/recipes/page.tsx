@@ -155,16 +155,16 @@ function RecipesPageContent() {
           <div className="flex items-center">
             <ChefHatIcon className="h-5 w-5 text-blue-600 mr-2" />
             <div className="text-sm text-blue-800">
-              <strong>Real Recipes from Our Community!</strong> These are actual recipes shared by users like you. Even though some are marked as demos, they are completely real and followable recipes.
+              <strong>{t('recipes.realRecipesBanner')}</strong>
             </div>
           </div>
         </div>
 
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Recipe Collection</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">{t('recipes.recipeCollection')}</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-6">
-            Discover amazing recipes shared by our community of passionate cooks and chefs
+            {t('recipes.discoverRecipes')}
           </p>
           <div className="flex justify-center space-x-4">
             <Link
@@ -172,28 +172,28 @@ function RecipesPageContent() {
               className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors flex items-center"
             >
               <ChefHatIcon className="h-5 w-5 mr-2" />
-              Create Recipe
+              {t('recipes.createRecipe')}
             </Link>
                             <Link
                   href="/recipes/import"
                   className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
                 >
                   <Upload className="h-5 w-5 mr-2" />
-                  Import Recipe
+                  {t('recipes.importRecipe')}
                 </Link>
                 <Link
                   href="/recipes/organize"
                   className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center"
                 >
                   <Folder className="h-5 w-5 mr-2" />
-                  Organize Recipes
+                  {t('recipes.organizeRecipes')}
                 </Link>
                 <Link
                   href="/recipes/adjust"
                   className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors flex items-center"
                 >
                   <Scale className="h-5 w-5 mr-2" />
-                  Adjust Recipes
+                  {t('recipes.adjustRecipes')}
                 </Link>
           </div>
         </div>
@@ -206,7 +206,7 @@ function RecipesPageContent() {
               <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder="Search recipes..."
+                placeholder={t('recipes.searchRecipes')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"

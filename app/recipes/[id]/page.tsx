@@ -595,8 +595,8 @@ function RecipePageContent({ params }: RecipePageProps) {
                       </svg>
                     </div>
                     <div className="text-xs text-blue-800">
-                      <p className="font-medium mb-1">📚 Demo Recipe</p>
-                      <p>This is a demo recipe showcasing our platform features. However, it's a <strong>real, tested recipe</strong> with accurate ingredients and instructions that you can follow to create this dish!</p>
+                      <p className="font-medium mb-1">📚 {t('recipes.demoRecipe')}</p>
+                      <p>{t('recipes.demoRecipeDescription')}</p>
                     </div>
                   </div>
                 </div>
@@ -618,19 +618,19 @@ function RecipePageContent({ params }: RecipePageProps) {
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Prep Time:</span>
+                  <span className="text-gray-600">{t('recipes.prepTime')}:</span>
                   <span className="font-medium">{recipe.prepTime}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Cook Time:</span>
+                  <span className="text-gray-600">{t('recipes.cookTime')}:</span>
                   <span className="font-medium">{recipe.cookTime}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Original Servings:</span>
+                  <span className="text-gray-600">{t('recipes.originalServings')}:</span>
                   <span className="font-medium">{recipe.servings}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Difficulty:</span>
+                  <span className="text-gray-600">{t('recipes.difficulty')}:</span>
                   <span className="font-medium">{recipe.difficulty}</span>
                 </div>
               </div>
@@ -639,7 +639,7 @@ function RecipePageContent({ params }: RecipePageProps) {
               <div className="mt-6 p-4 bg-primary-50 rounded-lg border">
                 <h4 className="font-semibold text-primary-800 mb-3 flex items-center">
                   <UsersIcon className="h-4 w-4 mr-2" />
-                  Cooking for how many people?
+                  {t('recipes.cookingForPeople')}
                 </h4>
                 <div className="flex items-center justify-center space-x-4">
                   <button
@@ -653,7 +653,7 @@ function RecipePageContent({ params }: RecipePageProps) {
                   <div className="text-center">
                     <div className="text-2xl font-bold text-primary-700">{servings}</div>
                     <div className="text-xs text-primary-600">
-                      {servings === 1 ? 'person' : 'people'}
+                      {servings === 1 ? t('recipes.people').slice(0, -1) : t('recipes.people')}
                     </div>
                   </div>
                   
@@ -677,7 +677,7 @@ function RecipePageContent({ params }: RecipePageProps) {
               <div className="flex space-x-2 mt-6">
                 <button className="flex-1 bg-primary-500 text-white py-2 px-4 rounded-lg hover:bg-primary-600 transition-colors flex items-center justify-center space-x-2">
                   <HeartIcon className="h-4 w-4" />
-                  <span>Save</span>
+                  <span>{t('recipes.save')}</span>
                 </button>
                 <button className="bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
                   <ShareIcon className="h-4 w-4" />
@@ -763,9 +763,9 @@ function RecipePageContent({ params }: RecipePageProps) {
             {/* Recipe Branching */}
             {user && recipe.author_id !== user.id && (
               <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Create Your Take</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('recipes.createYourTake')}</h3>
                 <p className="text-gray-600 mb-4">
-                  Want to modify this recipe with your own twist? Create your own version while giving credit to the original creator.
+                  {t('recipes.createYourTakeDescription')}
                 </p>
                 <div className="flex items-center space-x-3">
                   <Link
@@ -773,10 +773,10 @@ function RecipePageContent({ params }: RecipePageProps) {
                     className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
                   >
                     <span>🍴</span>
-                    <span>Fork This Recipe</span>
+                    <span>{t('recipes.forkThisRecipe')}</span>
                   </Link>
                   <div className="text-sm text-gray-500">
-                    Your version will credit "{displayedRecipe.author}" as the original creator
+                    {t('recipes.yourVersionWillCredit')} "{displayedRecipe.author}" {t('recipes.asOriginalCreator')}
                   </div>
                 </div>
               </div>
