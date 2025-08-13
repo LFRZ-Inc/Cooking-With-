@@ -402,5 +402,85 @@
     "signInWithFacebook": "Iniciar sesión con Facebook",
     "dontHaveAccount": "¿No tienes una cuenta?",
     "signUpForFree": "Regístrate gratis"
+  },
+  "newsletterContent": {
+    "fallComfortFoods": {
+      "title": "Comidas Reconfortantes de Otoño: 10 Recetas para Calentar tu Alma",
+      "excerpt": "A medida que las hojas cambian de color y las temperaturas bajan, no hay nada como el consuelo de platos abundantes y reconfortantes. Desde sopas cremosas hasta guisos ricos, estas recetas de otoño te abrazarán con sus sabores reconfortantes y llenarán tu hogar con aromas deliciosos.",
+      "content": "El otoño es un momento mágico para cocinar. El aire fresco llama a comidas que calientan desde adentro hacia afuera..."
+    },
+    "frenchPastry": {
+      "title": "El Arte de la Pastelería Francesa: Una Guía para Principiantes",
+      "excerpt": "Domina los fundamentos de la pastelería francesa con estas técnicas y recetas esenciales. Desde croissants hasta éclairs, te guiaremos a través del delicado arte de crear pasteles hermosos y mantecosos que impresionarán a todos.",
+      "content": "La pastelería francesa es tanto un arte como una ciencia. Requiere precisión, paciencia y práctica..."
+    },
+    "plantBasedProtein": {
+      "title": "Proteína Basada en Plantas: Más Allá del Tofu",
+      "excerpt": "Descubre fuentes emocionantes y deliciosas de proteína basada en plantas que revolucionarán tu cocina vegetariana. Desde tempeh hasta lentejas, aprende a crear comidas satisfactorias sin carne.",
+      "content": "El mundo de las proteínas basadas en plantas se extiende mucho más allá del tofu y los frijoles..."
+    },
+    "streetFoodRevolution": {
+      "title": "Revolución de la Comida Callejera: Sabores Globales en tu Cocina",
+      "excerpt": "Explora cómo la comida callejera de todo el mundo ha influido en la cocina casera moderna. Desde kimchi coreano hasta tacos mexicanos, descubre cómo recrear sabores auténticos de la calle en casa.",
+      "content": "La comida callejera representa el corazón y el alma de la cultura culinaria en todo el mundo. Estos platos humildes, nacidos de la necesidad y la creatividad, ahora han encontrado su camino en restaurantes de alta cocina y cocinas caseras por igual..."
+    },
+    "fermentationScience": {
+      "title": "La Ciencia de la Fermentación: Técnicas Antiguas para la Salud Moderna",
+      "excerpt": "Sumérgete en el fascinante mundo de la fermentación, desde kimchi y chucrut hasta kombucha y kéfir. Aprende cómo estos métodos de preservación ancestrales potencian el sabor y la nutrición.",
+      "content": "La fermentación es una de las técnicas de preservación de alimentos más antiguas de la humanidad, que data de antes de la historia registrada. Hoy, estamos redescubriendo los increíbles beneficios para la salud y los sabores complejos que los alimentos fermentados aportan a nuestras mesas..."
+    },
+    "mediterraneanDiet": {
+      "title": "Dieta Mediterránea: Más que Solo Aceite de Oliva",
+      "excerpt": "Descubre los verdaderos secretos de la dieta mediterránea más allá de lo básico. Explora variaciones regionales, patrones de alimentación estacionales y los aspectos sociales que hacen que este estilo de vida sea tan beneficioso.",
+      "content": "La dieta mediterránea ha ganado reconocimiento mundial por sus beneficios para la salud, pero hay mucho más que aceite de oliva y pescado. Esta antigua forma de comer abarca un enfoque completo de estilo de vida para la nutrición..."
+    }
+  },
+  "footer": {
+    "communityDescription": "Una plataforma impulsada por la comunidad para compartir, descubrir y preservar el patrimonio culinario. Construida con privacidad primero y respeto por las tradiciones alimentarias mundiales.",
+    "privacyProtectedUploads": "Cargas de imágenes protegidas por privacidad",
+    "legal": "Legal",
+    "termsOfService": "Términos de Servicio",
+    "privacyPolicy": "Política de Privacidad",
+    "accessibility": "Accesibilidad",
+    "communityGuidelines": "Pautas de la Comunidad",
+    "connect": "Conectar",
+    "tiktokHandle": "@earthtoluis en TikTok",
+    "aboutCookingWith": "Acerca de Cooking With",
+    "helpCenter": "Centro de Ayuda",
+    "sendFeedback": "Enviar Comentarios",
+    "copyright": "© 2025 Cooking With. Construido con ❤️ para amantes de la comida en todo el mundo.",
+    "preservingHeritage": "Preservando el patrimonio culinario",
+    "privacyFirst": "Plataforma con privacidad primero",
+    "privacyNotice": "Todas las imágenes subidas se procesan automáticamente para eliminar datos de ubicación y metadatos para proteger tu privacidad. Aprende más sobre nuestras protecciones de privacidad"
+  },
+  "account": {
+    "preferences": "Preferencias",
+    "emailNotificationsRecipes": "Notificaciones por correo electrónico para nuevas recetas",
+    "emailNotificationsArticles": "Notificaciones por correo electrónico para nuevos artículos",
+    "accountActions": "Acciones de Cuenta",
+    "signOut": "Cerrar Sesión"
+  },
+  "newsletters": {
+    "title": "Artículos del Boletín",
+    "subtitle": "Descubre historias de cocina inspiradoras, consejos e ideas de nuestra comunidad",
+    "searchPlaceholder": "Buscar artículos...",
+    "featuredOnly": "Solo destacados",
+    "noArticlesFound": "No se encontraron artículos",
+    "noArticlesDescription": "¡Intenta ajustar tu búsqueda o filtros, o crea el primer artículo!",
+    "loadingArticles": "Cargando artículos frescos...",
+    "loadingArticle": "Cargando artículo...",
+    "readFullArticle": "Leer Artículo Completo",
+    "demoNotice": "¡Artículos Reales de Nuestra Comunidad! Estos son artículos reales compartidos por usuarios como tú. Aunque algunos están marcados como demos, son contenido completamente real e informativo.",
+    "unverifiedArticle": "Artículo No Verificado",
+    "aboutAuthor": "Acerca de",
+    "authorBio": "es un escritor apasionado de comida y desarrollador de recetas que cree en el poder de la buena comida para unir a las personas. Con años de experiencia en cocinas profesionales y periodismo gastronómico, comparten ideas que hacen que cocinar sea accesible y agradable para todos.",
+    "shareThisArticle": "Compartir Este Artículo",
+    "saveArticle": "Guardar Artículo",
+    "share": "Compartir",
+    "print": "Imprimir",
+    "backToArticles": "Volver a Artículos",
+    "featured": "Destacado",
+    "emailPlaceholder": "Tu dirección de correo electrónico",
+    "getLatestRecipes": "Recibe las últimas recetas y consejos de cocina en tu bandeja de entrada."
   }
 }

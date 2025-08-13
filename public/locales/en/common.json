@@ -402,5 +402,62 @@
     "signInWithFacebook": "Sign in with Facebook",
     "dontHaveAccount": "Don't have an account?",
     "signUpForFree": "Sign up for free"
+  },
+  "newsletterContent": {
+    "fallComfortFoods": {
+      "title": "Fall Comfort Foods: 10 Recipes to Warm Your Soul",
+      "excerpt": "As the leaves change color and temperatures drop, there's nothing quite like the comfort of hearty, warming dishes. From creamy soups to rich stews, these fall recipes will embrace you with their comforting flavors and fill your home with delicious aromas.",
+      "content": "Fall is a magical time for cooking. The crisp air calls for meals that warm from the inside out..."
+    },
+    "frenchPastry": {
+      "title": "The Art of French Pastry: A Beginner's Guide",
+      "excerpt": "Master the fundamentals of French pastry with these essential techniques and recipes. From croissants to éclairs, we'll walk you through the delicate art of creating beautiful, buttery pastries that will impress everyone.",
+      "content": "French pastry is both an art and a science. It requires precision, patience, and practice..."
+    },
+    "plantBasedProtein": {
+      "title": "Plant-Based Protein: Beyond Tofu",
+      "excerpt": "Discover exciting and delicious plant-based protein sources that will revolutionize your vegetarian cooking. From tempeh to lentils, learn how to create satisfying meals without meat.",
+      "content": "The world of plant-based proteins extends far beyond tofu and beans..."
+    },
+    "streetFoodRevolution": {
+      "title": "Street Food Revolution: Global Flavors in Your Kitchen",
+      "excerpt": "Explore how street food from around the world has influenced modern home cooking. From Korean kimchi to Mexican tacos, discover how to recreate authentic street flavors at home.",
+      "content": "Street food represents the heart and soul of culinary culture across the globe. These humble dishes, born from necessity and creativity, have now found their way into high-end restaurants and home kitchens alike..."
+    },
+    "fermentationScience": {
+      "title": "The Science of Fermentation: Ancient Techniques for Modern Health",
+      "excerpt": "Dive into the fascinating world of fermentation, from kimchi and sauerkraut to kombucha and kefir. Learn how these age-old preservation methods boost flavor and nutrition.",
+      "content": "Fermentation is one of humanity's oldest food preservation techniques, predating recorded history. Today, we're rediscovering the incredible health benefits and complex flavors that fermented foods bring to our tables..."
+    },
+    "mediterraneanDiet": {
+      "title": "Mediterranean Diet: More Than Just Olive Oil",
+      "excerpt": "Uncover the true secrets of the Mediterranean diet beyond the basics. Explore regional variations, seasonal eating patterns, and the social aspects that make this lifestyle so beneficial.",
+      "content": "The Mediterranean diet has gained worldwide recognition for its health benefits, but there's so much more to it than olive oil and fish. This ancient way of eating encompasses a complete lifestyle approach to nutrition..."
+    }
+  },
+  "footer": {
+    "communityDescription": "A community-driven platform for sharing, discovering, and preserving culinary heritage. Built with privacy first and respect for food traditions worldwide.",
+    "privacyProtectedUploads": "Privacy-protected image uploads",
+    "legal": "Legal",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "accessibility": "Accessibility",
+    "communityGuidelines": "Community Guidelines",
+    "connect": "Connect",
+    "tiktokHandle": "@earthtoluis on TikTok",
+    "aboutCookingWith": "About Cooking With",
+    "helpCenter": "Help Center",
+    "sendFeedback": "Send Feedback",
+    "copyright": "© 2025 Cooking With. Built with ❤️ for food lovers worldwide.",
+    "preservingHeritage": "Preserving culinary heritage",
+    "privacyFirst": "Privacy-first platform",
+    "privacyNotice": "All uploaded images are automatically processed to remove location data and metadata to protect your privacy. Learn more about our privacy protections"
+  },
+  "account": {
+    "preferences": "Preferences",
+    "emailNotificationsRecipes": "Email notifications for new recipes",
+    "emailNotificationsArticles": "Email notifications for new articles",
+    "accountActions": "Account Actions",
+    "signOut": "Sign Out"
   }
 }

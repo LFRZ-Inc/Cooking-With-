@@ -1,8 +1,12 @@
+'use client'
 import React from 'react'
 import Link from 'next/link'
 import { ShieldIcon, FileTextIcon, HeartIcon } from 'lucide-react'
+import { useLanguage } from '@/lib/language'
 
 export default function Footer() {
+  const { t } = useLanguage()
+
   return (
     <footer className="bg-gray-900 text-gray-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -16,18 +20,17 @@ export default function Footer() {
               <h3 className="text-xl font-bold text-white">Cooking With</h3>
             </div>
             <p className="text-gray-400 mb-4 max-w-md">
-              A community-driven platform for sharing, discovering, and preserving culinary heritage. 
-              Built with privacy first and respect for food traditions worldwide.
+              {t('footer.communityDescription')}
             </p>
             <div className="flex items-center space-x-2 text-sm">
               <ShieldIcon className="h-4 w-4 text-green-400" />
-              <span className="text-green-400">Privacy-protected image uploads</span>
+              <span className="text-green-400">{t('footer.privacyProtectedUploads')}</span>
             </div>
           </div>
 
           {/* Legal & Policies */}
           <div>
-            <h4 className="text-lg font-semibold text-white mb-4">Legal</h4>
+            <h4 className="text-lg font-semibold text-white mb-4">{t('footer.legal')}</h4>
             <ul className="space-y-2">
               <li>
                 <Link 
@@ -35,7 +38,7 @@ export default function Footer() {
                   className="text-gray-400 hover:text-white transition-colors flex items-center space-x-2"
                 >
                   <FileTextIcon className="h-4 w-4" />
-                  <span>Terms of Service</span>
+                  <span>{t('footer.termsOfService')}</span>
                 </Link>
               </li>
               <li>
@@ -44,7 +47,7 @@ export default function Footer() {
                   className="text-gray-400 hover:text-white transition-colors flex items-center space-x-2"
                 >
                   <ShieldIcon className="h-4 w-4" />
-                  <span>Privacy Policy</span>
+                  <span>{t('footer.privacyPolicy')}</span>
                 </Link>
               </li>
               <li>
@@ -52,7 +55,7 @@ export default function Footer() {
                   href="/accessibility" 
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  Accessibility
+                  {t('footer.accessibility')}
                 </Link>
               </li>
               <li>
@@ -60,7 +63,7 @@ export default function Footer() {
                   href="/community-guidelines" 
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  Community Guidelines
+                  {t('footer.communityGuidelines')}
                 </Link>
               </li>
             </ul>
@@ -68,7 +71,7 @@ export default function Footer() {
 
           {/* Contact & Social */}
           <div>
-            <h4 className="text-lg font-semibold text-white mb-4">Connect</h4>
+            <h4 className="text-lg font-semibold text-white mb-4">{t('footer.connect')}</h4>
             <ul className="space-y-2">
               <li>
                 <a 
@@ -78,7 +81,7 @@ export default function Footer() {
                   className="text-gray-400 hover:text-white transition-colors flex items-center space-x-2"
                 >
                   <span className="text-lg">📱</span>
-                  <span>@earthtoluis on TikTok</span>
+                  <span>{t('footer.tiktokHandle')}</span>
                 </a>
               </li>
               <li>
@@ -86,7 +89,7 @@ export default function Footer() {
                   href="/about" 
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  About Cooking With
+                  {t('footer.aboutCookingWith')}
                 </Link>
               </li>
               <li>
@@ -94,7 +97,7 @@ export default function Footer() {
                   href="/help" 
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  Help Center
+                  {t('footer.helpCenter')}
                 </Link>
               </li>
               <li>
@@ -102,7 +105,7 @@ export default function Footer() {
                   href="/feedback" 
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  Send Feedback
+                  {t('footer.sendFeedback')}
                 </Link>
               </li>
             </ul>
@@ -113,17 +116,17 @@ export default function Footer() {
         <div className="mt-8 pt-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-sm text-gray-400">
-              <p>© {new Date().getFullYear()} Cooking With. Built with ❤️ for food lovers worldwide.</p>
+              <p>{t('footer.copyright')}</p>
             </div>
             
             <div className="flex items-center space-x-6 text-sm text-gray-400">
               <div className="flex items-center space-x-2">
                 <HeartIcon className="h-4 w-4 text-red-400" />
-                <span>Preserving culinary heritage</span>
+                <span>{t('footer.preservingHeritage')}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <ShieldIcon className="h-4 w-4 text-green-400" />
-                <span>Privacy-first platform</span>
+                <span>{t('footer.privacyFirst')}</span>
               </div>
             </div>
           </div>
@@ -131,10 +134,7 @@ export default function Footer() {
           {/* Privacy Notice */}
           <div className="mt-4 pt-4 border-t border-gray-800">
             <p className="text-xs text-gray-500 text-center">
-              🔒 All uploaded images are automatically processed to remove location data and metadata to protect your privacy. 
-              <Link href="/privacy" className="text-green-400 hover:text-green-300 ml-1">
-                Learn more about our privacy protections
-              </Link>
+              🔒 {t('footer.privacyNotice')}
             </p>
           </div>
         </div>

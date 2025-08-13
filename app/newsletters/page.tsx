@@ -1,27 +1,39 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { 
-  SearchIcon,
-  CalendarIcon,
-  ClockIcon,
-  UserIcon,
-  NewspaperIcon,
-  TagIcon
-} from 'lucide-react'
+import { SearchIcon, ClockIcon, UserIcon, TagIcon, StarIcon, CalendarIcon, NewspaperIcon } from 'lucide-react'
 import AuthGuard from '@/components/AuthGuard'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/lib/language'
 import ClientOnly from '@/lib/ClientOnly'
 
+interface Newsletter {
+  id: number
+  title: string
+  excerpt: string
+  content: string
+  author_id?: string
+  category?: string
+  tags: string[]
+  featured: boolean
+  publish_date: string
+  read_time_minutes: number
+  created_at: string
+  author?: string
+  authorImage?: string
+  readTime?: string
+  publishDate?: string
+  image?: string
+}
+
 // Mock demo newsletters - these will be mixed with real user submissions
-const demoNewsletters = [
+const getDemoNewsletters = (t: any) => [
   {
-    id: 9001, // High ID to avoid conflicts
-    title: "Fall Comfort Foods: 10 Recipes to Warm Your Soul",
-    excerpt: "As the leaves change color and temperatures drop, there's nothing quite like the comfort of hearty, warming dishes. From creamy soups to rich stews, these fall recipes will embrace you with their comforting flavors and fill your home with delicious aromas.",
-    content: "Fall is a magical time for cooking. The crisp air calls for meals that warm from the inside out...",
-    author_id: "demo_user_555", // Demo user
+    id: 9001,
+    title: t('newsletterContent.fallComfortFoods.title'),
+    excerpt: t('newsletterContent.fallComfortFoods.excerpt'),
+    content: t('newsletterContent.fallComfortFoods.content'),
+    author_id: "demo_user_555",
     category: "Seasonal",
     tags: ["Fall", "Comfort Food", "Soups", "Stews"],
     featured: true,
@@ -36,10 +48,10 @@ const demoNewsletters = [
   },
   {
     id: 9002,
-    title: "The Art of French Pastry: A Beginner's Guide",
-    excerpt: "Master the fundamentals of French pastry with these essential techniques and recipes. From croissants to éclairs, we'll walk you through the delicate art of creating beautiful, buttery pastries that will impress everyone.",
-    content: "French pastry is both an art and a science. It requires precision, patience, and practice...",
-    author_id: undefined, // Anonymous demo submission
+    title: t('newsletterContent.frenchPastry.title'),
+    excerpt: t('newsletterContent.frenchPastry.excerpt'),
+    content: t('newsletterContent.frenchPastry.content'),
+    author_id: undefined,
     category: "Techniques",
     tags: ["French", "Pastry", "Baking", "Techniques"],
     featured: true,
@@ -54,10 +66,10 @@ const demoNewsletters = [
   },
   {
     id: 9003,
-    title: "Plant-Based Protein: Beyond Tofu",
-    excerpt: "Discover exciting and delicious plant-based protein sources that will revolutionize your vegetarian cooking. From tempeh to lentils, learn how to create satisfying meals without meat.",
-    content: "The world of plant-based proteins extends far beyond tofu and beans...",
-    author_id: "demo_user_666", // Demo user
+    title: t('newsletterContent.plantBasedProtein.title'),
+    excerpt: t('newsletterContent.plantBasedProtein.excerpt'),
+    content: t('newsletterContent.plantBasedProtein.content'),
+    author_id: "demo_user_666",
     category: "Health",
     tags: ["Vegan", "Protein", "Health", "Plant-Based"],
     featured: false,
@@ -72,9 +84,9 @@ const demoNewsletters = [
   },
   {
     id: 9004,
-    title: "Street Food Revolution: Global Flavors in Your Kitchen",
-    excerpt: "Explore how street food from around the world has influenced modern home cooking. From Korean kimchi to Mexican tacos, discover how to recreate authentic street flavors at home.",
-    content: "Street food represents the heart and soul of culinary culture across the globe. These humble dishes, born from necessity and creativity, have now found their way into high-end restaurants and home kitchens alike...",
+    title: t('newsletterContent.streetFoodRevolution.title'),
+    excerpt: t('newsletterContent.streetFoodRevolution.excerpt'),
+    content: t('newsletterContent.streetFoodRevolution.content'),
     author_id: "demo_writer_1",
     category: "International",
     tags: ["Street Food", "International", "Authentic", "Home Cooking"],
@@ -90,9 +102,9 @@ const demoNewsletters = [
   },
   {
     id: 9005,
-    title: "The Science of Fermentation: Ancient Techniques for Modern Health",
-    excerpt: "Dive into the fascinating world of fermentation, from kimchi and sauerkraut to kombucha and kefir. Learn how these age-old preservation methods boost flavor and nutrition.",
-    content: "Fermentation is one of humanity's oldest food preservation techniques, predating recorded history. Today, we're rediscovering the incredible health benefits and complex flavors that fermented foods bring to our tables...",
+    title: t('newsletterContent.fermentationScience.title'),
+    excerpt: t('newsletterContent.fermentationScience.excerpt'),
+    content: t('newsletterContent.fermentationScience.content'),
     author_id: "demo_writer_2",
     category: "Health",
     tags: ["Fermentation", "Health", "Probiotics", "Traditional"],
@@ -108,87 +120,119 @@ const demoNewsletters = [
   },
   {
     id: 9006,
-    title: "Mediterranean Diet: More Than Just Olive Oil",
-    excerpt: "Uncover the true secrets of the Mediterranean diet beyond the basics. Explore regional variations, seasonal eating patterns, and the social aspects that make this lifestyle so beneficial.",
-    content: "The Mediterranean diet has gained worldwide recognition for its health benefits, but there's so much more to it than olive oil and fish. This ancient way of eating encompasses a complete lifestyle approach to nutrition...",
+    title: t('newsletterContent.mediterraneanDiet.title'),
+    excerpt: t('newsletterContent.mediterraneanDiet.excerpt'),
+    content: t('newsletterContent.mediterraneanDiet.content'),
     author_id: "demo_writer_3",
     category: "Health",
-    tags: ["Mediterranean", "Healthy Eating", "Lifestyle", "Regional"],
+    tags: ["Mediterranean", "Healthy Eating", "Lifestyle", "Nutrition"],
     featured: true,
     publish_date: "2024-01-18",
     read_time_minutes: 8,
-    created_at: "2024-01-18T11:45:00Z",
+    created_at: "2024-01-18T11:15:00Z",
     author: "Sofia Rosetti",
-    authorImage: "https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=100",
+    authorImage: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100",
     readTime: "8 min read",
     publishDate: "2024-01-18",
     image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600"
-  },
-  {
-    id: 9007,
-    title: "Kitchen Knife Skills: The Foundation of Great Cooking",
-    excerpt: "Master the essential knife skills that every home cook should know. From proper grip techniques to advanced cuts, learn how good knife work elevates your cooking.",
-    content: "Proper knife skills are the foundation of efficient and safe cooking. Whether you're a beginner or looking to refine your technique, mastering these fundamental skills will transform your time in the kitchen...",
-    author_id: "demo_writer_4",
-    category: "Techniques",
-    tags: ["Knife Skills", "Techniques", "Basics", "Safety"],
-    featured: false,
-    publish_date: "2024-01-16",
-    read_time_minutes: 5,
-    created_at: "2024-01-16T16:20:00Z",
-    author: "Chef Antoine Dubois",
-    authorImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100",
-    readTime: "5 min read",
-    publishDate: "2024-01-16",
-    image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600"
-  },
-  {
-    id: 9008,
-    title: "Seasonal Cooking: Winter Comfort Foods Around the World",
-    excerpt: "Explore how different cultures create warming, comforting dishes during cold months. From Japanese hotpot to German stews, discover winter comfort food traditions.",
-    content: "As winter settles in across the northern hemisphere, kitchens around the world come alive with the aromas of hearty, warming dishes. Each culture has developed its own approach to winter comfort foods...",
-    author_id: "demo_writer_5",
-    category: "Seasonal",
-    tags: ["Winter", "Comfort Food", "International", "Seasonal"],
-    featured: true,
-    publish_date: "2024-01-14",
-    read_time_minutes: 6,
-    created_at: "2024-01-14T13:10:00Z",
-    author: "Isabella Harper",
-    authorImage: "https://images.unsplash.com/photo-1557862921-37829c790f19?w=100",
-    readTime: "6 min read",
-    publishDate: "2024-01-14",
-    image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600"
   }
 ]
 
-interface Newsletter {
-  id: number
-  title: string
-  excerpt: string
-  content: string
-  author_id?: string
-  category?: string
-  tags: string[]
-  featured: boolean
-  publish_date: string
-  read_time_minutes: number
-  created_at: string
-  // Mock fields for display (we'll enhance these later)
-  author?: string
-  authorImage?: string
-  readTime?: string
-  publishDate?: string
-  image?: string
+function NewsletterCard({ newsletter }: { newsletter: Newsletter }) {
+  const { t } = useLanguage()
+  
+  return (
+    <article className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+      {/* Image */}
+      <div className="relative h-48 bg-gray-200">
+        <img
+          src={newsletter.image}
+          alt={newsletter.title}
+          className="w-full h-full object-cover"
+        />
+        {newsletter.featured && (
+          <div className="absolute top-3 right-3">
+            <span className="bg-orange-600 text-white text-xs px-2 py-1 rounded-full">
+              {t('newsletters.featured')}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="p-6">
+        {/* Category and Read Time */}
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-orange-600 text-sm font-medium">
+            {newsletter.category}
+          </span>
+          <div className="flex items-center text-gray-500 text-sm">
+            <ClockIcon className="h-4 w-4 mr-1" />
+            {newsletter.readTime}
+          </div>
+        </div>
+
+        {/* Title */}
+        <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+          {newsletter.title}
+        </h3>
+
+        {/* Excerpt */}
+        <p className="text-gray-600 mb-4 line-clamp-3">
+          {newsletter.excerpt}
+        </p>
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {newsletter.tags.slice(0, 3).map((tag, index) => (
+            <span
+              key={index}
+              className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full"
+            >
+              {tag}
+            </span>
+          ))}
+          {newsletter.tags.length > 3 && (
+            <span className="text-gray-500 text-xs px-2 py-1">
+              +{newsletter.tags.length - 3} more
+            </span>
+          )}
+        </div>
+
+        {/* Author and Date */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <img
+              src={newsletter.authorImage}
+              alt={newsletter.author}
+              className="w-8 h-8 rounded-full mr-2"
+            />
+            <span className="text-sm text-gray-700">{newsletter.author}</span>
+          </div>
+          <div className="flex items-center text-gray-500 text-sm">
+            <CalendarIcon className="h-4 w-4 mr-1" />
+            {newsletter.publishDate}
+          </div>
+        </div>
+
+        {/* Read More Button */}
+        <Link
+          href={`/newsletters/${newsletter.id}`}
+          className="inline-block bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors text-sm font-medium"
+        >
+          {t('newsletters.readFullArticle')}
+        </Link>
+      </div>
+    </article>
+  )
 }
 
-function NewslettersPageContent() {
+export default function NewslettersPage() {
+  const { t } = useLanguage()
   const [newsletters, setNewsletters] = useState<Newsletter[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('All')
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false)
-  const { t } = useLanguage()
 
   // Fetch newsletters from Supabase and mix with demo newsletters
   const fetchNewsletters = async () => {
@@ -200,8 +244,7 @@ function NewslettersPageContent() {
 
       if (error) {
         console.error('Error fetching newsletters:', error)
-        // If there's an error, just show demo newsletters
-        setNewsletters(demoNewsletters)
+        setNewsletters(getDemoNewsletters(t))
         return
       }
 
@@ -216,14 +259,13 @@ function NewslettersPageContent() {
       })) || []
 
       // Mix demo newsletters with real newsletters, sorting by creation date
-      const allNewsletters = [...demoNewsletters, ...transformedRealNewsletters]
+      const allNewsletters = [...getDemoNewsletters(t), ...transformedRealNewsletters]
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
       setNewsletters(allNewsletters)
     } catch (error) {
       console.error('Error fetching newsletters:', error)
-      // If there's an error, just show demo newsletters
-      setNewsletters(demoNewsletters)
+      setNewsletters(getDemoNewsletters(t))
     } finally {
       setLoading(false)
     }
@@ -238,202 +280,17 @@ function NewslettersPageContent() {
     }, 15 * 60 * 1000) // 15 minutes
 
     return () => clearInterval(interval)
-  }, [])
+  }, [t]) // Add t as dependency to refetch when language changes
 
   // Filter newsletters based on search and filters
   const filteredNewsletters = newsletters.filter(newsletter => {
     const matchesSearch = newsletter.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          newsletter.excerpt.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = selectedCategory === 'All' || newsletter.category === selectedCategory
     const matchesFeatured = !showFeaturedOnly || newsletter.featured
     
-    return matchesSearch && matchesCategory && matchesFeatured
+    return matchesSearch && matchesFeatured
   })
 
-  const categories = ['All', ...Array.from(new Set(newsletters.map(n => n.category).filter(Boolean)))]
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-            <span className="ml-3 text-lg text-gray-600">{t('newsletters.loadingArticles')}</span>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Demo Articles Notice */}
-        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-center">
-            <NewspaperIcon className="h-5 w-5 text-blue-600 mr-2" />
-            <div className="text-sm text-blue-800">
-              <strong>{t('newsletters.demoNotice')}</strong>
-            </div>
-          </div>
-        </div>
-
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">{t('newsletters.title')}</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            {t('newsletters.subtitle')}
-          </p>
-        </div>
-
-        {/* Search and Filters */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <input
-                type="text"
-                placeholder={t('newsletters.searchPlaceholder')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Filters */}
-            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-              >
-                {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
-              </select>
-
-              <label className="flex items-center space-x-2 text-sm text-gray-600">
-                <input
-                  type="checkbox"
-                  checked={showFeaturedOnly}
-                  onChange={(e) => setShowFeaturedOnly(e.target.checked)}
-                  className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                />
-                <span>{t('newsletters.featuredOnly')}</span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        {/* Articles Grid */}
-        {filteredNewsletters.length === 0 ? (
-          <div className="text-center py-12">
-            <NewspaperIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-medium text-gray-600 mb-2">{t('newsletters.noArticlesFound')}</h3>
-            <p className="text-gray-500">{t('newsletters.noArticlesDescription').split('create the first article')[0]}<Link href="/create/newsletter" className="text-orange-600 hover:text-orange-700">create the first article</Link>!</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredNewsletters.map((newsletter) => (
-              <article key={newsletter.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
-                {/* Article Image */}
-                <div className="relative h-48 bg-gray-200">
-                  <img
-                    src={newsletter.image}
-                    alt={newsletter.title}
-                    className="w-full h-full object-cover"
-                  />
-                  
-                  {/* Featured Badge */}
-                  {newsletter.featured && (
-                    <div className="absolute top-2 right-2">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                        {t('common.featured')}
-                      </span>
-                    </div>
-                  )}
-                  
-                  {/* Unverified Content Badge */}
-                  {!newsletter.author_id && (
-                    <div className="absolute top-2 left-2">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-                        {t('newsletters.unverifiedArticle')}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Article Content */}
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-orange-600 font-medium">{newsletter.category || 'General'}</span>
-                    <div className="flex items-center space-x-1 text-sm text-gray-500">
-                      <ClockIcon className="h-4 w-4" />
-                      <span>{newsletter.readTime}</span>
-                    </div>
-                  </div>
-
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{newsletter.title}</h3>
-                  <p className="text-gray-600 mb-4 line-clamp-3">{newsletter.excerpt}</p>
-
-                  {/* Tags */}
-                  {newsletter.tags && newsletter.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-4">
-                      {newsletter.tags.slice(0, 3).map((tag, index) => (
-                        <span
-                          key={index}
-                          className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
-                        >
-                          <TagIcon className="h-3 w-3 mr-1" />
-                          {tag}
-                        </span>
-                      ))}
-                      {newsletter.tags.length > 3 && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                          +{newsletter.tags.length - 3} more
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Author and Date */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-2">
-                      <img
-                        src={newsletter.authorImage}
-                        alt={newsletter.author}
-                        className="h-8 w-8 rounded-full object-cover"
-                      />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{newsletter.author}</p>
-                        <div className="flex items-center space-x-1 text-xs text-gray-500">
-                          <CalendarIcon className="h-3 w-3" />
-                          <span>{newsletter.publishDate}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Action Button */}
-                  <Link 
-                    href={`/newsletters/${newsletter.id}`}
-                    className="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors duration-200 text-center block"
-                  >
-                    {t('newsletters.readFullArticle')}
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
-export default function NewslettersPage() {
   return (
     <AuthGuard>
       <ClientOnly fallback={
@@ -446,7 +303,100 @@ export default function NewslettersPage() {
           </div>
         </div>
       }>
-        <NewslettersPageContent />
+        <div className="min-h-screen bg-gray-50">
+          {/* Header */}
+          <div className="bg-white shadow-sm border-b">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <div className="text-center">
+                <h1 className="text-4xl font-serif font-bold text-gray-900 mb-4">
+                  {t('newsletters.title')}
+                </h1>
+                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                  {t('newsletters.subtitle')}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Search and Filters */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="flex flex-col sm:flex-row gap-4 mb-8">
+              {/* Search */}
+              <div className="flex-1">
+                <div className="relative">
+                  <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder={t('newsletters.searchPlaceholder')}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Featured Filter */}
+              <div className="flex items-center">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={showFeaturedOnly}
+                    onChange={(e) => setShowFeaturedOnly(e.target.checked)}
+                    className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                  />
+                  <span className="text-sm text-gray-700">{t('newsletters.featuredOnly')}</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Demo Notice */}
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-8">
+              <div className="flex items-start">
+                <StarIcon className="h-5 w-5 text-orange-600 mt-0.5 mr-3" />
+                <p className="text-orange-800 text-sm">
+                  {t('newsletters.demoNotice')}
+                </p>
+              </div>
+            </div>
+
+            {/* Loading State */}
+            {loading && (
+              <div className="flex justify-center items-center py-12">
+                <div className="flex items-center space-x-3">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                  <span className="text-lg text-gray-600">{t('newsletters.loadingArticles')}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Newsletter Grid */}
+            {!loading && (
+              <>
+                {filteredNewsletters.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="max-w-md mx-auto">
+                      <div className="text-gray-400 mb-4">
+                        <NewspaperIcon className="h-12 w-12 mx-auto" />
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        {t('newsletters.noArticlesFound')}
+                      </h3>
+                      <p className="text-gray-600">
+                        {t('newsletters.noArticlesDescription')}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredNewsletters.map((newsletter) => (
+                      <NewsletterCard key={newsletter.id} newsletter={newsletter} />
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
       </ClientOnly>
     </AuthGuard>
   )

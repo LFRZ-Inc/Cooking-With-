@@ -543,7 +543,7 @@ function AccountPageContent() {
 
                 {/* Preferences */}
                 <div className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Preferences</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('account.preferences')}</h3>
                   <div className="space-y-4">
                     <label className="flex items-center space-x-3">
                       <input
@@ -551,7 +551,7 @@ function AccountPageContent() {
                         className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
                         defaultChecked
                       />
-                      <span className="text-sm text-gray-700">Email notifications for new recipes</span>
+                      <span className="text-sm text-gray-700">{t('account.emailNotificationsRecipes')}</span>
                     </label>
                     <label className="flex items-center space-x-3">
                       <input
@@ -559,20 +559,20 @@ function AccountPageContent() {
                         className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
                         defaultChecked
                       />
-                      <span className="text-sm text-gray-700">Email notifications for new articles</span>
+                      <span className="text-sm text-gray-700">{t('account.emailNotificationsArticles')}</span>
                     </label>
                   </div>
                 </div>
 
                 {/* Account Actions */}
                 <div className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Account Actions</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('account.accountActions')}</h3>
                   <div className="space-y-3">
                     <button
                       onClick={signOut}
                       className="w-full sm:w-auto bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
                     >
-                      Sign Out
+                      {t('account.signOut')}
                     </button>
                   </div>
                 </div>
