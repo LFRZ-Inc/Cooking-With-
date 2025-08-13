@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import ClientOnly from '@/lib/ClientOnly'
-import { useTranslation } from '@/lib/useTranslation'
+import { useLanguage } from '@/lib/language'
 
 // Mock data for demo
 const featuredRecipes = [
@@ -77,7 +77,7 @@ const latestNewsletters = [
 ]
 
 function HomeContent() {
-  const { t } = useTranslation()
+  const { t } = useLanguage()
   
   return (
     <div className="min-h-screen">

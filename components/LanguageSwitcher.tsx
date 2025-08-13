@@ -1,10 +1,10 @@
 'use client'
 import React, { useState } from 'react'
 import { Languages, Check } from 'lucide-react'
-import { useTranslation } from '@/lib/useTranslation'
+import { useLanguage } from '@/lib/language'
 
 export default function LanguageSwitcher() {
-  const { language, setLanguage, t } = useTranslation()
+  const { language, setLanguage, t } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
 
   const languages = [

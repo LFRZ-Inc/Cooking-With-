@@ -1,6 +1,6 @@
 'use client'
 
-import { useTranslation } from './useTranslation'
+import { useLanguage } from './language'
 import { supabase } from './supabase'
 
 // Build an absolute base URL for server-side fetches (used by API calls invoked from client as well)
@@ -505,7 +505,7 @@ export class TranslationService {
 
 // React hook for using translation service
 export function useTranslationService() {
-  const { language } = useTranslation()
+  const { language } = useLanguage()
   const translationService = TranslationService.getInstance()
 
   const translateContent = async (content: any, contentType: 'recipe' | 'newsletter'): Promise<any> => {

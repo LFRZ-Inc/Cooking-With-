@@ -20,6 +20,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>('en')
   const [translations, setTranslations] = useState<Translations>({})
   const [loading, setLoading] = useState(true)
+  const [isClient, setIsClient] = useState(false)
 
   // Load translations for the current language
   const loadTranslations = async (lang: Language) => {
@@ -47,6 +48,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   // Set language and persist to localStorage
   const setLanguage = (lang: Language) => {
+    if (!isClient) return
+    
     try {
       setLanguageState(lang)
       localStorage.setItem('language', lang)
@@ -61,6 +64,11 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   // Translation function with nested key support
   const t = (key: string): string => {
+    if (!isClient) {
+      // Return English fallback for SSR
+      return key
+    }
+    
     const keys = key.split('.')
     let value = translations
     
@@ -77,6 +85,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   // Initialize language from localStorage or browser preference
   useEffect(() => {
+    setIsClient(true)
+    
     try {
       const savedLanguage = localStorage.getItem('language') as Language
       const browserLanguage = navigator.language.split('-')[0] as Language
