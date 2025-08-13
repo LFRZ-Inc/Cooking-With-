@@ -321,11 +321,11 @@ function RecipesPageContent() {
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-2">
                       <p className="text-sm text-gray-600">
-                        Cooked With! <span className="font-medium">{recipe.author}</span>
+                        {t('content.cookedWith')} <span className="font-medium">{recipe.author}</span>
                       </p>
                       {recipe.author_id && (
                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          Registered Chef
+                          {t('content.registeredChef')}
                         </span>
                       )}
                     </div>

@@ -97,5 +97,20 @@
     "english": "English",
     "spanish": "Español",
     "selectLanguage": "Seleccionar Idioma"
+  },
+  "content": {
+    "cookedWith": "¡Cocinado Con!",
+    "registeredChef": "Chef Registrado",
+    "keyIngredients": "Ingredientes principales:",
+    "historicalOrigins": "Orígenes Históricos",
+    "inventor": "Inventor:",
+    "readyToStartCooking": "¿Listo para Empezar a Cocinar?",
+    "joinCommunity": "Únete a miles de entusiastas de la comida que comparten y descubren recetas increíbles todos los días.",
+    "joinTheCommunity": "Únete a la Comunidad",
+    "shareYourRecipe": "Comparte Tu Receta",
+    "readMore": "Leer Más →",
+    "byAuthor": "por",
+    "editorialTransparency": "📝 Transparencia Editorial:",
+    "editorialTransparencyText": "Esta receta fue publicada originalmente el {createdDate} y modificada por última vez el {updatedDate}. Todas las modificaciones se rastrean para mantener la integridad culinaria y la atribución adecuada."
   }
 }

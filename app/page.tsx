@@ -191,12 +191,12 @@ function HomeContent() {
                 
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm text-gray-500">Cooked With! {recipe.author}</span>
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        Registered Chef
-                      </span>
-                    </div>
+                                         <div className="flex items-center space-x-2">
+                       <span className="text-sm text-gray-500">{t('content.cookedWith')} {recipe.author}</span>
+                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                         {t('content.registeredChef')}
+                       </span>
+                     </div>
                     <div className="flex items-center space-x-1">
                       <StarIcon className="h-4 w-4 text-yellow-400 fill-current" />
                       <span className="text-sm text-gray-600">{recipe.rating}</span>
@@ -221,8 +221,8 @@ function HomeContent() {
                     </span>
                   </div>
                   
-                  <div className="border-t pt-4">
-                    <p className="text-sm text-gray-600 mb-2">Key ingredients:</p>
+                                     <div className="border-t pt-4">
+                     <p className="text-sm text-gray-600 mb-2">{t('content.keyIngredients')}</p>
                     <div className="flex flex-wrap gap-1 mb-4">
                       {recipe.ingredients.slice(0, 3).map((ingredient, index) => (
                         <span key={index} className="bg-primary-50 text-primary-700 px-2 py-1 rounded-full text-xs">
@@ -236,12 +236,12 @@ function HomeContent() {
                       )}
                     </div>
                     
-                    {recipe.inventor && (
-                      <div className="bg-amber-50 border-l-4 border-amber-200 p-3">
-                        <p className="text-xs font-semibold text-amber-800 mb-1">Historical Origins</p>
-                        <p className="text-xs text-amber-700 mb-1">
-                          <strong>Inventor:</strong> {recipe.inventor}
-                        </p>
+                                         {recipe.inventor && (
+                       <div className="bg-amber-50 border-l-4 border-amber-200 p-3">
+                         <p className="text-xs font-semibold text-amber-800 mb-1">{t('content.historicalOrigins')}</p>
+                         <p className="text-xs text-amber-700 mb-1">
+                           <strong>{t('content.inventor')}</strong> {recipe.inventor}
+                         </p>
                         <p className="text-xs text-amber-600 leading-relaxed">
                           {recipe.history}
                         </p>
@@ -282,8 +282,8 @@ function HomeContent() {
           <div className="grid md:grid-cols-2 gap-8">
             {latestNewsletters.map((newsletter) => (
               <article key={newsletter.id} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-                  <span>by {newsletter.author}</span>
+                                 <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+                   <span>{t('content.byAuthor')} {newsletter.author}</span>
                   <span>{newsletter.readTime}</span>
                 </div>
                 
@@ -297,12 +297,12 @@ function HomeContent() {
                 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-500">{newsletter.publishDate}</span>
-                  <Link 
-                    href={`/newsletters/${newsletter.id}`}
-                    className="text-primary-500 hover:text-primary-600 font-medium transition-colors"
-                  >
-                    Read More →
-                  </Link>
+                                     <Link 
+                     href={`/newsletters/${newsletter.id}`}
+                     className="text-primary-500 hover:text-primary-600 font-medium transition-colors"
+                   >
+                     {t('content.readMore')}
+                   </Link>
                 </div>
               </article>
             ))}
@@ -310,22 +310,22 @@ function HomeContent() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-primary-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-serif font-bold text-white mb-4">
-            Ready to Start Cooking?
-          </h2>
-          <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of food enthusiasts who share and discover amazing recipes every day.
-          </p>
+             {/* CTA Section */}
+       <section className="py-20 bg-primary-500">
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+           <h2 className="text-3xl font-serif font-bold text-white mb-4">
+             {t('content.readyToStartCooking')}
+           </h2>
+           <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
+             {t('content.joinCommunity')}
+           </p>
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <Link href="/signup" className="bg-white text-primary-500 hover:bg-gray-50 font-medium py-3 px-8 rounded-lg transition-colors text-lg">
-              Join the Community
-            </Link>
-            <Link href="/create" className="border-2 border-white text-white hover:bg-white hover:text-primary-500 font-medium py-3 px-8 rounded-lg transition-colors text-lg">
-              Share Your Recipe
-            </Link>
+                         <Link href="/signup" className="bg-white text-primary-500 hover:bg-gray-50 font-medium py-3 px-8 rounded-lg transition-colors text-lg">
+               {t('content.joinTheCommunity')}
+             </Link>
+             <Link href="/create" className="border-2 border-white text-white hover:bg-white hover:text-primary-500 font-medium py-3 px-8 rounded-lg transition-colors text-lg">
+               {t('content.shareYourRecipe')}
+             </Link>
           </div>
         </div>
       </section>

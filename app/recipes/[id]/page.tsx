@@ -20,6 +20,7 @@ import StarRating, { DualRatingDisplay } from '@/components/StarRating'
 import VersionNavigator from '@/components/VersionNavigator'
 import TranslationStatus from '@/components/TranslationStatus'
 import { useAuth } from '@/lib/auth'
+import { useLanguage } from '@/lib/language'
 import { supabase } from '@/lib/supabase'
 import { useTranslationService } from '@/lib/translationService'
 import toast from 'react-hot-toast'
@@ -197,6 +198,7 @@ function formatQuantity(num: number): string {
 
 function RecipePageContent({ params }: RecipePageProps) {
   const { user } = useAuth()
+  const { t } = useLanguage()
   const { translateContent } = useTranslationService()
   const [recipe, setRecipe] = useState<Recipe | null>(null)
   const [loading, setLoading] = useState(true)
@@ -573,12 +575,12 @@ function RecipePageContent({ params }: RecipePageProps) {
               <h3 className="text-lg font-semibold mb-4">Recipe Details</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Cooked With!</span>
+                  <span className="text-gray-600">{t('content.cookedWith')}</span>
                   <div className="flex items-center space-x-2">
                     <span className="font-medium">{recipe.author}</span>
                     {recipe.author_id && (
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        Registered Chef
+                        {t('content.registeredChef')}
                       </span>
                     )}
                   </div>
