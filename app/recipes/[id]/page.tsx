@@ -18,7 +18,7 @@ import {
 import AuthGuard from '@/components/AuthGuard'
 import StarRating, { DualRatingDisplay } from '@/components/StarRating'
 import VersionNavigator from '@/components/VersionNavigator'
-import TranslationStatus from '@/components/TranslationStatus'
+// import TranslationStatus from '@/components/TranslationStatus'
 import { useAuth } from '@/lib/auth'
 import { useLanguage } from '@/lib/language'
 import { supabase } from '@/lib/supabase'
@@ -559,13 +559,13 @@ function RecipePageContent({ params }: RecipePageProps) {
           </div>
         )}
 
-        {/* Translation Status */}
-        <TranslationStatus
+        {/* Translation Status - Hidden for cleaner UI */}
+        {/* <TranslationStatus
           contentType="recipe"
           contentId={recipe.id}
           originalLanguage="en"
           translatedLanguage="en"
-        />
+        /> */}
 
         <div className="grid md:grid-cols-3 gap-8">
           {/* Left Column - Ingredients & Info */}

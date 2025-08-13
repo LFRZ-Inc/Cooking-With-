@@ -13,7 +13,7 @@ import {
   PrinterIcon
 } from 'lucide-react'
 import AuthGuard from '@/components/AuthGuard'
-import TranslationStatus from '@/components/TranslationStatus'
+// import TranslationStatus from '@/components/TranslationStatus'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/lib/language'
 import { useTranslationService } from '@/lib/translationService'
@@ -704,13 +704,13 @@ function NewsletterPageContent({ params }: NewsletterPageProps) {
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
-        {/* Translation Status */}
-        <TranslationStatus
+        {/* Translation Status - Hidden for cleaner UI */}
+        {/* <TranslationStatus
           contentType="newsletter"
           contentId={newsletter.id.toString()}
           originalLanguage="en"
           translatedLanguage={currentLanguage !== 'en' ? currentLanguage : undefined}
-        />
+        /> */}
 
         <div className="grid lg:grid-cols-4 gap-8">
           {/* Article Content */}
