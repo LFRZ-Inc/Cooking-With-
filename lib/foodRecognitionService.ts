@@ -195,12 +195,12 @@ export class FoodRecognitionService {
     const dish_name = dishNameMatch ? dishNameMatch[1].trim() : 'Generated Recipe'
 
     // Extract ingredients (look for ingredients section)
-    const ingredientsMatch = recipeText.match(/ingredients?:(.*?)(?=instructions?|directions?|steps?|$)/i)
+    const ingredientsMatch = recipeText.match(/ingredients?:(.*?)(?=instructions?|directions?|steps?|$)/is)
     const ingredientsText = ingredientsMatch ? ingredientsMatch[1] : ''
     const ingredients = this.parseIngredients(ingredientsText)
 
     // Extract instructions (look for instructions section)
-    const instructionsMatch = recipeText.match(/instructions?|directions?|steps?:(.*?)(?=tips?|variations?|servings?|$)/i)
+    const instructionsMatch = recipeText.match(/instructions?|directions?|steps?:(.*?)(?=tips?|variations?|servings?|$)/is)
     const instructionsText = instructionsMatch ? instructionsMatch[1] : ''
     const cooking_methods = this.parseInstructions(instructionsText)
 
@@ -222,7 +222,7 @@ export class FoodRecognitionService {
     const cuisine_type = cuisineMatch ? cuisineMatch[1].trim() : undefined
 
     // Extract tips
-    const tipsMatch = recipeText.match(/tips?:(.*?)(?=variations?|servings?|$)/i)
+    const tipsMatch = recipeText.match(/tips?:(.*?)(?=variations?|servings?|$)/is)
     const tips = tipsMatch ? tipsMatch[1].split('\n').filter(tip => tip.trim()).map(tip => tip.trim()) : []
 
     // Visual analysis from original analysis
