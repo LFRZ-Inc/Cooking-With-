@@ -13,6 +13,7 @@ import {
   Scale
 } from 'lucide-react'
 import AuthGuard from '@/components/AuthGuard'
+import Pagination from '@/components/Pagination'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/lib/language'
 import { useTranslationService } from '@/lib/translationService'
@@ -53,6 +54,8 @@ function RecipesPageContent() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [selectedDifficulty, setSelectedDifficulty] = useState('All')
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 12
   const { t } = useLanguage()
   const { translateContent } = useTranslationService()
 
@@ -129,6 +132,17 @@ function RecipesPageContent() {
     
     return matchesSearch && matchesCategory && matchesDifficulty
   })
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredRecipes.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentRecipes = filteredRecipes.slice(startIndex, endIndex)
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, selectedCategory, selectedDifficulty])
 
   const categories = ['All', ...Array.from(new Set(recipes.map(r => r.category).filter(Boolean)))]
   const difficulties = ['All', 'Easy', 'Medium', 'Hard']
@@ -249,10 +263,11 @@ function RecipesPageContent() {
             <p className="text-gray-500">Try adjusting your search or filters, or <Link href="/create/recipe" className="text-orange-600 hover:text-orange-700">create the first recipe</Link>!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredRecipes.map((recipe) => {
-              console.log('🔍 Rendering recipe:', recipe.id, recipe.title)
-              return (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {currentRecipes.map((recipe) => {
+                console.log('🔍 Rendering recipe:', recipe.id, recipe.title)
+                return (
               <div key={recipe.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
                 {/* Recipe Image */}
                 <div className="relative h-48 bg-gray-200">
@@ -342,7 +357,21 @@ function RecipesPageContent() {
               </div>
             )
           })}
-          </div>
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                  itemsPerPage={itemsPerPage}
+                  totalItems={filteredRecipes.length}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

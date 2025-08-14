@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { SearchIcon, ClockIcon, UserIcon, TagIcon, StarIcon, CalendarIcon, NewspaperIcon } from 'lucide-react'
 import AuthGuard from '@/components/AuthGuard'
+import Pagination from '@/components/Pagination'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/lib/language'
 import ClientOnly from '@/lib/ClientOnly'
@@ -233,6 +234,8 @@ export default function NewslettersPage() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 12
 
   // Fetch newsletters from Supabase and mix with demo newsletters
   const fetchNewsletters = async () => {
@@ -290,6 +293,17 @@ export default function NewslettersPage() {
     
     return matchesSearch && matchesFeatured
   })
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredNewsletters.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentNewsletters = filteredNewsletters.slice(startIndex, endIndex)
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, showFeaturedOnly])
 
   return (
     <AuthGuard>
@@ -387,11 +401,26 @@ export default function NewslettersPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredNewsletters.map((newsletter) => (
-                      <NewsletterCard key={newsletter.id} newsletter={newsletter} />
-                    ))}
-                  </div>
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {currentNewsletters.map((newsletter) => (
+                        <NewsletterCard key={newsletter.id} newsletter={newsletter} />
+                      ))}
+                    </div>
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                      <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
+                        <Pagination
+                          currentPage={currentPage}
+                          totalPages={totalPages}
+                          onPageChange={setCurrentPage}
+                          itemsPerPage={itemsPerPage}
+                          totalItems={filteredNewsletters.length}
+                        />
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}
