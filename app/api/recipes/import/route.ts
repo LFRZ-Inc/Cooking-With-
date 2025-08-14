@@ -10,7 +10,8 @@ export async function POST(request: NextRequest) {
       source_data,
       user_id,
       auto_translate = false,
-      target_language = 'en'
+      target_language = 'en',
+      use_ethos_ai = true // Enable Ethos AI by default
     } = await request.json()
 
     if (!source_data || !user_id) {
@@ -37,20 +38,21 @@ export async function POST(request: NextRequest) {
             success: true
           }
         } else {
-          // It's just text, parse it
-          parsedRecipe = parseRecipe(source_data)
+          // It's just text, parse it with Ethos AI if available
+          parsedRecipe = await parseRecipe(source_data, use_ethos_ai)
         }
       } catch {
         // Not JSON, treat as raw text
-        parsedRecipe = parseRecipe(source_data)
+        parsedRecipe = await parseRecipe(source_data, use_ethos_ai)
       }
     } else if (import_type === 'webpage') {
       // For webpage imports, we'd need to fetch and parse the HTML
       // For now, treat as text
-      parsedRecipe = parseRecipe(source_data)
+      parsedRecipe = await parseRecipe(source_data, use_ethos_ai)
     } else if (import_type === 'image') {
       // For image imports, the OCR text should already be in source_data
-      parsedRecipe = parseRecipe(source_data)
+      // Use Ethos AI for better parsing of garbled OCR text
+      parsedRecipe = await parseRecipe(source_data, use_ethos_ai)
     } else {
       return NextResponse.json(
         { error: 'Invalid import_type. Must be "text", "webpage", or "image"' },
@@ -133,9 +135,9 @@ export async function POST(request: NextRequest) {
     const ingredientsData = recipe.ingredients.map((ingredient, index) => ({
       recipe_id: createdRecipe.id,
       name: ingredient,
-      amount: null,
-      unit: null,
-      notes: null,
+      amount: '',
+      unit: '',
+      notes: '',
       order_index: index
     }))
 
@@ -145,150 +147,61 @@ export async function POST(request: NextRequest) {
 
     if (ingredientsError) {
       console.error('Error creating ingredients:', ingredientsError)
-      // Don't fail the whole creation for ingredient errors
-    }
-
-    // Create import record
-    const importData = {
-      recipe_id: createdRecipe.id,
-      user_id: user_id,
-      source_url: recipe.source_url,
-      source_domain: recipe.source_url ? new URL(recipe.source_url).hostname : null,
-      import_method: import_type,
-      original_content: source_data,
-      import_metadata: {
-        confidence_score: recipe.confidence_score,
-        parsing_notes: recipe.parsing_notes,
-        warnings: parsedRecipe.warnings,
-        errors: parsedRecipe.errors
-      },
-      import_status: 'completed',
-      confidence_score: recipe.confidence_score,
-      field_mapping: {
-        title: recipe.title,
-        ingredients_count: recipe.ingredients.length,
-        instructions_count: recipe.instructions.length,
-        has_times: !!(recipe.prep_time_minutes || recipe.cook_time_minutes),
-        has_servings: !!recipe.servings
-      }
-    }
-
-    const { error: importError } = await supabase
-      .from('recipe_imports')
-      .insert([importData])
-
-    if (importError) {
-      console.error('Error creating import record:', importError)
-      // Don't fail the whole creation for import record errors
+      // Don't fail the whole request if ingredients fail
     }
 
     // Handle translation if requested
     if (auto_translate && target_language !== 'en') {
       try {
-        const translationService = TranslationService.getInstance()
+        const translationService = new TranslationService()
         
-        // Queue translation jobs for the recipe
-        const fieldsToTranslate = ['title', 'description']
-        if (recipe.description) {
-          fieldsToTranslate.push('description')
+        // Create translation job
+        const { data: translationJob, error: translationError } = await supabase
+          .from('translation_jobs')
+          .insert({
+            recipe_id: createdRecipe.id,
+            source_language: 'en',
+            target_language: target_language,
+            status: 'pending',
+            created_by: user_id
+          })
+          .select()
+          .single()
+
+        if (translationError) {
+          console.error('Error creating translation job:', translationError)
+        } else {
+          // Start translation in background
+          translationService.translateRecipe(createdRecipe.id, target_language).catch(error => {
+            console.error('Translation failed:', error)
+          })
         }
-
-        for (const field of fieldsToTranslate) {
-          const textToTranslate = recipe[field as keyof typeof recipe]
-          if (textToTranslate && typeof textToTranslate === 'string') {
-            const translatedText = await translationService.translateText(
-              textToTranslate,
-              target_language,
-              'en'
-            )
-
-            if (translatedText) {
-              // Store translation in database
-              await supabase
-                .from('translations')
-                .insert({
-                  content_type: 'recipe',
-                  content_id: createdRecipe.id,
-                  field_name: field,
-                  original_text: textToTranslate,
-                  translated_text: translatedText,
-                  source_language: 'en',
-                  target_language: target_language,
-                  translation_status: 'completed',
-                  translation_provider: 'libretranslate',
-                  confidence_score: 0.9
-                })
-            }
-          }
-        }
-
-        // Queue ingredient and instruction translations
-        const ingredientTranslations = await Promise.all(
-          recipe.ingredients.map(async (ingredient, index) => {
-            const translated = await translationService.translateText(ingredient, target_language, 'en')
-            return {
-              recipe_id: createdRecipe.id,
-              name: translated || ingredient,
-              amount: null,
-              unit: null,
-              notes: null,
-              order_index: index
-            }
-          })
-        )
-
-        const instructionTranslations = await Promise.all(
-          recipe.instructions.map(async (instruction, index) => {
-            const translated = await translationService.translateText(instruction, target_language, 'en')
-            return translated || instruction
-          })
-        )
-
-        // Update recipe with translations
-        await supabase
-          .from('recipes')
-          .update({
-            title: await translationService.translateText(recipe.title, target_language, 'en') || recipe.title,
-            instructions: instructionTranslations
-          })
-          .eq('id', createdRecipe.id)
-
-        // Update ingredients with translations
-        await supabase
-          .from('recipe_ingredients')
-          .delete()
-          .eq('recipe_id', createdRecipe.id)
-
-        await supabase
-          .from('recipe_ingredients')
-          .insert(ingredientTranslations)
-
-      } catch (translationError) {
-        console.error('Translation error:', translationError)
-        // Don't fail the import for translation errors
+      } catch (error) {
+        console.error('Translation setup failed:', error)
+        // Don't fail the import if translation fails
       }
     }
 
-    // Return the created recipe with additional metadata
-    const result = {
+    // Return success response
+    return NextResponse.json({
+      success: true,
       recipe: {
-        ...createdRecipe,
-        ingredients: recipe.ingredients,
-        confidence_score: recipe.confidence_score,
+        id: createdRecipe.id,
+        title: createdRecipe.title,
+        description: createdRecipe.description,
+        ingredients: ingredientsData,
+        instructions: createdRecipe.instructions,
+        prep_time_minutes: createdRecipe.prep_time_minutes,
+        cook_time_minutes: createdRecipe.cook_time_minutes,
+        servings: createdRecipe.servings,
+        difficulty: createdRecipe.difficulty,
+        status: createdRecipe.status,
+        created_at: createdRecipe.created_at,
         parsing_notes: recipe.parsing_notes,
-        warnings: parsedRecipe.warnings,
-        errors: parsedRecipe.errors
+        provider: recipe.provider
       },
-      import_metadata: {
-        method: import_type,
-        confidence: recipe.confidence_score,
-        ingredients_count: recipe.ingredients.length,
-        instructions_count: recipe.instructions.length,
-        translation_applied: auto_translate && target_language !== 'en'
-      }
-    }
-
-    return NextResponse.json(result)
+      message: 'Recipe imported successfully'
+    })
 
   } catch (error) {
     console.error('Recipe import error:', error)

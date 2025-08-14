@@ -203,29 +203,99 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
       ).then(({ data: { text } }) => {
         setProcessingState(prev => ({
           ...prev,
+          progress: 90,
+          currentStep: 'Cleaning extracted text...'
+        }))
+        
+        // Enhanced text cleaning for better recipe parsing
+        const cleanedText = text
+          .replace(/\n+/g, '\n') // Remove multiple newlines
+          .replace(/[^\w\s\n\-.,;:()\/°]/g, '') // Remove special characters except basic punctuation
+          .replace(/\s+/g, ' ') // Normalize whitespace
+          .replace(/\n\s*\n/g, '\n') // Remove empty lines
+          .trim()
+        
+        setProcessingState(prev => ({
+          ...prev,
           progress: 100,
           currentStep: 'Text extraction complete!'
         }))
-        
-        // Clean up the extracted text
-        const cleanedText = text
-          .replace(/\n+/g, '\n') // Remove multiple newlines
-          .replace(/[^\w\s\n\-.,;:()]/g, '') // Remove special characters except basic punctuation
-          .trim()
         
         resolve(cleanedText)
       }).catch((error) => {
         console.error('OCR Error:', error)
         setProcessingState(prev => ({
           ...prev,
-          error: 'Failed to extract text from image. Please try again with a clearer image.'
+          error: 'Failed to extract text from image. Please try again or use a clearer image.'
         }))
         reject(error)
       })
     })
   }
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const processRecipeText = async (text: string) => {
+    setProcessingState({
+      isProcessing: true,
+      progress: 0,
+      currentStep: 'Analyzing recipe text...',
+      error: null
+    })
+
+    try {
+      setProcessingState(prev => ({
+        ...prev,
+        progress: 30,
+        currentStep: 'Parsing recipe structure...'
+      }))
+
+      // Use the improved recipe parser with Ethos AI
+      const response = await fetch('/api/recipes/import', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          import_type: 'text',
+          source_data: text,
+          user_id: user?.id || 'anonymous',
+          use_ethos_ai: true, // Enable Ethos AI for better parsing
+          auto_translate: false
+        })
+      })
+
+      setProcessingState(prev => ({
+        ...prev,
+        progress: 70,
+        currentStep: 'Processing recipe data...'
+      }))
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to process recipe')
+      }
+
+      const result = await response.json()
+
+      setProcessingState(prev => ({
+        ...prev,
+        progress: 100,
+        currentStep: 'Recipe processed successfully!'
+      }))
+
+      // Set the parsed recipe data
+      setParsedRecipe(result.recipe)
+      setCurrentStep(2) // Move to review step
+
+    } catch (error) {
+      console.error('Recipe processing error:', error)
+      setProcessingState(prev => ({
+        ...prev,
+        error: error instanceof Error ? error.message : 'Failed to process recipe'
+      }))
+    }
+  }
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
 
@@ -240,37 +310,141 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
       toast.error('File size must be less than 10MB')
       return
     }
-
     setSelectedFile(file)
+    setPreviewUrl(URL.createObjectURL(file))
     
-    // Create preview URL
-    const url = URL.createObjectURL(file)
-    setPreviewUrl(url)
-
     try {
-      // Process image with OCR
-      const extractedText = await processImageWithOCR(file)
-      
-      if (extractedText.trim()) {
-        setSourceData(extractedText)
-        toast.success('Text extracted successfully from image!')
-      } else {
-        toast.error('No text could be extracted from the image. Please try a clearer image.')
-        setProcessingState(prev => ({
-          ...prev,
-          error: 'No text could be extracted from the image. Please try a clearer image.'
-        }))
-      }
-    } catch (error) {
-      console.error('File processing error:', error)
-      toast.error('Failed to process image. Please try again.')
-    } finally {
       setProcessingState({
-        isProcessing: false,
+        isProcessing: true,
         progress: 0,
-        currentStep: '',
+        currentStep: 'Processing image...',
         error: null
       })
+
+      // Extract text using OCR
+      const extractedText = await processImageWithOCR(file)
+      setSourceData(extractedText)
+
+      // Process the extracted text with improved parser
+      await processRecipeText(extractedText)
+
+    } catch (error) {
+      console.error('Image processing error:', error)
+      setProcessingState(prev => ({
+        ...prev,
+        error: 'Failed to process image. Please try again.'
+      }))
+    }
+  }
+
+  const handleTextInput = async (text: string) => {
+    setSourceData(text)
+    
+    if (text.trim().length > 10) {
+      await processRecipeText(text)
+    }
+  }
+
+  const handleFoodRecognition = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select a valid image file')
+      return
+    }
+
+    // Validate file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File size must be less than 10MB')
+      return
+    }
+    setSelectedFile(file)
+    setPreviewUrl(URL.createObjectURL(file))
+    
+    try {
+      setProcessingState({
+        isProcessing: true,
+        progress: 0,
+        currentStep: 'Analyzing food image...',
+        error: null
+      })
+
+      // Upload image to get URL
+      const formData = new FormData()
+      formData.append('file', file)
+      
+      const uploadResponse = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!uploadResponse.ok) {
+        throw new Error('Failed to upload image')
+      }
+
+      const uploadResult = await uploadResponse.json()
+      const imageUrl = uploadResult.url
+
+      setProcessingState(prev => ({
+        ...prev,
+        progress: 50,
+        currentStep: 'Generating recipe from image...'
+      }))
+
+      // Use Ethos AI for food recognition
+      const response = await fetch('/api/recipes/ethos-food-recognition', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          image_url: imageUrl,
+          user_id: user?.id || 'anonymous',
+          user_preferences: {},
+          auto_save: false
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to analyze food image')
+      }
+
+      const result = await response.json()
+
+      setProcessingState(prev => ({
+        ...prev,
+        progress: 100,
+        currentStep: 'Recipe generated successfully!'
+      }))
+
+      // Convert to our recipe format
+      const recipe = {
+        title: result.recipe.title,
+        description: result.recipe.description,
+        ingredients: result.recipe.ingredients.map((ing: any) => ing.name),
+        instructions: result.recipe.instructions,
+        prep_time_minutes: result.recipe.prep_time_minutes,
+        cook_time_minutes: result.recipe.cook_time_minutes,
+        servings: result.recipe.servings,
+        difficulty: result.recipe.difficulty,
+        image_url: imageUrl,
+        confidence_score: result.analysis.confidence,
+        parsing_notes: [`Generated using ${result.provider || 'AI'} food recognition`],
+        provider: result.provider || 'ai'
+      }
+
+      setParsedRecipe(recipe)
+      setCurrentStep(2) // Move to review step
+
+    } catch (error) {
+      console.error('Food recognition error:', error)
+      setProcessingState(prev => ({
+        ...prev,
+        error: error instanceof Error ? error.message : 'Failed to analyze food image'
+      }))
     }
   }
 
@@ -695,7 +869,7 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
                       ref={fileInputRef}
                       type="file"
                       accept="image/*"
-                      onChange={handleFileUpload}
+                      onChange={handleFoodRecognition}
                       className="hidden"
                     />
                     <button
@@ -777,7 +951,7 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
                       ref={fileInputRef}
                       type="file"
                       accept="image/*"
-                      onChange={handleFileUpload}
+                      onChange={handleImageUpload}
                       className="hidden"
                     />
                     <button
@@ -861,7 +1035,7 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
                 <textarea
                   placeholder="Paste your recipe text here..."
                   value={sourceData}
-                  onChange={(e) => setSourceData(e.target.value)}
+                  onChange={(e) => handleTextInput(e.target.value)}
                   rows={10}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 />
