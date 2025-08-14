@@ -1,4 +1,3 @@
-'use client'
 import React from 'react'
 import Link from 'next/link'
 import { FileQuestionIcon, HomeIcon, ArrowLeftIcon } from 'lucide-react'
@@ -19,11 +18,11 @@ export default function NotFound() {
 
         <div className="space-y-4">
           <Link
-            href="/newsletters"
-            className="w-full flex items-center justify-center space-x-2 bg-primary-600 text-white py-2 px-4 rounded-lg hover:bg-primary-700 transition-colors"
+            href="/recipes"
+            className="w-full flex items-center justify-center space-x-2 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <ArrowLeftIcon className="h-4 w-4" />
-            <span>Back to Articles</span>
+            <span>Back to Recipes</span>
           </Link>
           
           <Link

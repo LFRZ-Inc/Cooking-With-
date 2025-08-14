@@ -1,5 +1,5 @@
-import { supabase } from './supabase'
-import { parse } from 'node-html-parser'
+// Recipe Parser for Cooking With! Platform
+// Handles parsing of recipe text from various sources including OCR
 
 export interface ParsedRecipe {
   title: string
@@ -12,516 +12,477 @@ export interface ParsedRecipe {
   difficulty?: 'easy' | 'medium' | 'hard'
   cuisine_type?: string
   meal_type?: 'breakfast' | 'lunch' | 'dinner' | 'dessert' | 'snack'
-  tags?: string[]
   image_url?: string
   source_url?: string
   confidence_score: number
+  parsing_notes?: string[]
 }
 
-export interface ImportSource {
-  domain: string
-  site_name: string
-  recipe_pattern: string
-  extraction_rules: {
-    title: string
-    ingredients: string
-    instructions: string
-    description?: string
-    prep_time?: string
-    cook_time?: string
-    servings?: string
-    image?: string
-  }
+export interface ParsingResult {
+  recipe: ParsedRecipe
+  success: boolean
+  errors?: string[]
+  warnings?: string[]
 }
+
+// Common ingredient patterns
+const INGREDIENT_PATTERNS = [
+  /^[\d\/\s]+(cup|cups|tbsp|tsp|oz|pound|pounds|g|kg|ml|l|clove|cloves|slice|slices|can|cans|package|packages|bunch|bunches|head|heads|stalk|stalks|sprig|sprigs|dash|pinch|to taste)/i,
+  /^[\d\/\s]+(teaspoon|teaspoons|tablespoon|tablespoons|ounce|ounces|gram|grams|kilogram|kilograms|milliliter|milliliters|liter|liters)/i,
+  /^[\d\/\s]+(large|medium|small|extra large|xl|lg|med|sm)\s+(egg|eggs|onion|onions|tomato|tomatoes|potato|potatoes|carrot|carrots|bell pepper|bell peppers)/i,
+  /^[\d\/\s]+(fresh|dried|ground|whole|chopped|diced|minced|sliced|grated|shredded|crushed|softened|melted|room temperature)/i,
+  /^[\d\/\s]+(salt|pepper|sugar|flour|oil|butter|milk|water|broth|stock|sauce|vinegar|lemon juice|lime juice|garlic|onion|herbs|spices)/i
+]
+
+// Common instruction patterns
+const INSTRUCTION_PATTERNS = [
+  /^(preheat|heat|warm|bring|boil|simmer|fry|sauté|bake|roast|grill|broil|steam|poach|blanch|caramelize|reduce|thicken|whisk|beat|mix|stir|fold|knead|roll|cut|chop|dice|mince|slice|grate|shred|crush|mash|purée|blend|process|strain|drain|rinse|pat dry|season|marinate|rest|cool|chill|freeze|thaw|serve|garnish|decorate)/i,
+  /^(add|combine|mix|stir|whisk|beat|fold|knead|roll|cut|chop|dice|mince|slice|grate|shred|crush|mash|purée|blend|process|strain|drain|rinse|pat dry|season|marinate|rest|cool|chill|freeze|thaw|serve|garnish|decorate)/i,
+  /^(until|while|when|after|before|during|meanwhile|meanwhile|then|next|finally|lastly|first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth)/i
+]
+
+// Time patterns
+const TIME_PATTERNS = [
+  /(\d+)\s*(minute|minutes|min|mins)/i,
+  /(\d+)\s*(hour|hours|hr|hrs)/i,
+  /(\d+)\s*(second|seconds|sec|secs)/i,
+  /(\d+)\s*(day|days)/i
+]
+
+// Serving patterns
+const SERVING_PATTERNS = [
+  /(\d+)\s*(serving|servings|person|people|portion|portions)/i,
+  /serves\s*(\d+)/i,
+  /yield[s]?\s*(\d+)/i,
+  /makes\s*(\d+)/i
+]
+
+// Difficulty patterns
+const DIFFICULTY_PATTERNS = [
+  { pattern: /(easy|simple|quick|fast|beginner|basic)/i, value: 'easy' as const },
+  { pattern: /(medium|moderate|intermediate|average)/i, value: 'medium' as const },
+  { pattern: /(hard|difficult|complex|advanced|expert|challenging)/i, value: 'hard' as const }
+]
+
+// Meal type patterns
+const MEAL_TYPE_PATTERNS = [
+  { pattern: /(breakfast|morning|brunch)/i, value: 'breakfast' as const },
+  { pattern: /(lunch|midday|noon)/i, value: 'lunch' as const },
+  { pattern: /(dinner|evening|supper|main course)/i, value: 'dinner' as const },
+  { pattern: /(dessert|sweet|treat|cake|cookie|pie|ice cream)/i, value: 'dessert' as const },
+  { pattern: /(snack|appetizer|starter|hors d'oeuvre)/i, value: 'snack' as const }
+]
 
 export class RecipeParser {
-  private static instance: RecipeParser
-  private importSources: Map<string, ImportSource> = new Map()
+  private text: string
+  private lines: string[]
+  private parsingNotes: string[]
 
-  static getInstance(): RecipeParser {
-    if (!RecipeParser.instance) {
-      RecipeParser.instance = new RecipeParser()
-    }
-    return RecipeParser.instance
+  constructor(text: string) {
+    this.text = this.cleanText(text)
+    this.lines = this.text.split('\n').map(line => line.trim()).filter(line => line.length > 0)
+    this.parsingNotes = []
   }
 
-  // Load import sources from database
-  async loadImportSources(): Promise<void> {
-    try {
-      const { data, error } = await supabase
-        .from('import_sources')
-        .select('*')
-        .eq('is_active', true)
-
-      if (error) throw error
-
-      this.importSources.clear()
-      data?.forEach(source => {
-        this.importSources.set(source.domain, {
-          domain: source.domain,
-          site_name: source.site_name,
-          recipe_pattern: source.recipe_pattern,
-          extraction_rules: source.extraction_rules
-        })
-      })
-    } catch (error) {
-      console.error('Error loading import sources:', error)
-    }
+  private cleanText(text: string): string {
+    return text
+      .replace(/\r\n/g, '\n') // Normalize line endings
+      .replace(/\n{3,}/g, '\n\n') // Remove excessive newlines
+      .replace(/[^\w\s\n\-.,;:()\/°]/g, '') // Remove special characters but keep basic punctuation
+      .trim()
   }
 
-  // Parse recipe from webpage URL
-  async parseFromWebpage(url: string): Promise<ParsedRecipe | null> {
-    try {
-      const domain = this.extractDomain(url)
-      const source = this.importSources.get(domain)
-
-      if (!source) {
-        return await this.parseGenericWebpage(url)
-      }
-
-      return await this.parseWithTemplate(url, source)
-    } catch (error) {
-      console.error('Error parsing webpage:', error)
-      return null
-    }
-  }
-
-  // Parse recipe from image (OCR)
-  async parseFromImage(imageData: string): Promise<ParsedRecipe | null> {
-    try {
-      // This would integrate with OCR service like Google Vision API
-      // For now, we'll return a mock implementation
-      return await this.parseImageWithOCR(imageData)
-    } catch (error) {
-      console.error('Error parsing image:', error)
-      return null
-    }
-  }
-
-  // Parse recipe from text
-  async parseFromText(text: string): Promise<ParsedRecipe | null> {
-    try {
-      return await this.parseTextContent(text)
-    } catch (error) {
-      console.error('Error parsing text:', error)
-      return null
-    }
-  }
-
-  // Extract domain from URL
-  private extractDomain(url: string): string {
-    try {
-      const urlObj = new URL(url)
-      return urlObj.hostname.replace('www.', '')
-    } catch {
-      return ''
-    }
-  }
-
-  // Parse webpage with specific template
-  private async parseWithTemplate(url: string, source: ImportSource): Promise<ParsedRecipe | null> {
-    try {
-      const html = await this.fetchWebpageContent(url)
-      if (!html) {
-        console.error('Failed to fetch webpage content')
-        return null
-      }
+  private extractTitle(): string {
+    // Look for the first line that could be a title
+    for (let i = 0; i < Math.min(5, this.lines.length); i++) {
+      const line = this.lines[i]
       
-      const root = parse(html)
-      const selectText = (selector?: string) => {
-        if (!selector) return undefined
-        const element = root.querySelector(selector)
-        return element?.text?.replace(/\s+/g, ' ').trim() || undefined
-      }
-      const selectImage = (selector?: string) => {
-        if (!selector) return undefined
-        const element = root.querySelector(selector)
-        return element?.getAttribute('src') || element?.querySelector('img')?.getAttribute('src') || undefined
-      }
-      const selectList = (selector: string) => {
-        const items: string[] = []
-        root.querySelectorAll(selector).forEach(el => {
-          const txt = el.text?.replace(/\s+/g, ' ').trim()
-          if (txt) items.push(txt)
-        })
-        return items
-      }
-
-      const title = selectText(source.extraction_rules.title) || this.extractGenericTitle(html)
-      const description = selectText(source.extraction_rules.description)
-      const ingredients = source.extraction_rules.ingredients ? selectList(source.extraction_rules.ingredients) : this.extractGenericIngredients(html)
-      const instructions = source.extraction_rules.instructions ? selectList(source.extraction_rules.instructions) : this.extractGenericInstructions(html)
-      const image_url = selectImage(source.extraction_rules.image)
-      const prep_time_minutes = this.extractPrepTime(html, source.extraction_rules.prep_time)
-      const cook_time_minutes = this.extractCookTime(html, source.extraction_rules.cook_time)
-      const servings = this.extractServings(html, source.extraction_rules.servings)
-
-      return {
-        title,
-        description,
-        ingredients,
-        instructions,
-        prep_time_minutes,
-        cook_time_minutes,
-        servings,
-        image_url,
-        source_url: url,
-        confidence_score: 0.85
-      }
-    } catch (error) {
-      console.error('Error parsing with template:', error)
-      return null
-    }
-  }
-
-  // Parse generic webpage (fallback)
-  private async parseGenericWebpage(url: string): Promise<ParsedRecipe | null> {
-    try {
-      const mockContent = await this.fetchWebpageContent(url)
-      // Fallback generic extraction via node-html-parser when no template exists
-      try {
-        const root = parse(mockContent)
-        const title = root.querySelector('h1')?.text.trim() || this.extractGenericTitle(mockContent)
-        const ingredients = root.querySelectorAll('li').map(el => el.text.trim()).filter(Boolean)
-        const instructionCandidates = root.querySelectorAll('ol li, .instructions li, .method li').map(el => el.text.trim()).filter(Boolean)
-        const instructions = instructionCandidates.length ? instructionCandidates : ingredients.slice(-6)
-
-        return {
-          title,
-          ingredients,
-          instructions,
-          source_url: url,
-          confidence_score: 0.65
-        }
-      } catch {}
-
-      return {
-        title: this.extractGenericTitle(mockContent),
-        ingredients: this.extractGenericIngredients(mockContent),
-        instructions: this.extractGenericInstructions(mockContent),
-        source_url: url,
-        confidence_score: 0.65
-      }
-    } catch (error) {
-      console.error('Error parsing generic webpage:', error)
-      return null
-    }
-  }
-
-  // Parse image with OCR
-  private async parseImageWithOCR(imageData: string): Promise<ParsedRecipe | null> {
-    try {
-      // Mock OCR implementation
-      const mockOCRText = await this.performOCR(imageData)
-      return await this.parseFromText(mockOCRText)
-    } catch (error) {
-      console.error('Error parsing image with OCR:', error)
-      return null
-    }
-  }
-
-  // Parse text content
-  private async parseTextContent(text: string): Promise<ParsedRecipe | null> {
-    try {
-      const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0)
+      // Skip common non-title patterns
+      if (this.isCommonNonTitle(line)) continue
       
-      const recipe: ParsedRecipe = {
-        title: '',
-        ingredients: [],
-        instructions: [],
-        confidence_score: 0.7
+      // Check if line looks like a title
+      if (this.looksLikeTitle(line)) {
+        this.parsingNotes.push(`Title extracted from line ${i + 1}: "${line}"`)
+        return line
       }
-
-      let currentSection = 'title'
-      let ingredientSection = false
-      let instructionSection = false
-
-      for (const line of lines) {
-        const lowerLine = line.toLowerCase()
-
-        // Detect sections
-        if (lowerLine.includes('ingredients') || lowerLine.includes('ingredient')) {
-          ingredientSection = true
-          instructionSection = false
-          continue
-        }
-
-        if (lowerLine.includes('instructions') || lowerLine.includes('directions') || lowerLine.includes('method')) {
-          ingredientSection = false
-          instructionSection = true
-          continue
-        }
-
-        // Extract title (first non-empty line)
-        if (!recipe.title && line.length > 0 && !ingredientSection && !instructionSection) {
-          recipe.title = line
-          continue
-        }
-
-        // Extract ingredients
-        if (ingredientSection && line.length > 0) {
-          // Skip section headers
-          if (lowerLine.includes('ingredients') || lowerLine.includes('ingredient')) {
-            continue
-          }
-          
-          // Check if line looks like an ingredient
-          if (this.isIngredientLine(line)) {
-            recipe.ingredients.push(line)
-          }
-        }
-
-        // Extract instructions
-        if (instructionSection && line.length > 0) {
-          // Skip section headers
-          if (lowerLine.includes('instructions') || lowerLine.includes('directions') || lowerLine.includes('method')) {
-            continue
-          }
-          
-          // Check if line looks like an instruction
-          if (this.isInstructionLine(line)) {
-            recipe.instructions.push(line)
-          }
-        }
-      }
-
-      // Extract additional metadata
-      recipe.prep_time_minutes = this.extractTimeFromText(text, 'prep')
-      recipe.cook_time_minutes = this.extractTimeFromText(text, 'cook')
-      recipe.servings = this.extractServingsFromText(text)
-      recipe.difficulty = this.extractDifficultyFromText(text)
-      recipe.cuisine_type = this.extractCuisineFromText(text)
-      recipe.meal_type = this.extractMealTypeFromText(text)
-
-      return recipe
-    } catch (error) {
-      console.error('Error parsing text content:', error)
-      return null
     }
+
+    // Fallback: use first non-empty line
+    const firstLine = this.lines.find(line => line.length > 0 && !this.isCommonNonTitle(line))
+    if (firstLine) {
+      this.parsingNotes.push(`Using first available line as title: "${firstLine}"`)
+      return firstLine
+    }
+
+    this.parsingNotes.push('No suitable title found, using default')
+    return 'Untitled Recipe'
   }
 
-  // Helper methods for text extraction
-  private isIngredientLine(line: string): boolean {
-    const lowerLine = line.toLowerCase()
-    
-    // Common ingredient patterns
-    const ingredientPatterns = [
-      /\d+\s*(cup|tbsp|tsp|oz|lb|g|kg|ml|l)/i,
-      /\d+\/\d+/,
-      /\d+\s*(to taste|as needed)/i,
-      /^[a-z]+\s*(\([^)]+\))?$/i,
-      /salt|pepper|oil|butter|flour|sugar/i
+  private isCommonNonTitle(line: string): boolean {
+    const nonTitlePatterns = [
+      /^(ingredients|ingredient|directions|instructions|method|steps|preparation|serves|yield|makes|prep time|cook time|total time|difficulty|level|cuisine|type|category)/i,
+      /^\d+\./, // Numbered lists
+      /^[a-z]\./, // Lettered lists
+      /^[-*•]/, // Bullet points
+      /^\s*$/, // Empty lines
+      /^(preheat|heat|add|mix|stir|bake|cook|serve)/i // Common instruction starters
     ]
 
-    return ingredientPatterns.some(pattern => pattern.test(line))
+    return nonTitlePatterns.some(pattern => pattern.test(line))
   }
 
-  private isInstructionLine(line: string): boolean {
-    const lowerLine = line.toLowerCase()
+  private looksLikeTitle(line: string): boolean {
+    // Title characteristics
+    const hasReasonableLength = line.length >= 3 && line.length <= 100
+    const hasCapitalization = /[A-Z]/.test(line)
+    const notAllCaps = !/^[A-Z\s]+$/.test(line)
+    const notNumbered = !/^\d+\./.test(line)
+    const notBulletPoint = !/^[-*•]/.test(line)
     
-    // Skip lines that are likely ingredients
-    if (this.isIngredientLine(line)) {
-      return false
-    }
-
-    // Common instruction patterns
-    const instructionPatterns = [
-      /^step\s*\d+/i,
-      /^\d+\./,
-      /^[a-z]+\s+the/i,
-      /preheat|mix|combine|add|stir|heat|bake|cook/i
-    ]
-
-    return instructionPatterns.some(pattern => pattern.test(line)) || line.length > 20
+    return hasReasonableLength && hasCapitalization && notAllCaps && notNumbered && notBulletPoint
   }
 
-  private extractTimeFromText(text: string, timeType: 'prep' | 'cook'): number | undefined {
-    const regex = new RegExp(`(${timeType}|preparation|cooking)\\s*time[\\s:]*([\\d.]+)\\s*(min|minutes|hour|hours)`, 'i')
-    const match = text.match(regex)
-    
-    if (match) {
-      const time = parseFloat(match[2])
-      const unit = match[3].toLowerCase()
-      
-      if (unit.includes('hour')) {
-        return Math.round(time * 60)
-      }
-      return Math.round(time)
-    }
-    
-    return undefined
-  }
-
-  private extractServingsFromText(text: string): number | undefined {
-    const regex = /serves?\s*(\d+)|(\d+)\s*servings?/i
-    const match = text.match(regex)
-    
-    if (match) {
-      return parseInt(match[1] || match[2])
-    }
-    
-    return undefined
-  }
-
-  private extractDifficultyFromText(text: string): 'easy' | 'medium' | 'hard' | undefined {
-    const lowerText = text.toLowerCase()
-    
-    if (lowerText.includes('easy') || lowerText.includes('beginner')) {
-      return 'easy'
-    }
-    if (lowerText.includes('hard') || lowerText.includes('advanced') || lowerText.includes('expert')) {
-      return 'hard'
-    }
-    if (lowerText.includes('medium') || lowerText.includes('intermediate')) {
-      return 'medium'
-    }
-    
-    return undefined
-  }
-
-  private extractCuisineFromText(text: string): string | undefined {
-    const cuisines = [
-      'italian', 'mexican', 'chinese', 'japanese', 'indian', 'french', 'thai',
-      'mediterranean', 'american', 'greek', 'spanish', 'korean', 'vietnamese'
-    ]
-    
-    const lowerText = text.toLowerCase()
-    for (const cuisine of cuisines) {
-      if (lowerText.includes(cuisine)) {
-        return cuisine
-      }
-    }
-    
-    return undefined
-  }
-
-  private extractMealTypeFromText(text: string): 'breakfast' | 'lunch' | 'dinner' | 'dessert' | 'snack' | undefined {
-    const lowerText = text.toLowerCase()
-    
-    if (lowerText.includes('breakfast') || lowerText.includes('pancake') || lowerText.includes('waffle')) {
-      return 'breakfast'
-    }
-    if (lowerText.includes('lunch') || lowerText.includes('sandwich') || lowerText.includes('salad')) {
-      return 'lunch'
-    }
-    if (lowerText.includes('dinner') || lowerText.includes('main course') || lowerText.includes('entree')) {
-      return 'dinner'
-    }
-    if (lowerText.includes('dessert') || lowerText.includes('cake') || lowerText.includes('cookie')) {
-      return 'dessert'
-    }
-    if (lowerText.includes('snack') || lowerText.includes('appetizer')) {
-      return 'snack'
-    }
-    
-    return undefined
-  }
-
-  private async fetchWebpageContent(url: string): Promise<string> {
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; CookingWithBot/1.0; +https://example.com/bot)',
-        'Accept': 'text/html,application/xhtml+xml',
-      },
-    })
-    if (!res.ok) {
-      throw new Error(`Failed to fetch page: ${res.status}`)
-    }
-    return await res.text()
-  }
-
-  private async performOCR(imageData: string): Promise<string> {
-    // Use Tesseract.js in Node to OCR base64 image data
-    const { createWorker } = await import('tesseract.js')
-    const worker = await createWorker('eng')
-    try {
-      const { data } = await worker.recognize(imageData)
-      await worker.terminate()
-      return data.text || ''
-    } catch (e) {
-      try { await worker.terminate() } catch {}
-      console.error('OCR error:', e)
-      return ''
-    }
-  }
-
-  // Extract methods for specific fields
-  private extractTitle(content: string, selector: string): string {
-    // Mock implementation - in real app would use DOM parsing
-    const titleMatch = content.match(/<h1[^>]*>([^<]+)<\/h1>/i)
-    return titleMatch ? titleMatch[1].trim() : 'Untitled Recipe'
-  }
-
-  private extractDescription(content: string, selector?: string): string | undefined {
-    const descMatch = content.match(/<p[^>]*>([^<]+)<\/p>/i)
-    return descMatch ? descMatch[1].trim() : undefined
-  }
-
-  private extractIngredients(content: string, selector: string): string[] {
+  private extractIngredients(): string[] {
     const ingredients: string[] = []
-    const ingredientMatches = content.match(/<li[^>]*>([^<]+)<\/li>/g)
-    
-    if (ingredientMatches) {
-      ingredientMatches.forEach(match => {
-        const ingredient = match.replace(/<[^>]*>/g, '').trim()
-        if (ingredient && !ingredient.toLowerCase().includes('ingredients')) {
-          ingredients.push(ingredient)
-        }
-      })
+    let inIngredientsSection = false
+    let ingredientsStartIndex = -1
+
+    // Find ingredients section
+    for (let i = 0; i < this.lines.length; i++) {
+      const line = this.lines[i].toLowerCase()
+      
+      if (line.includes('ingredient') && !line.includes('instruction')) {
+        inIngredientsSection = true
+        ingredientsStartIndex = i
+        break
+      }
     }
-    
+
+    // If no ingredients section found, look for common ingredient patterns
+    if (ingredientsStartIndex === -1) {
+      for (let i = 0; i < this.lines.length; i++) {
+        const line = this.lines[i]
+        if (this.looksLikeIngredient(line)) {
+          ingredientsStartIndex = i
+          break
+        }
+      }
+    }
+
+    // Extract ingredients
+    if (ingredientsStartIndex !== -1) {
+      for (let i = ingredientsStartIndex + 1; i < this.lines.length; i++) {
+        const line = this.lines[i]
+        
+        // Stop if we hit instructions section
+        if (this.looksLikeInstructionsSection(line)) {
+          break
+        }
+        
+        // Skip empty lines and section headers
+        if (line.length === 0 || this.isSectionHeader(line)) {
+          continue
+        }
+        
+        // Check if line looks like an ingredient
+        if (this.looksLikeIngredient(line)) {
+          const cleanedIngredient = this.cleanIngredient(line)
+          if (cleanedIngredient) {
+            ingredients.push(cleanedIngredient)
+          }
+        }
+      }
+    }
+
+    this.parsingNotes.push(`Extracted ${ingredients.length} ingredients`)
     return ingredients
   }
 
-  private extractInstructions(content: string, selector: string): string[] {
+  private looksLikeIngredient(line: string): boolean {
+    // Check for common ingredient patterns
+    return INGREDIENT_PATTERNS.some(pattern => pattern.test(line)) ||
+           // Check for lines that start with quantities
+           /^[\d\/\s]+/.test(line) ||
+           // Check for common ingredient words
+           /(salt|pepper|sugar|flour|oil|butter|milk|water|egg|onion|garlic|tomato|cheese|meat|chicken|beef|pork|fish|vegetable|herb|spice)/i.test(line)
+  }
+
+  private cleanIngredient(ingredient: string): string {
+    return ingredient
+      .replace(/^[-*•\d\s\.]+/, '') // Remove bullets, numbers, and leading whitespace
+      .replace(/\s+/, ' ') // Normalize whitespace
+      .trim()
+  }
+
+  private looksLikeInstructionsSection(line: string): boolean {
+    const instructionHeaders = [
+      'instructions', 'directions', 'method', 'steps', 'preparation', 'how to', 'procedure'
+    ]
+    return instructionHeaders.some(header => line.toLowerCase().includes(header))
+  }
+
+  private isSectionHeader(line: string): boolean {
+    const sectionHeaders = [
+      'ingredients', 'directions', 'instructions', 'method', 'steps', 'preparation',
+      'serves', 'yield', 'makes', 'prep time', 'cook time', 'total time', 'difficulty'
+    ]
+    return sectionHeaders.some(header => line.toLowerCase().includes(header))
+  }
+
+  private extractInstructions(): string[] {
     const instructions: string[] = []
-    const instructionMatches = content.match(/<li[^>]*>([^<]+)<\/li>/g)
-    
-    if (instructionMatches) {
-      instructionMatches.forEach(match => {
-        const instruction = match.replace(/<[^>]*>/g, '').trim()
-        if (instruction && !instruction.toLowerCase().includes('instructions')) {
-          instructions.push(instruction)
-        }
-      })
+    let inInstructionsSection = false
+    let instructionsStartIndex = -1
+
+    // Find instructions section
+    for (let i = 0; i < this.lines.length; i++) {
+      const line = this.lines[i].toLowerCase()
+      
+      if (this.looksLikeInstructionsSection(line)) {
+        inInstructionsSection = true
+        instructionsStartIndex = i
+        break
+      }
     }
-    
+
+    // If no instructions section found, look for numbered steps
+    if (instructionsStartIndex === -1) {
+      for (let i = 0; i < this.lines.length; i++) {
+        const line = this.lines[i]
+        if (/^\d+\./.test(line) || this.looksLikeInstruction(line)) {
+          instructionsStartIndex = i
+          break
+        }
+      }
+    }
+
+    // Extract instructions
+    if (instructionsStartIndex !== -1) {
+      let currentInstruction = ''
+      
+      for (let i = instructionsStartIndex + 1; i < this.lines.length; i++) {
+        const line = this.lines[i]
+        
+        // Skip empty lines and section headers
+        if (line.length === 0 || this.isSectionHeader(line)) {
+          continue
+        }
+        
+        // Check if this is a new instruction (numbered or starts with action verb)
+        if (/^\d+\./.test(line) || this.looksLikeNewInstruction(line)) {
+          // Save previous instruction if it exists
+          if (currentInstruction.trim()) {
+            instructions.push(currentInstruction.trim())
+          }
+          currentInstruction = this.cleanInstruction(line)
+        } else {
+          // Continue current instruction
+          currentInstruction += ' ' + line
+        }
+      }
+      
+      // Add the last instruction
+      if (currentInstruction.trim()) {
+        instructions.push(currentInstruction.trim())
+      }
+    }
+
+    this.parsingNotes.push(`Extracted ${instructions.length} instructions`)
     return instructions
   }
 
-  private extractPrepTime(content: string, selector?: string): number | undefined {
-    const timeMatch = content.match(/prep time[:\s]*(\d+)/i)
-    return timeMatch ? parseInt(timeMatch[1]) : undefined
+  private looksLikeInstruction(line: string): boolean {
+    return INSTRUCTION_PATTERNS.some(pattern => pattern.test(line))
   }
 
-  private extractCookTime(content: string, selector?: string): number | undefined {
-    const timeMatch = content.match(/cook time[:\s]*(\d+)/i)
-    return timeMatch ? parseInt(timeMatch[1]) : undefined
+  private looksLikeNewInstruction(line: string): boolean {
+    // Check if line starts with common instruction verbs
+    return /^(preheat|heat|add|combine|mix|stir|whisk|beat|fold|knead|roll|cut|chop|dice|mince|slice|grate|shred|crush|mash|purée|blend|process|strain|drain|rinse|pat dry|season|marinate|rest|cool|chill|freeze|thaw|serve|garnish|decorate)/i.test(line)
   }
 
-  private extractServings(content: string, selector?: string): number | undefined {
-    const servingsMatch = content.match(/serves[:\s]*(\d+)/i)
-    return servingsMatch ? parseInt(servingsMatch[1]) : undefined
+  private cleanInstruction(instruction: string): string {
+    return instruction
+      .replace(/^\d+\.\s*/, '') // Remove numbering
+      .replace(/^[-*•\s]+/, '') // Remove bullets and leading whitespace
+      .replace(/\s+/, ' ') // Normalize whitespace
+      .trim()
   }
 
-  private extractImage(content: string, selector?: string): string | undefined {
-    const imageMatch = content.match(/<img[^>]*src="([^"]+)"/i)
-    return imageMatch ? imageMatch[1] : undefined
+  private extractTime(text: string, type: 'prep' | 'cook'): number {
+    const timePatterns = [
+      new RegExp(`${type}\\s*time[\\s:]*(${TIME_PATTERNS.map(p => p.source).join('|')})`, 'i'),
+      new RegExp(`(${TIME_PATTERNS.map(p => p.source).join('|')})`, 'i')
+    ]
+
+    for (const pattern of timePatterns) {
+      const match = text.match(pattern)
+      if (match) {
+        const timeStr = match[1] || match[0]
+        const timeMatch = timeStr.match(/(\d+)\s*(minute|minutes|min|mins|hour|hours|hr|hrs|second|seconds|sec|secs|day|days)/i)
+        
+        if (timeMatch) {
+          const value = parseInt(timeMatch[1])
+          const unit = timeMatch[2].toLowerCase()
+          
+          // Convert to minutes
+          if (unit.includes('hour') || unit.includes('hr')) {
+            return value * 60
+          } else if (unit.includes('day')) {
+            return value * 24 * 60
+          } else if (unit.includes('second') || unit.includes('sec')) {
+            return Math.ceil(value / 60)
+          } else {
+            return value // Already in minutes
+          }
+        }
+      }
+    }
+
+    return 0
   }
 
-  private extractGenericTitle(content: string): string {
-    return this.extractTitle(content, 'h1')
+  private extractServings(): number {
+    for (const pattern of SERVING_PATTERNS) {
+      const match = this.text.match(pattern)
+      if (match) {
+        const servings = parseInt(match[1])
+        if (servings > 0 && servings <= 50) { // Reasonable range
+          this.parsingNotes.push(`Found servings: ${servings}`)
+          return servings
+        }
+      }
+    }
+    return 4 // Default
   }
 
-  private extractGenericIngredients(content: string): string[] {
-    return this.extractIngredients(content, 'li')
+  private extractDifficulty(): 'easy' | 'medium' | 'hard' {
+    for (const { pattern, value } of DIFFICULTY_PATTERNS) {
+      if (pattern.test(this.text)) {
+        this.parsingNotes.push(`Detected difficulty: ${value}`)
+        return value
+      }
+    }
+    return 'medium' // Default
   }
 
-  private extractGenericInstructions(content: string): string[] {
-    return this.extractInstructions(content, 'li')
+  private extractMealType(): 'breakfast' | 'lunch' | 'dinner' | 'dessert' | 'snack' {
+    for (const { pattern, value } of MEAL_TYPE_PATTERNS) {
+      if (pattern.test(this.text)) {
+        this.parsingNotes.push(`Detected meal type: ${value}`)
+        return value
+      }
+    }
+    return 'dinner' // Default
+  }
+
+  private calculateConfidence(): number {
+    let confidence = 0.5 // Base confidence
+
+    // Title confidence
+    if (this.extractTitle() !== 'Untitled Recipe') {
+      confidence += 0.1
+    }
+
+    // Ingredients confidence
+    const ingredients = this.extractIngredients()
+    if (ingredients.length >= 3) {
+      confidence += 0.2
+    } else if (ingredients.length >= 1) {
+      confidence += 0.1
+    }
+
+    // Instructions confidence
+    const instructions = this.extractInstructions()
+    if (instructions.length >= 3) {
+      confidence += 0.2
+    } else if (instructions.length >= 1) {
+      confidence += 0.1
+    }
+
+    // Time information confidence
+    const prepTime = this.extractTime(this.text, 'prep')
+    const cookTime = this.extractTime(this.text, 'cook')
+    if (prepTime > 0 || cookTime > 0) {
+      confidence += 0.1
+    }
+
+    // Serving information confidence
+    if (this.extractServings() !== 4) {
+      confidence += 0.05
+    }
+
+    return Math.min(confidence, 1.0)
+  }
+
+  public parse(): ParsingResult {
+    try {
+      const title = this.extractTitle()
+      const ingredients = this.extractIngredients()
+      const instructions = this.extractInstructions()
+      const prepTime = this.extractTime(this.text, 'prep')
+      const cookTime = this.extractTime(this.text, 'cook')
+      const servings = this.extractServings()
+      const difficulty = this.extractDifficulty()
+      const mealType = this.extractMealType()
+      const confidence = this.calculateConfidence()
+
+      const recipe: ParsedRecipe = {
+        title,
+        ingredients,
+        instructions,
+        prep_time_minutes: prepTime,
+        cook_time_minutes: cookTime,
+        servings,
+        difficulty,
+        meal_type: mealType,
+        confidence_score: confidence,
+        parsing_notes: this.parsingNotes
+      }
+
+      const warnings: string[] = []
+      const errors: string[] = []
+
+      // Generate warnings
+      if (ingredients.length === 0) {
+        warnings.push('No ingredients were detected')
+      }
+      if (instructions.length === 0) {
+        warnings.push('No instructions were detected')
+      }
+      if (confidence < 0.6) {
+        warnings.push('Low confidence parsing - please review the extracted content')
+      }
+
+      // Generate errors
+      if (title === 'Untitled Recipe') {
+        errors.push('Could not extract recipe title')
+      }
+
+      return {
+        recipe,
+        success: errors.length === 0,
+        errors: errors.length > 0 ? errors : undefined,
+        warnings: warnings.length > 0 ? warnings : undefined
+      }
+    } catch (error) {
+      console.error('Recipe parsing error:', error)
+      return {
+        recipe: {
+          title: 'Error Parsing Recipe',
+          ingredients: [],
+          instructions: [],
+          confidence_score: 0,
+          parsing_notes: ['Parsing failed due to an error']
+        },
+        success: false,
+        errors: ['Failed to parse recipe: ' + (error instanceof Error ? error.message : 'Unknown error')]
+      }
+    }
   }
 }
 
-// Export singleton instance
-export const recipeParser = RecipeParser.getInstance() 
+// Export a simple function for easy use
+export function parseRecipe(text: string): ParsingResult {
+  const parser = new RecipeParser(text)
+  return parser.parse()
+} 
