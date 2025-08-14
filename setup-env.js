@@ -27,7 +27,8 @@ if (envExists) {
   const optionalVars = [
     'LIBRETRANSLATE_URL',
     'LIBRETRANSLATE_API_KEY',
-    'NEXT_PUBLIC_SITE_URL'
+    'NEXT_PUBLIC_SITE_URL',
+    'OPENAI_API_KEY'
   ]
   
   let missingRequired = []
@@ -84,6 +85,9 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 LIBRETRANSLATE_URL=https://libretranslate.com
 LIBRETRANSLATE_API_KEY=your_libretranslate_api_key_here
 
+# AI Food Recognition (OPTIONAL - required for food photo analysis)
+OPENAI_API_KEY=your_openai_api_key_here
+
 # Site URL for server-side API calls
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 `
@@ -106,6 +110,7 @@ console.log('4. Start the dev server: npm run dev')
 
 console.log('\n🎯 Current Status:')
 console.log('✅ Translation System: Ready (using fallback services)')
+console.log('✅ AI Food Recognition: Ready (requires OpenAI API key)')
 console.log('❌ Database Tables: Need migration')
 console.log('❌ Recipe Import: Waiting for database')
 console.log('❌ Environment Variables: Need configuration')

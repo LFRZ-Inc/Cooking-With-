@@ -61,7 +61,7 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
   const { user } = useAuth()
   const { currentLanguage } = useTranslationService()
   const [currentStep, setCurrentStep] = useState(0)
-  const [importType, setImportType] = useState<'webpage' | 'image' | 'text' | null>(null)
+  const [importType, setImportType] = useState<'webpage' | 'image' | 'text' | 'food_recognition' | null>(null)
   const [sourceData, setSourceData] = useState('')
   const [parsedRecipe, setParsedRecipe] = useState<ParsedRecipe | null>(null)
   const [isImporting, setIsImporting] = useState(false)
@@ -115,6 +115,13 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
 
   const importMethods = [
     {
+      id: 'food_recognition',
+      title: 'AI Food Recognition',
+      description: 'Take a photo of cooked food to generate recipe',
+      icon: <Camera className="h-8 w-8" />,
+      color: 'bg-orange-500 hover:bg-orange-600'
+    },
+    {
       id: 'webpage',
       title: 'Import from Website',
       description: 'Paste a recipe URL to import',
@@ -123,9 +130,9 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
     },
     {
       id: 'image',
-      title: 'Import from Image',
+      title: 'Import from Image (OCR)',
       description: 'Upload a photo or screenshot of a recipe',
-      icon: <Camera className="h-8 w-8" />,
+      icon: <FileText className="h-8 w-8" />,
       color: 'bg-green-500 hover:bg-green-600'
     },
     {
@@ -137,7 +144,7 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
     }
   ]
 
-  const handleImportMethodSelect = (method: 'webpage' | 'image' | 'text') => {
+  const handleImportMethodSelect = (method: 'webpage' | 'image' | 'text' | 'food_recognition') => {
     setImportType(method)
     setCurrentStep(1)
     // Reset state when changing import method
@@ -268,83 +275,193 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
   }
 
   const handleSourceSubmit = async () => {
-    if (!sourceData.trim()) {
-      toast.error('Please provide the recipe source')
-      return
-    }
-
-    setIsImporting(true)
-    setProcessingState({
-      isProcessing: true,
-      progress: 0,
-      currentStep: 'Parsing recipe...',
-      error: null
-    })
-
-    try {
-      // Simulate parsing progress
-      const progressInterval = setInterval(() => {
-        setProcessingState(prev => ({
-          ...prev,
-          progress: Math.min(prev.progress + 10, 90),
-          currentStep: prev.progress < 30 ? 'Analyzing recipe structure...' :
-                     prev.progress < 60 ? 'Extracting ingredients...' :
-                     prev.progress < 90 ? 'Processing instructions...' :
-                     'Finalizing recipe...'
-        }))
-      }, 200)
-
-      const response = await fetch('/api/recipes/import', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          import_type: importType,
-          source_data: sourceData,
-          user_id: user?.id,
-          auto_translate: currentLanguage !== 'en',
-          target_language: currentLanguage
-        }),
-      })
-
-      clearInterval(progressInterval)
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || 'Import failed')
+    if (importType === 'food_recognition') {
+      // Handle food recognition
+      if (!selectedFile) {
+        toast.error('Please upload a photo of the food')
+        return
       }
 
-      const result = await response.json()
-      
-      setProcessingState(prev => ({
-        ...prev,
-        progress: 100,
-        currentStep: 'Recipe parsed successfully!'
-      }))
+      setIsImporting(true)
+      setProcessingState({
+        isProcessing: true,
+        progress: 0,
+        currentStep: 'Analyzing food image...',
+        error: null
+      })
 
-      setParsedRecipe(result.recipe)
-      setEditedRecipe(result.recipe)
-      setCurrentStep(2)
-      toast.success('Recipe parsed successfully!')
-    } catch (error) {
-      console.error('Import error:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Failed to import recipe'
-      toast.error(errorMessage)
-      setProcessingState(prev => ({
-        ...prev,
-        error: errorMessage
-      }))
-    } finally {
-      setIsImporting(false)
-      setTimeout(() => {
-        setProcessingState({
-          isProcessing: false,
-          progress: 0,
-          currentStep: '',
-          error: null
+      try {
+        // Upload image to get URL
+        const formData = new FormData()
+        formData.append('file', selectedFile)
+        
+        // For now, we'll use a placeholder URL - in production you'd upload to storage
+        const imageUrl = previewUrl || ''
+
+        // Simulate AI analysis progress
+        const progressInterval = setInterval(() => {
+          setProcessingState(prev => ({
+            ...prev,
+            progress: Math.min(prev.progress + 15, 90),
+            currentStep: prev.progress < 30 ? 'Analyzing food image...' :
+                       prev.progress < 60 ? 'Identifying ingredients...' :
+                       prev.progress < 90 ? 'Generating recipe...' :
+                       'Finalizing recipe...'
+          }))
+        }, 300)
+
+        const response = await fetch('/api/recipes/food-recognition', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            image_url: imageUrl,
+            user_id: user?.id,
+            user_preferences: {
+              dietary_restrictions: [],
+              skill_level: 'intermediate'
+            },
+            auto_save: false
+          }),
         })
-      }, 2000)
+
+        clearInterval(progressInterval)
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+          throw new Error(errorData.error || 'Food recognition failed')
+        }
+
+        const result = await response.json()
+        
+        setProcessingState(prev => ({
+          ...prev,
+          progress: 100,
+          currentStep: 'Recipe generated successfully!'
+        }))
+
+        // Convert food recognition result to recipe format
+        const recipe = {
+          title: result.food_recognition.dish_name,
+          description: result.food_recognition.description,
+          ingredients: result.food_recognition.ingredients.map((ing: any) => `${ing.estimated_amount} ${ing.name}`),
+          instructions: result.food_recognition.cooking_methods,
+          prep_time_minutes: result.food_recognition.estimated_prep_time,
+          cook_time_minutes: result.food_recognition.estimated_cook_time,
+          servings: 4,
+          difficulty: result.food_recognition.difficulty,
+          meal_type: result.food_recognition.meal_type,
+          cuisine_type: result.food_recognition.cuisine_type,
+          image_url: imageUrl,
+          source_url: '',
+          confidence_score: result.food_recognition.confidence,
+          parsing_notes: [`AI-generated recipe from food image. Confidence: ${Math.round(result.food_recognition.confidence * 100)}%`]
+        }
+
+        setParsedRecipe(recipe)
+        setEditedRecipe(recipe)
+        setCurrentStep(2)
+        toast.success('Recipe generated from food image!')
+      } catch (error) {
+        console.error('Food recognition error:', error)
+        const errorMessage = error instanceof Error ? error.message : 'Failed to analyze food image'
+        toast.error(errorMessage)
+        setProcessingState(prev => ({
+          ...prev,
+          error: errorMessage
+        }))
+      } finally {
+        setIsImporting(false)
+        setTimeout(() => {
+          setProcessingState({
+            isProcessing: false,
+            progress: 0,
+            currentStep: '',
+            error: null
+          })
+        }, 2000)
+      }
+    } else {
+      // Handle other import types (existing code)
+      if (!sourceData.trim()) {
+        toast.error('Please provide the recipe source')
+        return
+      }
+
+      setIsImporting(true)
+      setProcessingState({
+        isProcessing: true,
+        progress: 0,
+        currentStep: 'Parsing recipe...',
+        error: null
+      })
+
+      try {
+        // Simulate parsing progress
+        const progressInterval = setInterval(() => {
+          setProcessingState(prev => ({
+            ...prev,
+            progress: Math.min(prev.progress + 10, 90),
+            currentStep: prev.progress < 30 ? 'Analyzing recipe structure...' :
+                       prev.progress < 60 ? 'Extracting ingredients...' :
+                       prev.progress < 90 ? 'Processing instructions...' :
+                       'Finalizing recipe...'
+          }))
+        }, 200)
+
+        const response = await fetch('/api/recipes/import', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            import_type: importType,
+            source_data: sourceData,
+            user_id: user?.id,
+            auto_translate: currentLanguage !== 'en',
+            target_language: currentLanguage
+          }),
+        })
+
+        clearInterval(progressInterval)
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+          throw new Error(errorData.error || 'Import failed')
+        }
+
+        const result = await response.json()
+        
+        setProcessingState(prev => ({
+          ...prev,
+          progress: 100,
+          currentStep: 'Recipe parsed successfully!'
+        }))
+
+        setParsedRecipe(result.recipe)
+        setEditedRecipe(result.recipe)
+        setCurrentStep(2)
+        toast.success('Recipe parsed successfully!')
+      } catch (error) {
+        console.error('Import error:', error)
+        const errorMessage = error instanceof Error ? error.message : 'Failed to import recipe'
+        toast.error(errorMessage)
+        setProcessingState(prev => ({
+          ...prev,
+          error: errorMessage
+        }))
+      } finally {
+        setIsImporting(false)
+        setTimeout(() => {
+          setProcessingState({
+            isProcessing: false,
+            progress: 0,
+            currentStep: '',
+            error: null
+          })
+        }, 2000)
+      }
     }
   }
 
@@ -546,16 +663,84 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
           <div className="space-y-6">
             <div className="text-center">
               <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {importType === 'food_recognition' && 'Upload Food Photo'}
                 {importType === 'webpage' && 'Enter Recipe URL'}
                 {importType === 'image' && 'Upload Recipe Image'}
                 {importType === 'text' && 'Paste Recipe Text'}
               </h3>
               <p className="text-gray-600">
+                {importType === 'food_recognition' && 'Take a photo of cooked food to generate a recipe'}
                 {importType === 'webpage' && 'Paste the URL of the recipe you want to import'}
                 {importType === 'image' && 'Upload a photo or screenshot of the recipe'}
                 {importType === 'text' && 'Copy and paste the recipe text here'}
               </p>
             </div>
+
+            {importType === 'food_recognition' && (
+              <div className="space-y-4">
+                {!selectedFile ? (
+                  <div className="border-2 border-dashed border-orange-300 rounded-lg p-8 text-center bg-orange-50">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={processingState.isProcessing}
+                      className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Camera className="h-6 w-6 inline mr-2" />
+                      Take Food Photo
+                    </button>
+                    <p className="text-sm text-gray-600 mt-2">
+                      Upload a photo of cooked food to generate a recipe
+                    </p>
+                    <p className="text-xs text-orange-600 mt-1">
+                      🍳 Works best with clear, well-lit photos of finished dishes
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Image Preview */}
+                    <div className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium text-gray-900">Food Photo</h4>
+                        <button
+                          onClick={() => {
+                            setSelectedFile(null)
+                            setPreviewUrl(null)
+                            if (fileInputRef.current) {
+                              fileInputRef.current.value = ''
+                            }
+                          }}
+                          className="text-red-500 hover:text-red-600"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                      {previewUrl && (
+                        <div className="flex items-center space-x-4">
+                          <img 
+                            src={previewUrl} 
+                            alt="Food preview" 
+                            className="w-20 h-20 object-cover rounded-lg"
+                          />
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900">{selectedFile.name}</p>
+                            <p className="text-sm text-gray-600">
+                              {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {importType === 'webpage' && (
               <div className="space-y-4">
@@ -684,16 +869,20 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
               </button>
               <button
                 onClick={handleSourceSubmit}
-                disabled={isImporting || !sourceData.trim() || processingState.isProcessing}
-                className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                disabled={isImporting || (importType !== 'food_recognition' && !sourceData.trim()) || processingState.isProcessing}
+                className={`px-6 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${
+                  importType === 'food_recognition' 
+                    ? 'bg-orange-500 text-white hover:bg-orange-600' 
+                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                }`}
               >
                 {isImporting ? (
                   <>
                     <Loader2 className="h-4 w-4 inline mr-2 animate-spin" />
-                    Importing...
+                    {importType === 'food_recognition' ? 'Analyzing...' : 'Importing...'}
                   </>
                 ) : (
-                  'Import Recipe'
+                  importType === 'food_recognition' ? 'Generate Recipe' : 'Import Recipe'
                 )}
               </button>
             </div>

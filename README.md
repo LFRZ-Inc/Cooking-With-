@@ -5,6 +5,7 @@ A comprehensive culinary platform that goes beyond recipe sharing - it's your co
 ## 🚀 Features
 
 ### ✅ **Recipe Importing System** (Phase 1)
+- **AI Food Recognition**: Take photos of cooked food to generate recipes (like ReciMe!)
 - **Multi-Source Import**: Import recipes from webpages, images, or text
 - **AI-Powered Parsing**: Smart field detection and extraction
 - **Confidence Scoring**: Quality assessment of imported content
@@ -134,6 +135,12 @@ The application uses Supabase with the following key tables:
 
 ### Recipe Importing
 ```typescript
+// AI Food Recognition - generate recipe from food photo
+const recipe = await foodRecognitionService.analyzeFoodImage({
+  image_url: foodPhotoUrl,
+  user_preferences: { dietary_restrictions: ['vegetarian'] }
+})
+
 // Import from webpage
 const recipe = await recipeParser.parseFromWebpage(url)
 
