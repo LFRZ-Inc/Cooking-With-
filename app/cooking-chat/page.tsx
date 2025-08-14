@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import CookingChat from '@/components/CookingChat'
 import { ChefHatIcon, LightbulbIcon, BookOpenIcon, ShieldIcon } from 'lucide-react'
