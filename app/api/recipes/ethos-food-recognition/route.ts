@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       confidence: result.analysis.confidence
     }
 
-    let savedRecipeId = null
+    let savedRecipeId: string | null = null
 
     // Save to database if requested
     if (saveToDatabase) {
