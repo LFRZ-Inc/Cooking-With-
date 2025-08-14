@@ -9,7 +9,8 @@ import {
   MenuIcon,
   XIcon,
   SearchIcon,
-  LogOutIcon
+  LogOutIcon,
+  MessageCircleIcon
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import { useLanguage } from '@/lib/language'
@@ -56,6 +57,13 @@ export default function Navbar() {
               className="flex items-center space-x-1 text-gray-700 hover:text-primary-500 transition-colors"
             >
               <span>{t('navigation.create')}</span>
+            </Link>
+            <Link 
+              href="/cooking-chat" 
+              className="flex items-center space-x-1 text-gray-700 hover:text-primary-500 transition-colors"
+            >
+              <MessageCircleIcon className="h-5 w-5" />
+              <span>Cooking Chat</span>
             </Link>
             <Link 
               href="/admin" 
@@ -158,6 +166,13 @@ export default function Navbar() {
                 className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-md transition-colors"
               >
                 <span>{t('navigation.create')}</span>
+              </Link>
+              <Link 
+                href="/cooking-chat" 
+                className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-primary-500 hover:bg-gray-50 rounded-md transition-colors"
+              >
+                <MessageCircleIcon className="h-5 w-5" />
+                <span>Cooking Chat</span>
               </Link>
               <div className="px-3 py-2">
                 <input

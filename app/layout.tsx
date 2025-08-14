@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import FloatingCookingChat from '@/components/FloatingCookingChat'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from '@/lib/auth'
 import { LanguageProvider } from '@/lib/language'
@@ -31,6 +32,7 @@ export default function RootLayout({
                 {children}
               </main>
               <Footer />
+              <FloatingCookingChat />
               <Toaster 
                 position="top-right"
                 toastOptions={{

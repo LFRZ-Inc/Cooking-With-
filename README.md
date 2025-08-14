@@ -1,328 +1,250 @@
-# Cooking With! 🍳
+# 🍳 Cooking Ethos AI - Specialized Food AI
 
-A comprehensive culinary platform that goes beyond recipe sharing - it's your complete kitchen companion with advanced features inspired by ReciMe and more!
+A specialized version of Ethos AI focused exclusively on cooking, food, and culinary knowledge. This AI is designed to be your personal cooking assistant, providing expert advice on recipes, ingredients, techniques, and all things food-related.
 
-## 🚀 Features
+## 🎯 **Purpose**
 
-### ✅ **Recipe Importing System** (Phase 1)
-- **AI Food Recognition**: Take photos of cooked food to generate recipes (like ReciMe!)
-- **Multi-Source Import**: Import recipes from webpages, images, or text
-- **AI-Powered Parsing**: Smart field detection and extraction
-- **Confidence Scoring**: Quality assessment of imported content
-- **Review System**: Edit and refine imported recipes before saving
-- **Translation Integration**: Automatic translation of imported content
+This is a **cooking-specialized fork** of the original Ethos AI, designed specifically for:
+- **Food-related conversations only**
+- **Cooking advice and tips**
+- **Recipe analysis and suggestions**
+- **Ingredient knowledge and substitutions**
+- **Culinary technique guidance**
+- **Integration with Cooking With! platform**
 
-### ✅ **Advanced Recipe Organization** (Phase 2)
-- **Recipe Collections**: Create custom collections with privacy settings
-- **Enhanced Categories & Tags**: Hierarchical organization system
-- **Meal Types & Cuisines**: International cuisine classification
-- **Dietary Restrictions**: Allergen and diet tracking
-- **Advanced Search**: Multi-dimensional filtering capabilities
-- **AI Recommendations**: Smart recipe suggestions based on preferences
-- **Analytics Dashboard**: User insights and cooking statistics
+## 🏗️ **Architecture**
 
-### ✅ **Meal Planning & Shopping Lists** (Phase 3)
-- **Weekly/Monthly Planning**: Calendar-based meal planning
-- **Smart Shopping Lists**: Auto-generate from selected recipes
-- **Cost Tracking**: Budget management and expense tracking
-- **Category Organization**: Store-optimized shopping lists
-- **Priority System**: High/urgent priority items
-- **Check-off Lists**: Interactive shopping list management
+### **Core Components:**
+- **Cooking-Specific Models**: Fine-tuned for culinary knowledge
+- **Food Database**: Comprehensive ingredient and recipe knowledge
+- **Cooking Chat Interface**: Specialized conversation system
+- **Recipe Analysis Engine**: AI-powered recipe understanding
+- **Culinary Knowledge Base**: Cooking techniques, tips, and best practices
 
-### ✅ **Recipe Adjustments & Conversions** (Phase 4)
-- **Dynamic Scaling**: Scale ingredients and times proportionally
-- **Unit Conversions**: Convert between metric/imperial units
-- **Ingredient Substitutions**: Community-driven substitution database
-- **Equipment Adjustments**: Cooking time modifications based on equipment
-- **Scaling History**: Track all scaling operations
-- **Pro Tips**: Expert advice for best practices
+### **Integration:**
+- **Cooking With! Platform**: Seamless integration with main cooking app
+- **Chat Widget**: Embedded chat interface for food questions
+- **Recipe Enhancement**: AI-powered recipe improvement suggestions
+- **Food Recognition**: Enhanced food identification and analysis
 
-### 🌟 **Premium Features** (Beyond ReciMe)
-- **Translation System**: Multi-language support with automatic translation
-- **Community Features**: Recipe sharing and collaboration
-- **Mobile-First Design**: Responsive and accessible interface
-- **SEO Optimized**: Search engine friendly
-- **Real-time Updates**: Live collaboration and updates
+## 🚀 **Features**
 
-## 🛠️ Technology Stack
+### **🍽️ Cooking Expertise**
+- **Recipe Analysis**: Understand and improve any recipe
+- **Ingredient Knowledge**: Comprehensive ingredient database
+- **Technique Guidance**: Step-by-step cooking instructions
+- **Substitution Advice**: Smart ingredient substitutions
+- **Nutritional Information**: Detailed nutritional analysis
+- **Cuisine Knowledge**: Global culinary traditions and techniques
 
-- **Frontend**: Next.js 14, React 18, TypeScript
-- **Styling**: Tailwind CSS, Headless UI
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth
-- **Icons**: Lucide React
-- **Forms**: React Hook Form
-- **Notifications**: React Hot Toast
-- **Rich Text**: React Quill
+### **💬 Specialized Chat**
+- **Food-Only Conversations**: Focused on culinary topics
+- **Context-Aware Responses**: Understands cooking context
+- **Recipe Suggestions**: Personalized recipe recommendations
+- **Cooking Tips**: Expert advice and best practices
+- **Problem Solving**: Troubleshoot cooking issues
+- **Learning Mode**: Educational cooking guidance
 
-## 📦 Installation
+### **🔗 Platform Integration**
+- **Cooking With! Integration**: Seamless connection with main app
+- **Recipe Enhancement**: AI-powered recipe improvements
+- **Smart Recommendations**: Personalized cooking suggestions
+- **Food Recognition**: Enhanced image analysis
+- **User Preferences**: Personalized advice
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/cooking-with.git
-   cd cooking-with
-   ```
+## 📊 **Training Data**
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+### **Culinary Datasets:**
+- **Recipe Collections**: Millions of recipes from various cuisines
+- **Ingredient Database**: Comprehensive ingredient knowledge
+- **Cooking Techniques**: Traditional and modern cooking methods
+- **Nutritional Data**: Detailed nutritional information
+- **Culinary Literature**: Cookbooks, food blogs, and culinary guides
+- **User Interactions**: Cooking-related conversations and queries
 
-3. **Set up environment variables**
-   Create a `.env.local` file with:
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-   GOOGLE_TRANSLATE_API_KEY=your_google_translate_key
-   ```
+### **Specialized Knowledge:**
+- **Global Cuisines**: International cooking traditions
+- **Dietary Restrictions**: Vegan, vegetarian, gluten-free, etc.
+- **Cooking Equipment**: Knowledge of various cooking tools
+- **Food Safety**: Important food safety guidelines
+- **Seasonal Cooking**: Seasonal ingredients and techniques
+- **Wine Pairing**: Food and wine pairing knowledge
 
-4. **Run the development server**
-   ```bash
-   npm run dev
-   ```
+## 🛠️ **Technical Stack**
 
-5. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
+### **Backend:**
+- **Python 3.11+**: Core AI processing
+- **FastAPI**: High-performance API framework
+- **Ollama**: Local AI model management
+- **PostgreSQL**: Cooking knowledge database
+- **Redis**: Caching and session management
 
-## 🗄️ Database Setup
+### **Frontend:**
+- **React**: Modern web interface
+- **TypeScript**: Type-safe development
+- **Tailwind CSS**: Responsive design
+- **WebSocket**: Real-time chat communication
 
-The application uses Supabase with the following key tables:
+### **AI Models:**
+- **Cooking-Specialized LLM**: Fine-tuned for culinary knowledge
+- **Food Recognition Model**: Enhanced image analysis
+- **Recipe Understanding Model**: Deep recipe comprehension
+- **Conversation Model**: Natural cooking conversations
 
-### Core Tables
-- `users` - User accounts and profiles
-- `recipes` - Recipe content and metadata
-- `recipe_ingredients` - Recipe ingredients
-- `categories` - Recipe categories
-- `newsletters` - Newsletter content
+## 🔧 **Setup Instructions**
 
-### Import System Tables
-- `recipe_imports` - Import history and metadata
-- `import_sources` - Source tracking and analytics
-- `import_templates` - Import templates for different sources
-- `import_queue` - Background import processing
-- `import_analytics` - Import performance metrics
-
-### Organization Tables
-- `recipe_collections` - User-created recipe collections
-- `recipe_collection_items` - Items in collections
-- `recipe_categories` - Enhanced category system
-- `recipe_tags` - Tagging system
-- `recipe_meal_types` - Meal type classification
-- `recipe_cuisine_types` - Cuisine type classification
-- `recipe_dietary_restrictions` - Dietary restriction tracking
-
-### Meal Planning Tables
-- `meal_plans` - User meal plans
-- `meal_plan_items` - Items in meal plans
-- `shopping_lists` - Shopping lists
-- `shopping_list_items` - Items in shopping lists
-
-### Adjustment Tables
-- `measurement_units` - Unit definitions
-- `unit_conversions` - Conversion rules
-- `recipe_scaling_history` - Scaling history
-- `ingredient_substitutions` - Substitution database
-- `cooking_equipment` - Equipment definitions
-- `cooking_time_adjustments` - Time adjustment history
-
-### Translation Tables
-- `translations` - Translation cache
-- `translation_jobs` - Background translation processing
-- `user_language_preferences` - User language settings
-
-## 🚀 Key Features in Detail
-
-### Recipe Importing
-```typescript
-// AI Food Recognition - generate recipe from food photo
-// Option 1: OpenAI (requires API key)
-const recipe = await foodRecognitionService.analyzeFoodImage({
-  image_url: foodPhotoUrl,
-  user_preferences: { dietary_restrictions: ['vegetarian'] }
-})
-
-// Option 2: Ethos AI (local, cost-free)
-const recipe = await ethosFoodRecognitionService.analyzeFoodImage({
-  imageUrl: foodPhotoUrl,
-  userPreferences: { dietaryRestrictions: ['vegetarian'] }
-})
-
-// Import from webpage
-const recipe = await recipeParser.parseFromWebpage(url)
-
-// Import from image (OCR)
-const recipe = await recipeParser.parseFromImage(imageFile)
-
-// Import from text
-const recipe = await recipeParser.parseFromText(textContent)
-```
-
-### Recipe Organization
-```typescript
-// Create collection
-const collection = await recipeOrganizationService.createCollection({
-  name: "Family Favorites",
-  description: "Our go-to recipes",
-  is_public: false
-})
-
-// Add recipe to collection
-await recipeOrganizationService.addRecipeToCollection(collectionId, recipeId)
-```
-
-### Meal Planning
-```typescript
-// Create meal plan
-const mealPlan = await mealPlanningService.createMealPlan({
-  name: "Week 1",
-  start_date: "2024-01-01",
-  end_date: "2024-01-07"
-})
-
-// Generate shopping list from meal plan
-const shoppingList = await mealPlanningService.generateShoppingListFromMealPlan(mealPlanId)
-```
-
-### Recipe Adjustments
-```typescript
-// Scale recipe
-const scaledRecipe = await recipeAdjustmentService.scaleRecipe(recipeId, 8, userId)
-
-// Convert units
-const converted = await recipeAdjustmentService.convertUnit(2, "cups", "ml")
-
-// Get substitutions
-const substitutions = await recipeAdjustmentService.getSubstitutions("butter")
-```
-
-## 🤖 AI Food Recognition Options
-
-The platform supports two AI food recognition systems:
-
-### OpenAI Integration (Default)
-- **High Accuracy**: Uses GPT-4 Vision for precise food analysis
-- **Easy Setup**: Just add your OpenAI API key
-- **Cost**: Pay per API call (tokens used)
-
-### Ethos AI Integration (Cost-Free)
-- **Local Processing**: Runs on your own server
-- **Privacy-Focused**: No data sent to external APIs
-- **Cost-Free**: No API charges or rate limits
-- **Customizable**: Modify prompts and models as needed
-
-#### Setting up Ethos AI:
+### **1. Clone the Repository**
 ```bash
-# Run the setup script
-node "Ethos Food AI Version/setup-ethos-ai.js"
+git clone https://github.com/LFRZ-Inc/Cooking-Ethos-AI.git
+cd Cooking-Ethos-AI
+```
 
-# Or manually:
-git clone https://github.com/LFRZ-Inc/Ethos-AI.git
-cd Ethos-AI
+### **2. Install Dependencies**
+```bash
+# Backend
+cd backend
 pip install -r requirements.txt
-ollama pull llava:7b
-ollama pull llama3.2:3b
-python backend/main.py
+
+# Frontend
+cd ../frontend
+npm install
 ```
 
-For detailed setup instructions, see: `Ethos Food AI Version/README.md`
+### **3. Configure Environment**
+```bash
+# Copy environment template
+cp .env.example .env
 
-## 🎯 Competitive Advantages
-
-Your "Cooking With!" platform now offers **significantly more advanced features** than ReciMe:
-
-1. **Comprehensive Import System** - Beyond basic URL importing
-2. **Advanced Organization** - Collections, tags, categories, recommendations
-3. **Smart Meal Planning** - Auto-generated shopping lists, cost tracking
-4. **Dynamic Recipe Adjustments** - Scaling, conversions, substitutions
-5. **Translation System** - Multi-language support
-6. **Flexible AI Options** - Choose between OpenAI and cost-free Ethos AI
-6. **Analytics Dashboard** - User insights and statistics
-7. **Community Features** - Recipe sharing and collaboration
-
-## 📱 Pages & Routes
-
-### Core Pages
-- `/` - Homepage with featured recipes
-- `/recipes` - Recipe listing with search and filters
-- `/recipes/[id]` - Individual recipe view
-- `/create/recipe` - Recipe creation form
-
-### Import System
-- `/recipes/import` - Recipe import wizard
-- `/recipes/import/[id]` - Import review and editing
-
-### Organization
-- `/recipes/organize` - Recipe organization dashboard
-- `/collections/[id]` - Collection view
-
-### Meal Planning
-- `/meal-plans` - Meal planning interface
-- `/shopping-lists` - Shopping list management
-
-### Recipe Adjustments
-- `/recipes/adjust` - Recipe adjustment tools
-- `/converter` - Unit conversion calculator
-
-### Admin
-- `/admin` - Admin dashboard
-- `/admin/translations` - Translation management
-
-## 🔧 Development
-
-### Project Structure
-```
-├── app/                    # Next.js app directory
-│   ├── api/               # API routes
-│   ├── recipes/           # Recipe-related pages
-│   ├── admin/             # Admin pages
-│   └── globals.css        # Global styles
-├── components/            # React components
-├── lib/                   # Utility functions and services
-├── public/                # Static assets
-└── types/                 # TypeScript type definitions
+# Edit with your settings
+nano .env
 ```
 
-### Key Services
-- `recipeParser.ts` - Recipe parsing and import logic
-- `recipeOrganizationService.ts` - Organization and search
-- `mealPlanningService.ts` - Meal planning and shopping lists
-- `recipeAdjustmentService.ts` - Scaling and conversions
-- `translationService.ts` - Translation management
+### **4. Initialize Database**
+```bash
+# Run database migrations
+python backend/migrations/init_db.py
 
-## 🚀 Deployment
+# Load cooking knowledge base
+python backend/scripts/load_cooking_data.py
+```
 
-### Vercel (Recommended)
-1. Connect your GitHub repository to Vercel
-2. Set environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
+### **5. Start Services**
+```bash
+# Terminal 1: Backend
+cd backend
+python main.py
 
-### Other Platforms
-The app can be deployed to any platform that supports Next.js:
-- Netlify
-- Railway
-- DigitalOcean App Platform
-- AWS Amplify
+# Terminal 2: Frontend
+cd frontend
+npm run dev
+```
 
-## 🤝 Contributing
+## 🌐 **Access Points**
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- **Web Interface**: http://localhost:1420
+- **API Endpoints**: http://localhost:8000
+- **Cooking With! Integration**: Via API calls
+- **Chat Widget**: Embedded in Cooking With! platform
 
-## 📄 License
+## 🔗 **Integration with Cooking With!**
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### **API Endpoints:**
+- `POST /api/cooking/chat` - Cooking conversation
+- `POST /api/cooking/analyze-recipe` - Recipe analysis
+- `POST /api/cooking/suggestions` - Recipe suggestions
+- `POST /api/cooking/ingredients` - Ingredient information
+- `POST /api/cooking/techniques` - Cooking technique guidance
 
-## 🙏 Acknowledgments
+### **Chat Widget:**
+```typescript
+// Embed in Cooking With! platform
+<CookingEthosChat
+  onMessage={(message) => {
+    // Handle cooking conversation
+  }}
+  onRecipeSuggestion={(recipe) => {
+    // Handle recipe suggestions
+  }}
+/>
+```
 
-- Inspired by ReciMe's innovative features
-- Built with Next.js and Supabase
-- Icons from Lucide React
-- UI components from Headless UI
+## 🎨 **User Experience**
+
+### **Chat Interface:**
+- **Food-Focused**: Only cooking-related conversations
+- **Context-Aware**: Understands cooking context
+- **Helpful Responses**: Expert culinary advice
+- **Recipe Integration**: Direct recipe suggestions
+- **Learning Mode**: Educational cooking guidance
+
+### **Cooking With! Integration:**
+- **Seamless Experience**: Integrated into main platform
+- **Recipe Enhancement**: AI-powered improvements
+- **Smart Recommendations**: Personalized suggestions
+- **Food Recognition**: Enhanced image analysis
+- **User Preferences**: Personalized advice
+
+## 🔒 **Privacy & Security**
+
+- **Local Processing**: All AI processing happens locally
+- **No External APIs**: No dependency on paid services
+- **User Data Protection**: Complete data privacy
+- **Offline Capability**: Works without internet connection
+- **Secure Communication**: Encrypted API communication
+
+## 🚀 **Deployment**
+
+### **Local Development:**
+```bash
+# Development mode
+npm run dev
+python backend/main.py --dev
+```
+
+### **Production Deployment:**
+```bash
+# Build for production
+npm run build
+python backend/main.py --production
+```
+
+### **Docker Deployment:**
+```bash
+# Build and run with Docker
+docker-compose up --build
+```
+
+## 📈 **Future Enhancements**
+
+### **Planned Features:**
+- **Voice Integration**: Voice-based cooking conversations
+- **Video Analysis**: Cooking technique video analysis
+- **Recipe Generation**: AI-powered recipe creation
+- **Meal Planning**: Intelligent meal planning assistance
+- **Shopping Lists**: Smart shopping list generation
+- **Nutritional Tracking**: Advanced nutritional analysis
+
+### **Advanced Capabilities:**
+- **Multi-Modal Learning**: Text, image, and video understanding
+- **Personalized Cooking**: User-specific cooking preferences
+- **Cultural Cooking**: Deep cultural culinary knowledge
+- **Seasonal Intelligence**: Seasonal ingredient awareness
+- **Dietary Expertise**: Specialized dietary knowledge
+
+## 🤝 **Contributing**
+
+This is a specialized fork focused on cooking. Contributions should be:
+- **Cooking-focused**: Related to culinary knowledge
+- **Quality-focused**: High-quality cooking information
+- **User-focused**: Improving cooking experience
+- **Privacy-focused**: Maintaining local processing
+
+## 📄 **License**
+
+This project is licensed under the same terms as the original Ethos AI, with additional cooking-specific modifications.
 
 ---
 
-**Ready to revolutionize your cooking experience? Start exploring the advanced features of Cooking With! today!** 🎉 
+**🍳 Cooking Ethos AI - Your Personal Cooking Assistant**
+
+*Powered by local AI, focused on food, designed for cooking enthusiasts.* 

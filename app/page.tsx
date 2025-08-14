@@ -8,11 +8,14 @@ import {
   StarIcon,
   ClockIcon,
   UsersIcon,
-  HeartIcon
+  HeartIcon,
+  MessageCircleIcon,
+  SparklesIcon
 } from 'lucide-react'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import ClientOnly from '@/lib/ClientOnly'
 import { useLanguage } from '@/lib/language'
+import CookingChat from '@/components/CookingChat'
 
 // Mock data for demo
 const featuredRecipes = [
@@ -306,6 +309,88 @@ function HomeContent() {
                 </div>
               </article>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Cooking Chat Section */}
+      <section className="py-20 bg-gradient-to-br from-orange-50 to-yellow-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center space-x-3 mb-4">
+              <MessageCircleIcon className="h-8 w-8 text-primary-500" />
+              <h2 className="text-3xl font-serif font-bold text-gray-900">
+                AI Cooking Assistant
+              </h2>
+              <SparklesIcon className="h-6 w-6 text-yellow-500" />
+            </div>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Get instant cooking advice, recipe help, ingredient substitutions, and food safety tips from our AI-powered cooking assistant.
+            </p>
+          </div>
+          
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Chat Component */}
+            <div className="lg:col-span-2">
+              <div className="h-[500px]">
+                <CookingChat />
+              </div>
+            </div>
+            
+            {/* Features */}
+            <div className="space-y-6">
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">What I Can Help With</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
+                    <span className="text-sm text-gray-700">Cooking techniques & methods</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
+                    <span className="text-sm text-gray-700">Ingredient substitutions</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
+                    <span className="text-sm text-gray-700">Food safety & temperatures</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
+                    <span className="text-sm text-gray-700">Recipe troubleshooting</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
+                    <span className="text-sm text-gray-700">Meal planning tips</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Start</h3>
+                <div className="space-y-2">
+                  {[
+                    "How do I cook chicken breast?",
+                    "What can I substitute for eggs?",
+                    "What's the safe temperature for fish?",
+                    "How do I make perfect pasta?"
+                  ].map((question, index) => (
+                    <button
+                      key={index}
+                      className="w-full text-left p-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+                    >
+                      {question}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <Link 
+                href="/cooking-chat" 
+                className="block w-full text-center bg-primary-500 text-white py-3 px-6 rounded-lg hover:bg-primary-600 transition-colors font-medium"
+              >
+                Open Full Chat
+              </Link>
+            </div>
           </div>
         </div>
       </section>

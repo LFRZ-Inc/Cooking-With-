@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍳 Cooking Ethos AI - Your Personal Cooking Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .chat-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin: 0 10px;
+        }
+
+        .message.assistant .message-avatar {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .message.user .message-avatar {
+            background: #4ecdc4;
+            color: white;
+        }
+
+        .message-content {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            max-width: 70%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            line-height: 1.5;
+        }
+
+        .message.user .message-content {
+            background: #4ecdc4;
+            color: white;
+        }
+
+        .suggestions {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        .suggestions h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .suggestion-chip {
+            background: #f0f0f0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .suggestion-chip:hover {
+            background: #ff6b6b;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .chat-input {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #eee;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .chat-input input:focus {
+            border-color: #ff6b6b;
+        }
+
+        .chat-input button {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            background: #ee5a24;
+            transform: translateY(-2px);
+        }
+
+        .chat-input button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 15px;
+            background: white;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .typing-indicator.show {
+            display: block;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 5px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                width: 95%;
+                height: 90vh;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .suggestion-chips {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🍳 Cooking Ethos AI</h1>
+            <p>Your personal cooking assistant - Ask me anything about food, recipes, and cooking!</p>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <!-- Initial assistant message -->
+            <div class="message assistant">
+                <div class="message-avatar">🍳</div>
+                <div class="message-content">
+                    Hello! I'm Cooking Ethos AI, your specialized cooking assistant. I can help you with:
+                    <br><br>
+                    • Recipe creation and modifications<br>
+                    • Ingredient substitutions and alternatives<br>
+                    • Cooking techniques and methods<br>
+                    • Food safety and best practices<br>
+                    • Nutritional information<br>
+                    • Meal planning and preparation<br><br>
+                    What would you like to cook today?
+                </div>
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-dots">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+        
+        <div class="suggestions">
+            <h3>Quick suggestions:</h3>
+            <div class="suggestion-chips">
+                <div class="suggestion-chip" onclick="sendMessage('How do I cook chicken breast?')">How do I cook chicken breast?</div>
+                <div class="suggestion-chip" onclick="sendMessage('What can I substitute for butter?')">What can I substitute for butter?</div>
+                <div class="suggestion-chip" onclick="sendMessage('How do I make pasta?')">How do I make pasta?</div>
+                <div class="suggestion-chip" onclick="sendMessage('What is the safe temperature for cooking meat?')">Safe cooking temperatures</div>
+            </div>
+        </div>
+        
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Ask me about cooking, recipes, ingredients..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()" id="sendButton">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8000';
+        let isProcessing = false;
+
+        function addMessage(content, isUser = false) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = isUser ? '👤' : '🍳';
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.innerHTML = content;
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(messageContent);
+            messagesContainer.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').classList.add('show');
+        }
+
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').classList.remove('show');
+        }
+
+        async function sendMessage(message = null) {
+            if (isProcessing) return;
+            
+            const input = document.getElementById('messageInput');
+            const button = document.getElementById('sendButton');
+            const userMessage = message || input.value.trim();
+            
+            if (!userMessage) return;
+            
+            isProcessing = true;
+            button.disabled = true;
+            
+            // Add user message
+            addMessage(userMessage, true);
+            
+            // Clear input
+            if (!message) {
+                input.value = '';
+            }
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/cooking/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: userMessage,
+                        context: {},
+                        user_preferences: {}
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    hideTypingIndicator();
+                    addMessage(data.response);
+                    
+                    // Add suggestions if available
+                    if (data.suggestions && data.suggestions.length > 0) {
+                        const suggestionsHtml = data.suggestions.map(suggestion => 
+                            `<div class="suggestion-chip" onclick="sendMessage('${suggestion}')">${suggestion}</div>`
+                        ).join('');
+                        
+                        const suggestionsDiv = document.createElement('div');
+                        suggestionsDiv.className = 'message assistant';
+                        suggestionsDiv.innerHTML = `
+                            <div class="message-avatar">💡</div>
+                            <div class="message-content">
+                                <strong>You might also want to ask:</strong><br>
+                                <div class="suggestion-chips" style="margin-top: 10px;">
+                                    ${suggestionsHtml}
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('chatMessages').appendChild(suggestionsDiv);
+                    }
+                } else {
+                    throw new Error('Failed to get response');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                hideTypingIndicator();
+                addMessage('Sorry, I encountered an error. Please try again or check if the backend server is running.');
+            } finally {
+                isProcessing = false;
+                button.disabled = false;
+                input.focus();
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Focus on input when page loads
+        window.onload = function() {
+            document.getElementById('messageInput').focus();
+        };
+    </script>
+</body>
+</html>
