@@ -8,8 +8,16 @@ export default function LanguageSelector() {
   const [isOpen, setIsOpen] = useState(false)
 
   const languages = [
-    { code: 'en' as const, name: t('language.english'), flag: '🇺🇸' },
-    { code: 'es' as const, name: t('language.spanish'), flag: '🇪🇸' }
+    { code: 'en' as const, name: 'English', flag: '🇺🇸' },
+    { code: 'es' as const, name: 'Español', flag: '🇪🇸' },
+    { code: 'fr' as const, name: 'Français', flag: '🇫🇷' },
+    { code: 'de' as const, name: 'Deutsch', flag: '🇩🇪' },
+    { code: 'it' as const, name: 'Italiano', flag: '🇮🇹' },
+    { code: 'pt' as const, name: 'Português', flag: '🇵🇹' },
+    { code: 'ja' as const, name: '日本語', flag: '🇯🇵' },
+    { code: 'ko' as const, name: '한국어', flag: '🇰🇷' },
+    { code: 'zh' as const, name: '中文', flag: '🇨🇳' },
+    { code: 'ar' as const, name: 'العربية', flag: '🇸🇦' }
   ]
 
   const currentLanguage = languages.find(lang => lang.code === language)
@@ -36,7 +44,7 @@ export default function LanguageSelector() {
           />
           
           {/* Dropdown */}
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-20">
+          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-20 max-h-64 overflow-y-auto">
             <div className="py-1">
               {languages.map((lang) => (
                 <button

@@ -452,5 +452,18 @@
     "signInWithFacebook": "Entrar com Facebook",
     "dontHaveAccount": "Não tem uma conta?",
     "signUpForFree": "Cadastre-se gratuitamente"
+  },
+  "language": {
+    "english": "English",
+    "spanish": "Español",
+    "french": "Français",
+    "german": "Deutsch",
+    "italian": "Italiano",
+    "portuguese": "Português",
+    "japanese": "日本語",
+    "korean": "한국어",
+    "chinese": "中文",
+    "arabic": "العربية",
+    "selectLanguage": "Selecionar Idioma"
   }
 }

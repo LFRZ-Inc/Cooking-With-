@@ -9,7 +9,15 @@ export default function LanguageSwitcher() {
 
   const languages = [
     { code: 'en' as const, name: 'English', flag: '🇺🇸' },
-    { code: 'es' as const, name: 'Español', flag: '🇪🇸' }
+    { code: 'es' as const, name: 'Español', flag: '🇪🇸' },
+    { code: 'fr' as const, name: 'Français', flag: '🇫🇷' },
+    { code: 'de' as const, name: 'Deutsch', flag: '🇩🇪' },
+    { code: 'it' as const, name: 'Italiano', flag: '🇮🇹' },
+    { code: 'pt' as const, name: 'Português', flag: '🇵🇹' },
+    { code: 'ja' as const, name: '日本語', flag: '🇯🇵' },
+    { code: 'ko' as const, name: '한국어', flag: '🇰🇷' },
+    { code: 'zh' as const, name: '中文', flag: '🇨🇳' },
+    { code: 'ar' as const, name: 'العربية', flag: '🇸🇦' }
   ]
 
   const currentLanguage = languages.find(lang => lang.code === language)
@@ -37,7 +45,7 @@ export default function LanguageSwitcher() {
           />
           
           {/* Dropdown Menu */}
-          <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+          <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-80 overflow-y-auto">
             <div className="py-2">
               <div className="px-4 py-2 text-sm font-medium text-gray-500 border-b border-gray-100">
                 {t('language.selectLanguage')}
