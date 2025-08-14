@@ -345,24 +345,7 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
     }
   }
 
-  const handleFoodRecognition = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select a valid image file')
-      return
-    }
-
-    // Validate file size (10MB limit)
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('File size must be less than 10MB')
-      return
-    }
-    setSelectedFile(file)
-    setPreviewUrl(URL.createObjectURL(file))
-    
+  const processFoodRecognitionFile = async (file: File) => {
     try {
       setProcessingState({
         isProcessing: true,
@@ -420,20 +403,20 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
         currentStep: 'Recipe generated successfully!'
       }))
 
-      // Convert to our recipe format
-      const recipe = {
+      // Convert the result to our app's recipe format
+      const recipe: ParsedRecipe = {
         title: result.recipe.title,
         description: result.recipe.description,
         ingredients: result.recipe.ingredients.map((ing: any) => ing.name),
         instructions: result.recipe.instructions,
-        prep_time_minutes: result.recipe.prep_time_minutes,
-        cook_time_minutes: result.recipe.cook_time_minutes,
+        prep_time_minutes: result.recipe.prepTime,
+        cook_time_minutes: result.recipe.cookTime,
         servings: result.recipe.servings,
         difficulty: result.recipe.difficulty,
+        cuisine_type: result.recipe.cuisine,
+        meal_type: result.recipe.mealType,
         image_url: imageUrl,
-        confidence_score: result.analysis.confidence,
-        parsing_notes: [`Generated using ${result.provider || 'AI'} food recognition`],
-        provider: result.provider || 'ai'
+        confidence_score: result.analysis.confidence
       }
 
       setParsedRecipe(recipe)
@@ -446,6 +429,27 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
         error: error instanceof Error ? error.message : 'Failed to analyze food image'
       }))
     }
+  }
+
+  const handleFoodRecognition = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select a valid image file')
+      return
+    }
+
+    // Validate file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File size must be less than 10MB')
+      return
+    }
+    
+    setSelectedFile(file)
+    setPreviewUrl(URL.createObjectURL(file))
+    await processFoodRecognitionFile(file)
   }
 
   const parseTimeToMinutes = (timeString: string): number => {
@@ -864,7 +868,36 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
             {importType === 'food_recognition' && (
               <div className="space-y-4">
                 {!selectedFile ? (
-                  <div className="border-2 border-dashed border-orange-300 rounded-lg p-8 text-center bg-orange-50">
+                  <div 
+                    className="border-2 border-dashed border-orange-300 rounded-lg p-8 text-center bg-orange-50 hover:bg-orange-100 transition-colors cursor-pointer"
+                    onDragOver={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      const files = Array.from(e.dataTransfer.files)
+                      if (files.length > 0) {
+                        const file = files[0]
+                        if (file.type.startsWith('image/')) {
+                          if (file.size <= 10 * 1024 * 1024) {
+                            // Handle the file directly instead of creating a synthetic event
+                            setSelectedFile(file)
+                            setPreviewUrl(URL.createObjectURL(file))
+                            
+                            // Process the file for food recognition
+                            processFoodRecognitionFile(file)
+                          } else {
+                            toast.error('File size must be less than 10MB')
+                          }
+                        } else {
+                          toast.error('Please select a valid image file')
+                        }
+                      }
+                    }}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -872,20 +905,32 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
                       onChange={handleFoodRecognition}
                       className="hidden"
                     />
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={processingState.isProcessing}
-                      className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <Camera className="h-6 w-6 inline mr-2" />
-                      Take Food Photo
-                    </button>
-                    <p className="text-sm text-gray-600 mt-2">
-                      Upload a photo of cooked food to generate a recipe
-                    </p>
-                    <p className="text-xs text-orange-600 mt-1">
-                      🍳 Works best with clear, well-lit photos of finished dishes
-                    </p>
+                    <div className="space-y-4">
+                      <div className="flex flex-col items-center space-y-2">
+                        <div className="p-3 bg-orange-100 rounded-full">
+                          <Camera className="h-8 w-8 text-orange-600" />
+                        </div>
+                        <div>
+                          <button
+                            disabled={processingState.isProcessing}
+                            className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            Choose Food Photo
+                          </button>
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-gray-600 mb-2">
+                          Upload a photo of cooked food to generate a recipe
+                        </p>
+                        <p className="text-xs text-orange-600 mb-2">
+                          🍳 Works best with clear, well-lit photos of finished dishes
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          📁 Drag and drop an image here, or click to browse
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-4">
