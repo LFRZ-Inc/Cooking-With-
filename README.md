@@ -136,9 +136,16 @@ The application uses Supabase with the following key tables:
 ### Recipe Importing
 ```typescript
 // AI Food Recognition - generate recipe from food photo
+// Option 1: OpenAI (requires API key)
 const recipe = await foodRecognitionService.analyzeFoodImage({
   image_url: foodPhotoUrl,
   user_preferences: { dietary_restrictions: ['vegetarian'] }
+})
+
+// Option 2: Ethos AI (local, cost-free)
+const recipe = await ethosFoodRecognitionService.analyzeFoodImage({
+  imageUrl: foodPhotoUrl,
+  userPreferences: { dietaryRestrictions: ['vegetarian'] }
 })
 
 // Import from webpage
@@ -189,6 +196,37 @@ const converted = await recipeAdjustmentService.convertUnit(2, "cups", "ml")
 const substitutions = await recipeAdjustmentService.getSubstitutions("butter")
 ```
 
+## 🤖 AI Food Recognition Options
+
+The platform supports two AI food recognition systems:
+
+### OpenAI Integration (Default)
+- **High Accuracy**: Uses GPT-4 Vision for precise food analysis
+- **Easy Setup**: Just add your OpenAI API key
+- **Cost**: Pay per API call (tokens used)
+
+### Ethos AI Integration (Cost-Free)
+- **Local Processing**: Runs on your own server
+- **Privacy-Focused**: No data sent to external APIs
+- **Cost-Free**: No API charges or rate limits
+- **Customizable**: Modify prompts and models as needed
+
+#### Setting up Ethos AI:
+```bash
+# Run the setup script
+node "Ethos Food AI Version/setup-ethos-ai.js"
+
+# Or manually:
+git clone https://github.com/LFRZ-Inc/Ethos-AI.git
+cd Ethos-AI
+pip install -r requirements.txt
+ollama pull llava:7b
+ollama pull llama3.2:3b
+python backend/main.py
+```
+
+For detailed setup instructions, see: `Ethos Food AI Version/README.md`
+
 ## 🎯 Competitive Advantages
 
 Your "Cooking With!" platform now offers **significantly more advanced features** than ReciMe:
@@ -198,6 +236,7 @@ Your "Cooking With!" platform now offers **significantly more advanced features*
 3. **Smart Meal Planning** - Auto-generated shopping lists, cost tracking
 4. **Dynamic Recipe Adjustments** - Scaling, conversions, substitutions
 5. **Translation System** - Multi-language support
+6. **Flexible AI Options** - Choose between OpenAI and cost-free Ethos AI
 6. **Analytics Dashboard** - User insights and statistics
 7. **Community Features** - Recipe sharing and collaboration
 

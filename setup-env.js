@@ -28,7 +28,8 @@ if (envExists) {
     'LIBRETRANSLATE_URL',
     'LIBRETRANSLATE_API_KEY',
     'NEXT_PUBLIC_SITE_URL',
-    'OPENAI_API_KEY'
+    'OPENAI_API_KEY',
+    'ETHOS_AI_URL'
   ]
   
   let missingRequired = []
@@ -85,8 +86,11 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 LIBRETRANSLATE_URL=https://libretranslate.com
 LIBRETRANSLATE_API_KEY=your_libretranslate_api_key_here
 
-# AI Food Recognition (OPTIONAL - required for food photo analysis)
+# AI Food Recognition (OPTIONAL - choose one)
+# Option 1: OpenAI (requires API key and costs tokens)
 OPENAI_API_KEY=your_openai_api_key_here
+# Option 2: Ethos AI (local, free, requires Ethos AI server running)
+ETHOS_AI_URL=http://localhost:8000
 
 # Site URL for server-side API calls
 NEXT_PUBLIC_SITE_URL=http://localhost:3000

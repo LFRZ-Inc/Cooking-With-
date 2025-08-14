@@ -274,6 +274,16 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
     }
   }
 
+  const parseTimeToMinutes = (timeString: string): number => {
+    const match = timeString.match(/(\d+)\s*(minute|hour|min|hr)/i)
+    if (match) {
+      const value = parseInt(match[1])
+      const unit = match[2].toLowerCase()
+      return unit.includes('hour') || unit.includes('hr') ? value * 60 : value
+    }
+    return 30 // Default fallback
+  }
+
   const handleSourceSubmit = async () => {
     if (importType === 'food_recognition') {
       // Handle food recognition
@@ -310,19 +320,20 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
           }))
         }, 300)
 
-        const response = await fetch('/api/recipes/food-recognition', {
+        const response = await fetch('/api/recipes/ethos-food-recognition', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            image_url: imageUrl,
-            user_id: user?.id,
-            user_preferences: {
-              dietary_restrictions: [],
-              skill_level: 'intermediate'
+            imageUrl: imageUrl,
+            userPreferences: {
+              dietaryRestrictions: [],
+              cuisine: '',
+              difficulty: 'Medium',
+              servings: 4
             },
-            auto_save: false
+            saveToDatabase: false
           }),
         })
 
@@ -341,22 +352,22 @@ export default function RecipeImportWizard({ onImportComplete, onClose }: Recipe
           currentStep: 'Recipe generated successfully!'
         }))
 
-        // Convert food recognition result to recipe format
+        // Convert Ethos AI food recognition result to recipe format
         const recipe = {
-          title: result.food_recognition.dish_name,
-          description: result.food_recognition.description,
-          ingredients: result.food_recognition.ingredients.map((ing: any) => `${ing.estimated_amount} ${ing.name}`),
-          instructions: result.food_recognition.cooking_methods,
-          prep_time_minutes: result.food_recognition.estimated_prep_time,
-          cook_time_minutes: result.food_recognition.estimated_cook_time,
-          servings: 4,
-          difficulty: result.food_recognition.difficulty,
-          meal_type: result.food_recognition.meal_type,
-          cuisine_type: result.food_recognition.cuisine_type,
+          title: result.recipe.title,
+          description: result.recipe.description,
+          ingredients: result.recipe.ingredients.map((ing: any) => `${ing.amount} ${ing.unit} ${ing.name}`),
+          instructions: result.recipe.instructions,
+          prep_time_minutes: parseTimeToMinutes(result.recipe.prepTime),
+          cook_time_minutes: parseTimeToMinutes(result.recipe.cookTime),
+          servings: result.recipe.servings,
+          difficulty: result.recipe.difficulty,
+          meal_type: result.recipe.mealType,
+          cuisine_type: result.recipe.cuisine,
           image_url: imageUrl,
           source_url: '',
-          confidence_score: result.food_recognition.confidence,
-          parsing_notes: [`AI-generated recipe from food image. Confidence: ${Math.round(result.food_recognition.confidence * 100)}%`]
+          confidence_score: result.analysis.confidence,
+          parsing_notes: [`Ethos AI-generated recipe from food image. Confidence: ${Math.round(result.analysis.confidence * 100)}%`]
         }
 
         setParsedRecipe(recipe)

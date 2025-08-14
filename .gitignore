@@ -99,4 +99,7 @@ Thumbs.db
 
 # Typescript
 *.tsbuildinfo
-next-env.d.ts 
+next-env.d.ts
+
+# Ethos AI repository (separate git repo)
+/Ethos-AI/ 
