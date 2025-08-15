@@ -395,6 +395,33 @@ def generate_cooking_response(message: str, source: str = "cooking_with") -> Dic
         else:
             response = "I don't have specific tips for that, but here are some general cooking tips that are always helpful."
             suggestions = ["Baking tips", "Kitchen safety", "Cooking techniques", "Seasoning advice"]
+    elif "what can i do with" in message_lower or "what to make with" in message_lower or "recipes with" in message_lower:
+        # Handle ingredient combination questions
+        common_ingredients = list(INGREDIENT_DATABASE.keys())
+        found_ingredients = []
+        for ing in common_ingredients:
+            if ing in message_lower:
+                found_ingredients.append(ing)
+        
+        if found_ingredients:
+            if len(found_ingredients) == 1:
+                # Single ingredient
+                ingredient_info = INGREDIENT_DATABASE[found_ingredients[0]]
+                response = f"With {ingredient_info['name']}, you can: {', '.join(ingredient_info['cooking_methods'])}. {ingredient_info['tips'][0]}"
+                suggestions = [
+                    f"Recipes with {ingredient_info['name']}",
+                    f"Substitutes for {ingredient_info['name']}",
+                    f"Storage tips for {ingredient_info['name']}"
+                ]
+            else:
+                # Multiple ingredients - suggest recipes
+                ingredient_names = [INGREDIENT_DATABASE[ing]['name'] for ing in found_ingredients]
+                response = f"Great combination! With {', '.join(ingredient_names)}, you can make: pancakes, French toast, custard, ice cream, cake, cookies, bread pudding, or flan. These ingredients are perfect for baking and desserts!"
+                suggestions = ["Pancake recipes", "French toast ideas", "Custard recipes", "Baking tips"]
+        else:
+            response = "I can help you find recipes and cooking ideas! What specific ingredients are you working with?"
+            suggestions = ["Recipe search", "Ingredient substitutions", "Cooking techniques"]
+    
     elif "ingredient" in message_lower or "substitute" in message_lower or "cook" in message_lower:
         # Check for ingredient-specific questions
         common_ingredients = list(INGREDIENT_DATABASE.keys())
