@@ -4,8 +4,11 @@ import { NextRequest, NextResponse } from 'next/server'
 const ETHOS_AI_URL = process.env.ETHOS_AI_URL || 'https://ethos-ai-backend-production.up.railway.app'
 
 export async function POST(request: NextRequest) {
+  let message = ''
+  
   try {
-    const { message, context, user_preferences } = await request.json()
+    const { message: requestMessage, context, user_preferences } = await request.json()
+    message = requestMessage
 
     if (!message) {
       return NextResponse.json(
