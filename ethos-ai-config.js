@@ -2,8 +2,8 @@
 // Update this URL to match your Railway deployment
 
 const ETHOS_AI_CONFIG = {
-  // Temporarily using localhost since Railway is down
-  RAILWAY_URL: 'http://localhost:8000',
+  // Your working Railway Ethos-AI deployment URL
+  RAILWAY_URL: 'https://ethos-ai-backend-production.up.railway.app',
   
   // Alternative URLs (update these if needed)
   FALLBACK_URL: 'http://localhost:8000',

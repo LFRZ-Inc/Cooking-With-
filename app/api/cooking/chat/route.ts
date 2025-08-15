@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// Temporarily use local Ethos-AI since Railway is down
-const ETHOS_AI_URL = process.env.ETHOS_AI_URL || 'http://localhost:8000'
+// Use the correct Railway Ethos-AI deployment URL
+const ETHOS_AI_URL = process.env.ETHOS_AI_URL || 'https://ethos-ai-backend-production.up.railway.app'
 
 export async function POST(request: NextRequest) {
   let message = ''
