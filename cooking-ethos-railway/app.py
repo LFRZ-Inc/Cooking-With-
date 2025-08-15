@@ -340,63 +340,14 @@ def generate_cooking_response(message: str, source: str = "cooking_with") -> Dic
     suggestions = ["How to cook chicken breast", "Pasta cooking tips", "Ingredient substitutions", "Safe cooking temperatures"]
     confidence = 0.85
     
-    # Check for specific cooking topics
-    if "chicken" in message_lower and ("cook" in message_lower or "make" in message_lower):
-        knowledge = COOKING_KNOWLEDGE["chicken"]
-        response = knowledge["response"]
-        suggestions = knowledge["suggestions"]
-    elif "ground beef" in message_lower or "ground_beef" in message_lower or ("beef" in message_lower and ("dish" in message_lower or "recipe" in message_lower or "good" in message_lower)):
-        knowledge = COOKING_KNOWLEDGE["ground_beef"]
-        response = knowledge["response"]
-        suggestions = knowledge["suggestions"]
-    elif "pasta" in message_lower and ("make" in message_lower or "cook" in message_lower):
-        knowledge = COOKING_KNOWLEDGE["pasta"]
-        response = knowledge["response"]
-        suggestions = knowledge["suggestions"]
-    elif "substitute" in message_lower or "alternative" in message_lower or "replace" in message_lower:
-        knowledge = COOKING_KNOWLEDGE["substitute"]
-        response = knowledge["response"]
-        suggestions = knowledge["suggestions"]
-    elif "temperature" in message_lower and "safe" in message_lower:
-        knowledge = COOKING_KNOWLEDGE["temperature"]
-        response = knowledge["response"]
-        suggestions = knowledge["suggestions"]
-    elif "knife" in message_lower or "cut" in message_lower or "chop" in message_lower:
-        knowledge = COOKING_KNOWLEDGE["knife"]
-        response = knowledge["response"]
-        suggestions = knowledge["suggestions"]
-    elif "season" in message_lower or "salt" in message_lower or "spice" in message_lower:
-        knowledge = COOKING_KNOWLEDGE["seasoning"]
-        response = knowledge["response"]
-        suggestions = knowledge["suggestions"]
-    elif "bake" in message_lower or "baking" in message_lower or "oven" in message_lower:
-        knowledge = COOKING_KNOWLEDGE["baking"]
-        response = knowledge["response"]
-        suggestions = knowledge["suggestions"]
-    elif "meal" in message_lower and "plan" in message_lower:
-        knowledge = COOKING_KNOWLEDGE["meal_planning"]
-        response = knowledge["response"]
-        suggestions = knowledge["suggestions"]
-    elif "tip" in message_lower or "advice" in message_lower or "help" in message_lower:
-        # Get cooking tips
-        relevant_tips = []
-        for category, tips in COOKING_TIPS.items():
-            for tip in tips:
-                if (tip["title"].lower() in message_lower or 
-                    tip["tip"].lower() in message_lower or
-                    tip["category"].lower() in message_lower):
-                    relevant_tips.append(tip)
-        
-        if relevant_tips:
-            response = f"Here are some helpful cooking tips for you:\n\n" + "\n\n".join([
-                f"• {tip['title']}: {tip['tip']}" for tip in relevant_tips[:3]
-            ])
-            suggestions = ["Baking tips", "Kitchen safety", "Cooking techniques", "Seasoning advice"]
-        else:
-            response = "I don't have specific tips for that, but here are some general cooking tips that are always helpful."
-            suggestions = ["Baking tips", "Kitchen safety", "Cooking techniques", "Seasoning advice"]
-    elif "what can i do with" in message_lower or "what to make with" in message_lower or "recipes with" in message_lower:
-        # Handle ingredient combination questions
+    # ===== INGREDIENT COMBINATION PATTERNS =====
+    # Handle "what can i do with" patterns
+    if any(phrase in message_lower for phrase in [
+        "what can i do with", "what to make with", "recipes with", "what can i make with",
+        "what should i cook with", "what can i cook with", "ideas for", "what to do with",
+        "how to use", "what to make", "what can i cook", "what should i make",
+        "i have", "i got", "i bought", "i need ideas for", "help me use"
+    ]):
         common_ingredients = list(INGREDIENT_DATABASE.keys())
         found_ingredients = []
         for ing in common_ingredients:
@@ -422,7 +373,125 @@ def generate_cooking_response(message: str, source: str = "cooking_with") -> Dic
             response = "I can help you find recipes and cooking ideas! What specific ingredients are you working with?"
             suggestions = ["Recipe search", "Ingredient substitutions", "Cooking techniques"]
     
-    elif "ingredient" in message_lower or "substitute" in message_lower or "cook" in message_lower:
+    # ===== COOKING TECHNIQUE PATTERNS =====
+    # Chicken cooking patterns
+    elif any(phrase in message_lower for phrase in [
+        "chicken", "chicken breast", "chicken thigh", "chicken wing"
+    ]) and any(phrase in message_lower for phrase in [
+        "cook", "make", "prepare", "how to", "way to", "best way", "properly", "right way",
+        "cooking", "preparing", "making", "recipe", "method", "technique"
+    ]):
+        knowledge = COOKING_KNOWLEDGE["chicken"]
+        response = knowledge["response"]
+        suggestions = knowledge["suggestions"]
+    
+    # Ground beef patterns
+    elif any(phrase in message_lower for phrase in [
+        "ground beef", "ground_beef", "beef", "hamburger meat", "minced beef"
+    ]) and any(phrase in message_lower for phrase in [
+        "dish", "recipe", "good", "make", "cook", "prepare", "what to", "ideas", "meal"
+    ]):
+        knowledge = COOKING_KNOWLEDGE["ground_beef"]
+        response = knowledge["response"]
+        suggestions = knowledge["suggestions"]
+    
+    # Pasta patterns
+    elif "pasta" in message_lower and any(phrase in message_lower for phrase in [
+        "make", "cook", "prepare", "how to", "way to", "best way", "properly", "al dente",
+        "cooking", "preparing", "making", "recipe", "method", "technique"
+    ]):
+        knowledge = COOKING_KNOWLEDGE["pasta"]
+        response = knowledge["response"]
+        suggestions = knowledge["suggestions"]
+    
+    # ===== SUBSTITUTION PATTERNS =====
+    elif any(phrase in message_lower for phrase in [
+        "substitute", "alternative", "replace", "instead of", "don't have", "out of",
+        "substitution", "replacement", "alternative to", "what can i use", "can i use",
+        "what to use", "what else", "other options", "options for"
+    ]):
+        knowledge = COOKING_KNOWLEDGE["substitute"]
+        response = knowledge["response"]
+        suggestions = knowledge["suggestions"]
+    
+    # ===== SAFETY PATTERNS =====
+    elif any(phrase in message_lower for phrase in [
+        "temperature", "safe", "safety", "cook to", "internal temp", "how hot",
+        "food safety", "safe to eat", "done", "cooked enough", "undercooked",
+        "overcooked", "thermometer", "food poisoning", "bacteria"
+    ]):
+        knowledge = COOKING_KNOWLEDGE["temperature"]
+        response = knowledge["response"]
+        suggestions = knowledge["suggestions"]
+    
+    # ===== KNIFE SKILLS PATTERNS =====
+    elif any(phrase in message_lower for phrase in [
+        "knife", "cut", "chop", "slice", "dice", "mince", "julienne", "knife skills",
+        "cutting", "chopping", "slicing", "how to cut", "proper way to", "knife technique",
+        "knife safety", "sharp knife", "dull knife", "knife grip", "knife hold"
+    ]):
+        knowledge = COOKING_KNOWLEDGE["knife"]
+        response = knowledge["response"]
+        suggestions = knowledge["suggestions"]
+    
+    # ===== SEASONING PATTERNS =====
+    elif any(phrase in message_lower for phrase in [
+        "season", "salt", "spice", "herb", "flavor", "taste", "seasoning", "spices",
+        "herbs", "flavoring", "how to season", "when to salt", "salt timing",
+        "spice blend", "herb mix", "flavor profile", "taste balance", "seasoning tips"
+    ]):
+        knowledge = COOKING_KNOWLEDGE["seasoning"]
+        response = knowledge["response"]
+        suggestions = knowledge["suggestions"]
+    
+    # ===== BAKING PATTERNS =====
+    elif any(phrase in message_lower for phrase in [
+        "bake", "baking", "oven", "baked goods", "cake", "bread", "cookie", "pastry",
+        "baking tips", "baking mistakes", "baking science", "baking temperature",
+        "baking time", "baking ingredients", "baking technique", "baking method"
+    ]):
+        knowledge = COOKING_KNOWLEDGE["baking"]
+        response = knowledge["response"]
+        suggestions = knowledge["suggestions"]
+    
+    # ===== MEAL PLANNING PATTERNS =====
+    elif any(phrase in message_lower for phrase in [
+        "meal plan", "meal planning", "weekly meals", "dinner ideas", "lunch ideas",
+        "breakfast ideas", "meal prep", "food prep", "weekly menu", "meal schedule",
+        "planning meals", "organizing meals", "meal ideas", "what to cook this week"
+    ]):
+        knowledge = COOKING_KNOWLEDGE["meal_planning"]
+        response = knowledge["response"]
+        suggestions = knowledge["suggestions"]
+    
+    # ===== TIPS AND ADVICE PATTERNS =====
+    elif any(phrase in message_lower for phrase in [
+        "tip", "advice", "help", "suggestion", "recommendation", "trick", "hack",
+        "pro tip", "chef tip", "cooking tip", "kitchen tip", "helpful tip",
+        "useful tip", "good tip", "best practice", "cooking advice", "kitchen advice"
+    ]):
+        # Get cooking tips
+        relevant_tips = []
+        for category, tips in COOKING_TIPS.items():
+            for tip in tips:
+                if (tip["title"].lower() in message_lower or 
+                    tip["tip"].lower() in message_lower or
+                    tip["category"].lower() in message_lower):
+                    relevant_tips.append(tip)
+        
+        if relevant_tips:
+            response = f"Here are some helpful cooking tips for you:\n\n" + "\n\n".join([
+                f"• {tip['title']}: {tip['tip']}" for tip in relevant_tips[:3]
+            ])
+            suggestions = ["Baking tips", "Kitchen safety", "Cooking techniques", "Seasoning advice"]
+        else:
+            response = "I don't have specific tips for that, but here are some general cooking tips that are always helpful."
+            suggestions = ["Baking tips", "Kitchen safety", "Cooking techniques", "Seasoning advice"]
+    
+    # ===== INGREDIENT-SPECIFIC PATTERNS =====
+    elif any(phrase in message_lower for phrase in [
+        "ingredient", "substitute", "cook", "prepare", "use", "how to use", "what to do with"
+    ]):
         # Check for ingredient-specific questions
         common_ingredients = list(INGREDIENT_DATABASE.keys())
         found_ingredient = None
@@ -433,13 +502,13 @@ def generate_cooking_response(message: str, source: str = "cooking_with") -> Dic
         
         if found_ingredient:
             ingredient_info = INGREDIENT_DATABASE[found_ingredient]
-            if "substitute" in message_lower or "replace" in message_lower:
+            if any(phrase in message_lower for phrase in ["substitute", "replace", "instead", "alternative"]):
                 response = f"For {ingredient_info['name']}, you can substitute with: {', '.join(ingredient_info['substitutions'])}. The best choice depends on your recipe and dietary needs."
                 suggestions = ["How to use substitutes", "Recipe modifications", "Dietary restrictions"]
-            elif "cook" in message_lower or "method" in message_lower:
+            elif any(phrase in message_lower for phrase in ["cook", "method", "prepare", "make", "how to"]):
                 response = f"{ingredient_info['name']} can be cooked using these methods: {', '.join(ingredient_info['cooking_methods'])}. {ingredient_info['tips'][0]}"
                 suggestions = ["Cooking techniques", "Recipe ideas", "Kitchen tips"]
-            elif "store" in message_lower or "keep" in message_lower:
+            elif any(phrase in message_lower for phrase in ["store", "keep", "save", "preserve", "refrigerate"]):
                 response = f"To store {ingredient_info['name']}: {ingredient_info['storage']}"
                 suggestions = ["Food storage tips", "Kitchen organization", "Food safety"]
             else:
@@ -449,6 +518,94 @@ def generate_cooking_response(message: str, source: str = "cooking_with") -> Dic
                     f"Substitutes for {ingredient_info['name']}",
                     f"Storage tips for {ingredient_info['name']}"
                 ]
+    
+    # ===== GENERAL COOKING QUESTIONS =====
+    elif any(phrase in message_lower for phrase in [
+        "how do i", "how to", "what's the best way", "what's the right way", "proper way",
+        "correct way", "best method", "easiest way", "quick way", "simple way",
+        "step by step", "instructions", "guide", "tutorial", "help me"
+    ]):
+        # Check for specific cooking topics in the question
+        if any(phrase in message_lower for phrase in ["chicken", "meat", "beef", "pork", "fish"]):
+            knowledge = COOKING_KNOWLEDGE["chicken"]
+            response = knowledge["response"]
+            suggestions = knowledge["suggestions"]
+        elif any(phrase in message_lower for phrase in ["pasta", "noodle", "spaghetti"]):
+            knowledge = COOKING_KNOWLEDGE["pasta"]
+            response = knowledge["response"]
+            suggestions = knowledge["suggestions"]
+        elif any(phrase in message_lower for phrase in ["bake", "cake", "bread", "cookie"]):
+            knowledge = COOKING_KNOWLEDGE["baking"]
+            response = knowledge["response"]
+            suggestions = knowledge["suggestions"]
+        else:
+            # Generic cooking help
+            response = "I'd be happy to help you with cooking! Could you be more specific about what you'd like to learn? For example, are you looking for help with a particular ingredient, cooking technique, or recipe?"
+            suggestions = ["Cooking basics", "Ingredient guides", "Recipe help", "Kitchen tips"]
+    
+    # ===== RECIPE HELP PATTERNS =====
+    elif any(phrase in message_lower for phrase in [
+        "recipe", "dish", "meal", "food", "cooking", "preparing", "making", "cook",
+        "prepare", "make", "create", "whip up", "throw together", "put together"
+    ]):
+        # Check for specific recipe types
+        if any(phrase in message_lower for phrase in ["breakfast", "pancake", "waffle", "egg", "bacon"]):
+            response = "For breakfast recipes, you can make pancakes, waffles, omelets, French toast, or breakfast burritos. What specific breakfast dish are you interested in?"
+            suggestions = ["Pancake recipes", "Egg cooking tips", "Breakfast ideas", "Quick breakfast"]
+        elif any(phrase in message_lower for phrase in ["dinner", "main course", "entree", "meal"]):
+            response = "For dinner recipes, you can make pasta dishes, grilled meats, stir-fries, soups, or casseroles. What type of cuisine or main ingredient are you thinking of?"
+            suggestions = ["Pasta recipes", "Grilled chicken", "Stir-fry ideas", "Soup recipes"]
+        elif any(phrase in message_lower for phrase in ["dessert", "sweet", "cake", "cookie", "pie"]):
+            response = "For dessert recipes, you can make cakes, cookies, pies, ice cream, or puddings. What type of dessert are you craving?"
+            suggestions = ["Chocolate cake", "Sugar cookies", "Apple pie", "Ice cream"]
+        else:
+            response = "I can help you with all kinds of recipes! What type of dish are you looking to make? Breakfast, lunch, dinner, or dessert?"
+            suggestions = ["Breakfast recipes", "Dinner ideas", "Dessert recipes", "Quick meals"]
+    
+    # ===== KITCHEN EQUIPMENT PATTERNS =====
+    elif any(phrase in message_lower for phrase in [
+        "pan", "pot", "utensil", "tool", "equipment", "appliance", "mixer", "blender",
+        "food processor", "oven", "stove", "grill", "microwave", "slow cooker",
+        "instant pot", "air fryer", "toaster", "coffee maker", "kitchen gadget"
+    ]):
+        response = "Kitchen equipment can make cooking much easier! What specific tool or appliance are you asking about? I can help with proper usage, maintenance, and cooking techniques for various kitchen equipment."
+        suggestions = ["Pan types and uses", "Kitchen tool guide", "Appliance tips", "Equipment maintenance"]
+    
+    # ===== TIME AND EFFICIENCY PATTERNS =====
+    elif any(phrase in message_lower for phrase in [
+        "quick", "fast", "easy", "simple", "quick meal", "fast food", "easy recipe",
+        "simple dish", "time saving", "efficient", "speedy", "hurry", "rush",
+        "30 minutes", "15 minutes", "one pot", "one pan", "minimal effort"
+    ]):
+        response = "I can help you with quick and easy recipes! Here are some time-saving cooking tips: 1) Prep ingredients in advance, 2) Use one-pot meals, 3) Choose simple recipes with few ingredients, 4) Use kitchen shortcuts like pre-cut vegetables."
+        suggestions = ["Quick dinner ideas", "One-pot meals", "30-minute recipes", "Easy cooking tips"]
+    
+    # ===== DIETARY RESTRICTIONS PATTERNS =====
+    elif any(phrase in message_lower for phrase in [
+        "vegetarian", "vegan", "gluten free", "dairy free", "keto", "paleo", "low carb",
+        "healthy", "diet", "allergy", "intolerance", "restriction", "dietary",
+        "plant based", "meatless", "no dairy", "no gluten", "low sugar"
+    ]):
+        response = "I can help you with dietary restrictions and special diets! There are many delicious alternatives and substitutions available. What specific dietary need are you working with?"
+        suggestions = ["Vegetarian recipes", "Gluten-free baking", "Dairy alternatives", "Healthy cooking"]
+    
+    # ===== COOKING PROBLEMS PATTERNS =====
+    elif any(phrase in message_lower for phrase in [
+        "problem", "issue", "trouble", "difficulty", "not working", "failed", "burned",
+        "overcooked", "undercooked", "stuck", "mess", "disaster", "ruined", "wrong",
+        "mistake", "error", "fix", "help", "what went wrong", "why didn't"
+    ]):
+        response = "Don't worry, cooking problems happen to everyone! I can help you troubleshoot. What specific issue are you having? Common problems include overcooking, undercooking, burning, or texture issues."
+        suggestions = ["Cooking troubleshooting", "Common mistakes", "Kitchen disasters", "Cooking fixes"]
+    
+    # ===== SEASONAL AND OCCASION PATTERNS =====
+    elif any(phrase in message_lower for phrase in [
+        "holiday", "party", "celebration", "special occasion", "birthday", "anniversary",
+        "thanksgiving", "christmas", "easter", "halloween", "valentine", "summer",
+        "winter", "spring", "fall", "seasonal", "festive", "entertaining"
+    ]):
+        response = "Special occasions call for special recipes! I can help you plan holiday meals, party food, or seasonal dishes. What type of celebration or season are you cooking for?"
+        suggestions = ["Holiday recipes", "Party food ideas", "Seasonal cooking", "Entertaining tips"]
     
     # If source is "cooking_with", ensure we stay focused on cooking
     if source == "cooking_with":
