@@ -3,7 +3,7 @@
 
 const ETHOS_AI_CONFIG = {
   // Your working Railway Ethos-AI deployment URL
-  RAILWAY_URL: 'https://ethos-ai-production.up.railway.app',
+  RAILWAY_URL: 'https://ethos-ai-backend-production.up.railway.app',
   
   // Alternative URLs (update these if needed)
   FALLBACK_URL: 'http://localhost:8000',

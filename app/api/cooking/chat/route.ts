@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// Use the working Railway Ethos-AI deployment
-const ETHOS_AI_URL = process.env.ETHOS_AI_URL || 'https://ethos-ai-production.up.railway.app'
+// Use the correct Railway Ethos-AI deployment URL
+const ETHOS_AI_URL = process.env.ETHOS_AI_URL || 'https://ethos-ai-backend-production.up.railway.app'
 
 export async function POST(request: NextRequest) {
   try {
