@@ -26,6 +26,14 @@ COOKING_KNOWLEDGE = {
         "response": "To cook chicken breast properly, preheat your oven to 400°F (200°C). Season the chicken with salt, pepper, and your favorite herbs. Place it in a baking dish and cook for 20-25 minutes until the internal temperature reaches 165°F (74°C). Let it rest for 5 minutes before slicing.",
         "suggestions": ["How to make chicken marinade", "Chicken cooking techniques", "Safe cooking temperatures"]
     },
+    "ground_beef": {
+        "response": "Ground beef is incredibly versatile! Here are some great dishes you can make: 1) Classic hamburgers - form into patties and grill or pan-fry. 2) Spaghetti Bolognese - brown the beef, add tomato sauce and herbs. 3) Tacos - season with taco seasoning and serve with tortillas. 4) Meatballs - mix with breadcrumbs, egg, and herbs, then bake or simmer in sauce. 5) Shepherd's pie - layer with mashed potatoes and bake. Always cook ground beef to 160°F (71°C) for safety!",
+        "suggestions": ["Ground beef recipes", "How to make burgers", "Taco seasoning", "Meatball recipes"]
+    },
+    "beef": {
+        "response": "Ground beef is incredibly versatile! Here are some great dishes you can make: 1) Classic hamburgers - form into patties and grill or pan-fry. 2) Spaghetti Bolognese - brown the beef, add tomato sauce and herbs. 3) Tacos - season with taco seasoning and serve with tortillas. 4) Meatballs - mix with breadcrumbs, egg, and herbs, then bake or simmer in sauce. 5) Shepherd's pie - layer with mashed potatoes and bake. Always cook ground beef to 160°F (71°C) for safety!",
+        "suggestions": ["Ground beef recipes", "How to make burgers", "Taco seasoning", "Meatball recipes"]
+    },
     "pasta": {
         "response": "To make pasta, bring a large pot of salted water to a boil. Add your pasta and cook according to package directions (usually 8-12 minutes). Drain and serve with your favorite sauce. Remember: the water should taste like seawater for proper seasoning!",
         "suggestions": ["Pasta sauce recipes", "Al dente cooking tips", "Pasta types and uses"]
@@ -147,6 +155,15 @@ INGREDIENT_DATABASE = {
         "nutrition": "Sodium chloride, essential for body function",
         "storage": "Store in cool, dry place",
         "tips": ["Season in layers", "Different types have different flavors", "Essential for bringing out flavors"]
+    },
+    "ground_beef": {
+        "name": "Ground Beef",
+        "description": "Minced beef meat used in various dishes from burgers to pasta sauces",
+        "cooking_methods": ["pan-fry", "grill", "bake", "simmer", "stir-fry"],
+        "substitutions": ["ground turkey", "ground chicken", "ground pork", "plant-based crumbles", "lentils"],
+        "nutrition": "Good source of protein, iron, and B vitamins",
+        "storage": "Refrigerate and use within 2 days, or freeze for up to 4 months",
+        "tips": ["Cook to 160°F for safety", "Break up while cooking for even browning", "Drain fat after cooking for healthier dishes"]
     }
 }
 
@@ -326,6 +343,10 @@ def generate_cooking_response(message: str, source: str = "cooking_with") -> Dic
     # Check for specific cooking topics
     if "chicken" in message_lower and ("cook" in message_lower or "make" in message_lower):
         knowledge = COOKING_KNOWLEDGE["chicken"]
+        response = knowledge["response"]
+        suggestions = knowledge["suggestions"]
+    elif "ground beef" in message_lower or "ground_beef" in message_lower or ("beef" in message_lower and ("dish" in message_lower or "recipe" in message_lower or "good" in message_lower)):
+        knowledge = COOKING_KNOWLEDGE["ground_beef"]
         response = knowledge["response"]
         suggestions = knowledge["suggestions"]
     elif "pasta" in message_lower and ("make" in message_lower or "cook" in message_lower):
