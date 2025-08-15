@@ -607,6 +607,61 @@ def generate_cooking_response(message: str, source: str = "cooking_with") -> Dic
         response = "Special occasions call for special recipes! I can help you plan holiday meals, party food, or seasonal dishes. What type of celebration or season are you cooking for?"
         suggestions = ["Holiday recipes", "Party food ideas", "Seasonal cooking", "Entertaining tips"]
     
+    # ===== SMART FALLBACK FOR UNRECOGNIZED COOKING TOPICS =====
+    # If we haven't matched any patterns but the message contains cooking-related keywords,
+    # provide a more helpful response based on the context
+    else:
+        # Check if this is likely a cooking question based on keywords
+        cooking_keywords = [
+            'cook', 'recipe', 'food', 'ingredient', 'kitchen', 'bake', 'fry', 'grill',
+            'chicken', 'pasta', 'vegetable', 'meat', 'fish', 'sauce', 'seasoning',
+            'temperature', 'safety', 'knife', 'cut', 'chop', 'meal', 'dinner', 'lunch',
+            'breakfast', 'dessert', 'cake', 'bread', 'soup', 'salad', 'stir', 'mix',
+            'oven', 'stove', 'pan', 'pot', 'utensil', 'appliance', 'nutrition', 'diet',
+            'flour', 'sugar', 'salt', 'butter', 'oil', 'herb', 'spice', 'garlic', 'onion',
+            'tomato', 'cheese', 'milk', 'egg', 'rice', 'noodle', 'sauce', 'gravy',
+            'marinade', 'seasoning', 'flavor', 'taste', 'texture', 'crispy', 'tender',
+            'juicy', 'dry', 'wet', 'hot', 'cold', 'warm', 'fresh', 'frozen', 'raw',
+            'cooked', 'prepared', 'made', 'created', 'whipped', 'mixed', 'blended',
+            'chopped', 'diced', 'minced', 'sliced', 'grated', 'peeled', 'washed',
+            'drained', 'strained', 'filtered', 'pressed', 'rolled', 'kneaded', 'folded'
+        ]
+        
+        # Check if message contains cooking-related keywords
+        contains_cooking_keywords = any(keyword in message_lower for keyword in cooking_keywords)
+        
+        if contains_cooking_keywords:
+            # Try to identify what type of cooking question this might be
+            if any(word in message_lower for word in ['bread', 'dough', 'yeast', 'sourdough', 'pizza', 'pastry']):
+                response = "I can help you with bread and dough recipes! Bread making involves flour, water, yeast, and proper kneading techniques. What specific type of bread are you interested in making?"
+                suggestions = ["Basic bread recipe", "Pizza dough", "Sourdough starter", "Baking tips"]
+            elif any(word in message_lower for word in ['sauce', 'gravy', 'dressing', 'marinade', 'glaze']):
+                response = "I can help you with sauces and dressings! These can be made from various ingredients like tomatoes, cream, herbs, or vinegar. What type of sauce are you looking to make?"
+                suggestions = ["Tomato sauce", "Cream sauce", "Vinaigrette", "Marinade recipes"]
+            elif any(word in message_lower for word in ['soup', 'stew', 'broth', 'stock', 'bisque']):
+                response = "I can help you with soups and stews! These are great for using leftover ingredients and can be very nutritious. What type of soup are you interested in?"
+                suggestions = ["Chicken soup", "Vegetable soup", "Beef stew", "Soup basics"]
+            elif any(word in message_lower for word in ['salad', 'greens', 'vegetable', 'fresh']):
+                response = "I can help you with salads and fresh dishes! Salads can be simple or complex, and are great for healthy eating. What type of salad are you thinking of?"
+                suggestions = ["Green salad", "Pasta salad", "Fruit salad", "Salad dressings"]
+            elif any(word in message_lower for word in ['cake', 'cookie', 'pie', 'dessert', 'sweet']):
+                response = "I can help you with desserts and sweet treats! Baking requires precise measurements and techniques. What type of dessert are you craving?"
+                suggestions = ["Chocolate cake", "Sugar cookies", "Apple pie", "Baking tips"]
+            elif any(word in message_lower for word in ['grill', 'bbq', 'barbecue', 'smoke', 'charcoal']):
+                response = "I can help you with grilling and barbecue! Grilling adds great flavor and is perfect for outdoor cooking. What are you planning to grill?"
+                suggestions = ["Grilled chicken", "BBQ ribs", "Grilled vegetables", "Grilling tips"]
+            elif any(word in message_lower for word in ['slow', 'crock', 'pressure', 'instant', 'multi']):
+                response = "I can help you with slow cooking and pressure cooking! These methods are great for tender meats and flavorful dishes. What type of dish are you planning?"
+                suggestions = ["Slow cooker recipes", "Pressure cooking", "One-pot meals", "Cooking times"]
+            else:
+                # Generic but helpful response for unrecognized cooking topics
+                response = f"I'd be happy to help you with cooking! I can assist with recipes, techniques, ingredient questions, and cooking tips. Could you tell me more about what you're trying to make or what specific help you need?"
+                suggestions = ["Recipe search", "Cooking techniques", "Ingredient help", "Kitchen tips"]
+        else:
+            # Not cooking-related, provide the default response
+            response = "I'm your specialized cooking assistant! I can help with recipes, cooking techniques, ingredient substitutions, food safety, and more. What would you like to know about cooking?"
+            suggestions = ["How to cook chicken breast", "Pasta cooking tips", "Ingredient substitutions", "Safe cooking temperatures"]
+    
     # If source is "cooking_with", ensure we stay focused on cooking
     if source == "cooking_with":
         # Add cooking context to responses
