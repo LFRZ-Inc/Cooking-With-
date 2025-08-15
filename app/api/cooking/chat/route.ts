@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// Use local Ethos-AI system instead of broken Railway deployment
-const ETHOS_AI_URL = process.env.ETHOS_AI_URL || 'http://localhost:8000'
+// Use the working Railway Ethos-AI deployment
+const ETHOS_AI_URL = process.env.ETHOS_AI_URL || 'https://ethos-ai-production.up.railway.app'
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,19 +14,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Add cooking-specific context to make Ethos-AI cooking-focused
-    const cookingContext = {
-      ...context,
-      cooking_focus: true,
-      user_type: 'cooking_enthusiast',
-      domain: 'culinary',
-      preferences: {
-        ...user_preferences,
-        focus_areas: ['recipes', 'ingredients', 'techniques', 'safety', 'tips']
-      }
-    }
-
-    // Forward request to local Ethos-AI with cooking context
+    // Forward request to working Railway Ethos-AI with cooking context
     const response = await fetch(`${ETHOS_AI_URL}/api/chat`, {
       method: 'POST',
       headers: {
@@ -35,7 +23,6 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         content: `You are a specialized cooking assistant. Please help with this cooking-related question: ${message}`,
         conversation_id: context?.conversation_id || 'cooking_session',
-        model_override: 'llama3.2-3b', // Use local model
         use_tools: true
       })
     })
