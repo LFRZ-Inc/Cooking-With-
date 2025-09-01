@@ -3,7 +3,6 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth'
 import { useLanguage } from '@/lib/language'
-import { supabase } from '@/lib/supabase'
 import ImageUpload from '@/components/ImageUpload'
 import toast from 'react-hot-toast'
 
@@ -50,32 +49,44 @@ export default function CreateRecipePage() {
     setIsSubmitting(true)
 
     try {
-      const { data, error } = await supabase
-        .from('recipes')
-        .insert([
-          {
-            title: formData.title,
-            description: formData.description,
-            image_url: formData.imageUrl || null,
-            prep_time_minutes: formData.prepTime,
-            cook_time_minutes: formData.cookTime,
-            servings: formData.servings,
-            difficulty: formData.difficulty,
-            ingredients: JSON.stringify(formData.ingredients.filter(ing => ing.trim())),
-            instructions: JSON.stringify(formData.instructions.filter(inst => inst.trim())),
-            author_id: user.id,
-            self_rating: formData.selfRating,
-            original_creator: formData.originalCreator || null,
-            cultural_origin: formData.culturalOrigin || null,
-            is_original: true
-          }
-        ])
-        .select()
+      // Use the API endpoint instead of direct database insert
+      const response = await fetch('/api/recipes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description,
+          author_id: user.id,
+          difficulty: formData.difficulty,
+          prep_time_minutes: formData.prepTime,
+          cook_time_minutes: formData.cookTime,
+          servings: formData.servings,
+          instructions: formData.instructions.filter(inst => inst.trim()),
+          tips: formData.originalCreator || formData.culturalOrigin ? 
+            `Original Creator: ${formData.originalCreator || 'Unknown'}\nCultural Origin: ${formData.culturalOrigin || 'Unknown'}` : 
+            null,
+          image_url: formData.imageUrl || null,
+          ingredients: formData.ingredients.filter(ing => ing.trim()).map(ingredient => ({
+            name: ingredient,
+            amount: null,
+            unit: null,
+            notes: null
+          })),
+          categories: []
+        })
+      })
 
-      if (error) throw error
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create recipe')
+      }
+
+      const { recipe } = await response.json()
 
       toast.success('Recipe created successfully!')
-      router.push(`/recipes/${data[0].id}`)
+      router.push(`/recipes/${recipe.id}`)
     } catch (error: any) {
       console.error('Error creating recipe:', error)
       toast.error('Failed to create recipe: ' + error.message)

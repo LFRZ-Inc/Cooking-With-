@@ -65,7 +65,10 @@ function RecipesPageContent() {
 
       const { data, error } = await supabase
         .from('recipes')
-        .select('*')
+        .select(`
+          *,
+          recipe_ingredients(name)
+        `)
         .order('created_at', { ascending: false })
 
       if (error) {
@@ -81,7 +84,7 @@ function RecipesPageContent() {
         rating: 4.5 + Math.random() * 0.5, // Random rating between 4.5-5.0
         author: recipe.author_id ? 'Luis Rodriguez' : 'Anonymous Chef', // Show actual user name
         dietType: recipe.category || 'General',
-        ingredients: [], // Will be populated from recipe_ingredients table later
+        ingredients: recipe.recipe_ingredients?.map((ing: any) => ing.name) || [],
         inventor: 'User Creation',
         history: 'This recipe was shared by our community members.'
       })) || []

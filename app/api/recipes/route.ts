@@ -13,11 +13,7 @@ export async function GET(request: NextRequest) {
       .from('recipes')
       .select(`
         *,
-        recipe_ingredients(*),
-        recipe_categories(
-          category_id,
-          categories(name)
-        )
+        recipe_ingredients(*)
       `)
       .eq('status', status)
       .order('created_at', { ascending: false })
