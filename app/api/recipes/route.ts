@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export async function GET(request: NextRequest) {
   try {
@@ -99,7 +100,7 @@ export async function POST(request: NextRequest) {
       branch_name: null
     }
 
-    const { data: recipe, error: recipeError } = await supabase
+    const { data: recipe, error: recipeError } = await supabaseAdmin
       .from('recipes')
       .insert([recipeData])
       .select()
@@ -124,7 +125,7 @@ export async function POST(request: NextRequest) {
         order_index: index
       }))
 
-      const { error: ingredientsError } = await supabase
+      const { error: ingredientsError } = await supabaseAdmin
         .from('recipe_ingredients')
         .insert(ingredientsData)
 
@@ -141,7 +142,7 @@ export async function POST(request: NextRequest) {
         category_id: categoryId
       }))
 
-      const { error: categoryError } = await supabase
+      const { error: categoryError } = await supabaseAdmin
         .from('recipe_categories')
         .insert(categoryData)
 
